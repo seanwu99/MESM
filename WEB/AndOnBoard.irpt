@@ -32,8 +32,7 @@
             font-family: "Arial Black", Arial, Helvetica, sans-serif;
             font-size: 32px;
             color: #007dc0;
-            margin-bottom;
-            20px;
+            margin-bottom: 20px;
         }
 
         #app_menu {
