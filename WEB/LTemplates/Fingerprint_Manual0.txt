@@ -1,0 +1,248 @@
+<?xml version="1.0"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:html="http://www.w3.org/TR/REC-html40">
+ <DocumentProperties xmlns="urn:schemas-microsoft-com:office:office">
+  <Author>RadPa</Author>
+  <LastAuthor>MII14.0.2</LastAuthor>
+  <Created>2014-03-03T13:47:54Z</Created>
+  <Version>12.00</Version>
+ </DocumentProperties>
+ <ExcelWorkbook xmlns="urn:schemas-microsoft-com:office:excel">
+  <WindowHeight>10740</WindowHeight>
+  <WindowWidth>12375</WindowWidth>
+  <WindowTopX>15</WindowTopX>
+  <WindowTopY>15</WindowTopY>
+  <ProtectStructure>False</ProtectStructure>
+  <ProtectWindows>False</ProtectWindows>
+ </ExcelWorkbook>
+ <Styles>
+  <Style ss:ID="Default" ss:Name="Normal">
+   <Alignment ss:Vertical="Bottom"/>
+   <Borders/>
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="11" ss:Color="#000000"/>
+   <Interior/>
+   <NumberFormat/>
+   <Protection/>
+  </Style>
+ </Styles>
+ <Worksheet ss:Name="Workcenters Groups">
+  <Table ss:ExpandedColumnCount="10" ss:ExpandedRowCount="16" x:FullColumns="1"
+   x:FullRows="1" ss:DefaultRowHeight="15">
+   <Column ss:Index="2" ss:Width="65.25"/>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">1</Data></Cell>
+    <Cell><Data ss:Type="String">FCW WeighUp</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">1</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">1</Data></Cell>
+    <Cell><Data ss:Type="String">http://10.21.20.66:50000/XMII/CM/ESAB/HMI/FCW/DryWeighUp.html</Data></Cell>
+    <Cell><Data ss:Type="String">http://10.21.20.66:50000/XMII/CM/ESAB/HMI/FCW/Fabrication_LTD.html</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">2</Data></Cell>
+    <Cell><Data ss:Type="String">FCW Blender</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">1</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">1</Data></Cell>
+    <Cell><Data ss:Type="String">http://10.21.20.66:50000/XMII/CM/ESAB/HMI/FCW/DryWeighUp.html</Data></Cell>
+    <Cell><Data ss:Type="String">http://10.21.20.66:50000/XMII/CM/ESAB/HMI/FCW/Fabrication_LTD.html</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">3</Data></Cell>
+    <Cell><Data ss:Type="String">FCW Fabrication</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">1</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">1</Data></Cell>
+    <Cell><Data ss:Type="String">http://10.21.20.66:50000/XMII/CM/ESAB/HMI/FCW/Fabrication.html</Data></Cell>
+    <Cell><Data ss:Type="String">http://10.21.20.66:50000/XMII/CM/ESAB/HMI/FCW/Fabrication_LTD.html</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">4</Data></Cell>
+    <Cell><Data ss:Type="String">FCW Redraw</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">1</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">1</Data></Cell>
+    <Cell><Data ss:Type="String">url 4</Data></Cell>
+    <Cell><Data ss:Type="String">http://10.21.20.66:50000/XMII/CM/ESAB/HMI/FCW/Fabrication_LTD.html</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">5</Data></Cell>
+    <Cell><Data ss:Type="String">FCW Rewinder</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">1</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">1</Data></Cell>
+    <Cell><Data ss:Type="String">http://10.21.20.66:50000/XMII/CM/ESAB/HMI/FCW/Rewinder.html</Data></Cell>
+    <Cell><Data ss:Type="String">http://10.21.20.66:50000/XMII/CM/ESAB/HMI/FCW/Fabrication_LTD.html</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">6</Data></Cell>
+    <Cell><Data ss:Type="String">Electrodes Cutter</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">2</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">2</Data></Cell>
+    <Cell><Data ss:Type="String">http://10.21.20.66:50000/XMII/CM/ESAB/HMI/ELEC/Cutter.html</Data></Cell>
+    <Cell><Data ss:Type="String">http://10.21.20.66:50000/XMII/CM/ESAB/HMI/FCW/Fabrication_LTD.html</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">7</Data></Cell>
+    <Cell><Data ss:Type="String">Electrodes WeighUp</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">2</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">6</Data></Cell>
+    <Cell><Data ss:Type="String">http://10.21.20.66:50000/XMII/CM/ESAB/HMI/ELEC/DryWeighUp.html</Data></Cell>
+    <Cell><Data ss:Type="String">http://10.21.20.66:50000/XMII/CM/ESAB/HMI/FCW/Fabrication_LTD.html</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">8</Data></Cell>
+    <Cell><Data ss:Type="String">Electrodes WetMix</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">2</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">0</Data></Cell>
+    <Cell><Data ss:Type="String">url 8</Data></Cell>
+    <Cell><Data ss:Type="String">http://10.21.20.66:50000/XMII/CM/ESAB/HMI/FCW/Fabrication_LTD.html</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">9</Data></Cell>
+    <Cell><Data ss:Type="String">Electrodes Extrusion</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">2</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">4</Data></Cell>
+    <Cell><Data ss:Type="String">http://10.21.20.66:50000/XMII/CM/ESAB/HMI/ELEC/Extrusion.html</Data></Cell>
+    <Cell><Data ss:Type="String">http://10.21.20.66:50000/XMII/CM/ESAB/HMI/FCW/Fabrication_LTD.html</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">10</Data></Cell>
+    <Cell><Data ss:Type="String">Electrodes Packing</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">2</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">3</Data></Cell>
+    <Cell><Data ss:Type="String">http://10.21.20.66:50000/XMII/CM/ESAB/HMI/ELEC/Packaging.html</Data></Cell>
+    <Cell><Data ss:Type="String">http://10.21.20.66:50000/XMII/CM/ESAB/HMI/FCW/Fabrication_LTD.html</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">11</Data></Cell>
+    <Cell><Data ss:Type="String">Flux PowderMix</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">3</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">5</Data></Cell>
+    <Cell><Data ss:Type="String">http://10.21.20.66:50000/XMII/CM/ESAB/HMI/FLUX/DryWeighUpF.html</Data></Cell>
+    <Cell><Data ss:Type="String">http://10.21.20.66:50000/XMII/CM/ESAB/HMI/FCW/Fabrication_LTD.html</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">12</Data></Cell>
+    <Cell><Data ss:Type="String">Flux WetMix</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">3</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">5</Data></Cell>
+    <Cell><Data ss:Type="String">http://10.21.20.66:50000/XMII/CM/ESAB/HMI/FLUX/WetMixF.html</Data></Cell>
+    <Cell><Data ss:Type="String">http://10.21.20.66:50000/XMII/CM/ESAB/HMI/FCW/Fabrication_LTD.html</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">13</Data></Cell>
+    <Cell><Data ss:Type="String">Flux Packaging</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">3</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">5</Data></Cell>
+    <Cell><Data ss:Type="String">http://10.21.20.66:50000/XMII/CM/ESAB/HMI/FLUX/PackagingF.html</Data></Cell>
+    <Cell><Data ss:Type="String">http://10.21.20.66:50000/XMII/CM/ESAB/HMI/FCW/Fabrication_LTD.html</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">14</Data></Cell>
+    <Cell><Data ss:Type="String">Flux Plant1</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">3</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">5</Data></Cell>
+    <Cell><Data ss:Type="String">url 14</Data></Cell>
+    <Cell><Data ss:Type="String">http://10.21.20.66:50000/XMII/CM/ESAB/HMI/FCW/Fabrication_LTD.html</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">15</Data></Cell>
+    <Cell><Data ss:Type="String">none</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">0</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">0</Data></Cell>
+    <Cell><Data ss:Type="String">url 15</Data></Cell>
+    <Cell><Data ss:Type="String">http://10.21.20.66:50000/XMII/CM/ESAB/HMI/FCW/Fabrication_LTD.html</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">16</Data></Cell>
+    <Cell><Data ss:Type="String">FCW Marathon</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">1</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">NULL</Data></Cell>
+    <Cell><Data ss:Type="String">1</Data></Cell>
+    <Cell><Data ss:Type="String">http://10.21.20.66:50000/XMII/CM/ESAB/HMI/FCW/RewinderM.html</Data></Cell>
+    <Cell><Data ss:Type="String">http://10.21.20.66:50000/XMII/CM/ESAB/HMI/FCW/Fabrication_LTD.html</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+  </Table>
+  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+   <PageSetup>
+    <Header x:Margin="0.3"/>
+    <Footer x:Margin="0.3"/>
+    <PageMargins x:Bottom="0.75" x:Left="0.7" x:Right="0.7" x:Top="0.75"/>
+   </PageSetup>
+   <Unsynced/>
+   <Selected/>
+   <Panes>
+    <Pane>
+     <Number>3</Number>
+     <ActiveRow>15</ActiveRow>
+     <ActiveCol>2</ActiveCol>
+    </Pane>
+   </Panes>
+   <ProtectObjects>False</ProtectObjects>
+   <ProtectScenarios>False</ProtectScenarios>
+  </WorksheetOptions>
+ </Worksheet>
+</Workbook>

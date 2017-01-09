@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?><NotificationMessage>
+    <Header>
+        <Name>TransCtr</Name>
+        <Description><![CDATA[MES_STA_2310]]></Description>
+        <Destination>MII5</Destination>
+        <CreatedDate>2016-11-17T18:16:09</CreatedDate>
+        <ID>3313bf65-9a6c-49f7-b636-d21323ef4b76</ID>
+        <Status>Delivered</Status>
+    </Header>
+    <Body>
+        <Values>
+            <TransCtr quality="Good" timeStamp="2016-11-17T18:16:08.7951390Z" type="xsd:integer"><![CDATA[2]]></TransCtr>
+        </Values>
+    </Body>
+    <Faults/>
+</NotificationMessage>
