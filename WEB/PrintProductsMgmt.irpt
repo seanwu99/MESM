@@ -1,0 +1,266 @@
+<!DOCTYPE html >
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>CT MODULE</title>
+	<style>
+		body  {
+   			background-size: 120px;
+			background-repeat: no-repeat;
+    			background-attachment: fixed;
+    			background-position: right 40px top 10px;
+			font-family: Arial;
+		}
+		table {
+  			  margin: 0 auto;
+		}
+
+		#app_header {
+ 			padding: 10px;
+ 			padding-left: 40px;
+ 			padding-top: 15px;
+ 			padding-bottom: 0px;
+			height:80px;
+			width:1150px;
+			text-align: center;
+		}
+		#app_title {
+			width:100%;
+			text-align: center;
+			font-family: "Arial Black",Arial,Helvetica,sans-serif;
+			font-size:32px;
+			color: #007dc0;
+			margin-bottom; 20px;
+		}
+
+		#B-PrintList {
+			width:100px;
+			height:35px;
+			font-size:14px;
+		}
+
+		@media print{    
+
+			* { margin: 0 !important; padding: 0 !important; }
+
+    .			no-print, .no-print *	  {
+        				display: none !important;
+    			}
+			#B-PrintList { 
+   				display: none; 
+			}
+		}
+		@media all {
+			.page-break{ display: none; }
+		}
+		@media print {
+			.page-break{ display: block; page-break-before: always; }
+		}
+		.separatorLine { border-bottom: 3px solid #000; }
+
+	</style>
+
+	<script id="sap-ui-bootstrap"
+		src="/sapui5/resources/sap-ui-core.js"
+		data-sap-ui-theme="sap_goldreflection"
+		data-sap-ui-libs="sap.ui.core,sap.ui.commons,sap.ui.table"
+		data-sap-ui-language="en" >
+	</script>
+
+	<script type="text/javascript" src="Common/js/default.js"></script>
+
+<script type="text/javascript" id="app-init">
+
+	// Get Core SAP UI5
+	var oCore = sap.ui.getCore();
+
+	// ******************************************************************************************************************************************************************
+
+	function createHTMLPage (){
+		var plantID = selectedPlant.value;
+		var routeID = selectedRoute.value;
+		buildTableProducts(plantID, routeID);
+	}
+
+	// ******************************************************************************************************************************************************************
+	function buildTableProducts(plantID, routeID) {
+		var Server_SQL = "";
+		var ProductRoute = routeID;
+		var QueryTitle = "PRODUCT LIST";
+		var d = new Date();
+		var date = [ d.getFullYear(), d.getMonth() + 1, d.getDate() ]; 
+		var time = [ d.getHours(), d.getMinutes(), d.getSeconds() ];
+		for ( var i = 1; i < 3; i++ ) { 
+		     if ( date[i] < 10 ) { 
+		       date[i] = "0" + date[i]; 
+		     } 
+		}
+		for ( var i = 1; i < 3; i++ ) { 
+		     if ( time[i] < 10 ) { 
+		       time[i] = "0" + time[i]; 
+		     } 
+		} 
+
+		var dateStr = date.join("-")  + " " + time.join(":");
+
+		document.getElementById("list").innerHTML = "<img src='Common/img/pls_wait.gif' alt='wait ..' />";
+
+		var stringHTML = "";
+
+		var materialID = ''; 
+		var materialName = '';
+		var materialDescription = '';
+		var specialRequirementCode = '';
+		var materialRevision = '';
+		var maxQuantity = '';
+		var materialCommodity = '';
+		var materialModel = '';
+		var materialType = '';
+		var materialAccount = '';
+		var materialDeptRoute = '';
+		var materialUOM = '';
+		var UOMName = ''
+		var materialBOM = '';
+		var materialSAPID = '';
+		var Active = '';
+
+		var bgColor = "#efefef";
+
+		var Param1 = plantID;
+		var Param2 = routeID;
+
+       		var timestamp = new Date().getTime();
+		var paramStr = "Param.1="+encodeURIComponent(Param1)+"&Param.2="+encodeURIComponent(Param2);
+		 //alert(paramStr);
+
+		var tableHTML = "";
+			
+		getData("/XMII/Illuminator?QueryTemplate=MESM/MATERIALS/QUERIES/get_Materials&"+paramStr+"&ts="+timestamp+"&Content-Type=text/xml", parseJsonMaterialsList);
+	
+		function parseJsonMaterialsList(jsondata){
+
+			tableHTML = tableHTML + "<table id=\"top-hdr\" cellspacing=0 cellpadding=10 border=0 align=center width=1030 style=\"margin-top:0px;font-family: Arial;\"><tr style=\"border-top:2px solid #666;margin-top:0px;background-color:#ffffff;\"><td colspan=13 style=\"font-size:28px;font-weight:bold;color: #007dc0;text-align:center\">" + QueryTitle + " ( Route " + ProductRoute + " )</td></tr><tr style=\"font-size:11px;font-weight:bold;border-top:2px solid #666;margin-top:0px;background-color:#cfcfcf;\">";
+			tableHTML = tableHTML + "<td style=\"width:100px; text-align:center;\">Product Name</td>";
+			tableHTML = tableHTML + "<td style=\"width:140px; text-align:center;\">Description</td>";
+			tableHTML = tableHTML + "<td style=\"width:80px; text-align:center;\">Code</td>";
+			tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">Revision</td>";
+			tableHTML = tableHTML + "<td style=\"width:120px; text-align:center;\">Max Qty</td>";
+			tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">Com</td>";
+			tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">Model</td>";
+			tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">Type</td>";
+			tableHTML = tableHTML + "<td style=\"width:80px; text-align:center;\">Account</td>";
+			tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">Route</td>";
+			tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">UOM</td>";
+			tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">BOM</td>";
+			tableHTML = tableHTML + "<td style=\"width:70px; text-align:center;\">Active</td></tr></table>";
+				
+			for (var i=0; i<jsondata.length; i++){
+
+				materialID = jsondata[i]['materialID'];
+				materialName = jsondata[i]['materialName'];
+				materialDescription = jsondata[i]['materialDescription'];
+				specialRequirementCode = jsondata[i]['specialRequirementCode'];
+				materialRevision = jsondata[i]['materialRevision'];
+				maxQuantity = jsondata[i]['maxQuantity'];
+				materialCommodity = jsondata[i]['materialCommodity'];
+				materialModel = jsondata[i]['materialModel'];
+				materialType = jsondata[i]['materialType'];
+				materialAccount = jsondata[i]['materialAccount'];
+				materialDeptRoute = jsondata[i]['materialDeptRoute'];
+				materialUOM = jsondata[i]['materialUOM'];
+				UOMName = jsondata[i]['UOMName'];
+				materialBOM = jsondata[i]['materialBOM'];
+
+				if(materialBOM == 0){
+					materialBOM = "NO";
+				}else{
+					materialBOM = "YES";
+				}
+
+				materialSAPID = jsondata[i]['materialSAPID'];
+				 Active = jsondata[i]['Active'];
+
+				if(Active == 0){
+					Active = "NO";
+				}else{
+					Active = "YES";
+				}
+
+				if (i==0) {
+					tableHTML = tableHTML + "<table id=\"data-val" + i + "\" cellspacing=0 cellpadding=4 border=0 align=center width=1030 style=\"border-top:2px solid #666;margin-top:0px; font-size:11px;font-family: Arial;\">";
+					tableHTML = tableHTML + "<tr style=\"background-color:" + bgColor + ";\">";
+					tableHTML = tableHTML + "<td style=\"width:100px; text-align:center;\">" + materialName + "</td>";
+					tableHTML = tableHTML + "<td style=\"width:140px; text-align:center;\">" + materialDescription + "</td>";
+					tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">" + specialRequirementCode + "</td>";
+					tableHTML = tableHTML + "<td style=\"width:80px; text-align:center;\">" + materialRevision + "</td>";
+					tableHTML = tableHTML + "<td style=\"width:120px; text-align:center;\">" + maxQuantity + " </td>";
+					tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">" + materialCommodity + " </td>";
+					tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">" + materialModel + " </td>";
+					tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">" + materialType + " </td>";
+					tableHTML = tableHTML + "<td style=\"width:80px; text-align:center;\">" + materialAccount + " </td>";
+					tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">" + materialDeptRoute + " </td>";
+					tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">" + UOMName + "</td>";
+					tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">" + materialBOM + "</td>";
+					tableHTML = tableHTML + "<td style=\"width:70px; text-align:center;\">" + Active + "</td></tr></table>"; 
+				}
+
+				if (i!=0) {
+				if (i==jsondata.length-1) {
+					tableHTML = tableHTML +  "<table id=\"data-val" + i + "\" cellspacing=0 cellpadding=4 border=0 align=center width=1030 style=\"border-bottom: 2px solid #666; margin-top:0px; font-size:11px; font-family: Arial;\">";
+					tableHTML = tableHTML + "<tr style=\"background-color:" + bgColor + ";\">";
+					tableHTML = tableHTML + "<td style=\"width:100px; text-align:center;\">" + materialName + "</td>";
+					tableHTML = tableHTML + "<td style=\"width:140px; text-align:center;\">" + materialDescription + "</td>";
+					tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">" + specialRequirementCode + "</td>";
+					tableHTML = tableHTML + "<td style=\"width:80px; text-align:center;\">" + materialRevision + "</td>";
+					tableHTML = tableHTML + "<td style=\"width:120px; text-align:center;\">" + maxQuantity + " </td>";
+					tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">" + materialCommodity + " </td>";
+					tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">" + materialModel + " </td>";
+					tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">" + materialType + " </td>";
+					tableHTML = tableHTML + "<td style=\"width:80px; text-align:center;\">" + materialAccount + " </td>";
+					tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">" + materialDeptRoute + " </td>";
+					tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">" + UOMName + "</td>";
+					tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">" + materialBOM + "</td>";
+					tableHTML = tableHTML + "<td style=\"width:70px; text-align:center;\">" + Active + "</td></tr></table>"; 
+
+					tableHTML = tableHTML + "<table id=\"data-bot" + "\" cellspacing=0 cellpadding=4 border=0 align=center width=1030 style=\"margin-top:0px; font-size:11px; font-family: Arial;font-weight:bold\">";
+					tableHTML = tableHTML + "<tr style=\"background-color:#ffffff;\"><td colspan=13 style=\"margin-top:0px;\" align=left>&nbsp;" + dateStr + " -- " + jsondata.length + " Records</td></tr></table>";
+				}
+				else {
+					tableHTML = tableHTML + "<table id=\"data-val" + i + "\" cellspacing=0 cellpadding=4 border=0 align=center width=1030 style=\"border-bottom: 0px solid #666; margin-top:0px; font-size:11px; font-family: Arial;\">";
+					tableHTML = tableHTML + "<tr style=\"background-color:" + bgColor + ";\">";
+					tableHTML = tableHTML + "<td style=\"width:100px; text-align:center;\">" + materialName + "</td>";
+					tableHTML = tableHTML + "<td style=\"width:140px; text-align:center;\">" + materialDescription + "</td>";
+					tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">" + specialRequirementCode + "</td>";
+					tableHTML = tableHTML + "<td style=\"width:80px; text-align:center;\">" + materialRevision + "</td>";
+					tableHTML = tableHTML + "<td style=\"width:120px; text-align:center;\">" + maxQuantity + " </td>";
+					tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">" + materialCommodity + " </td>";
+					tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">" + materialModel + " </td>";
+					tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">" + materialType + " </td>";
+					tableHTML = tableHTML + "<td style=\"width:80px; text-align:center;\">" + materialAccount + " </td>";
+					tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">" + materialDeptRoute + " </td>";
+					tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">" + UOMName + "</td>";
+					tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">" + materialBOM + "</td>";
+					tableHTML = tableHTML + "<td style=\"width:70px; text-align:center;\">" + Active + "</td></tr></table>"; 
+				}
+				}
+				if(bgColor=="#efefef") { bgColor = "#ffffff"; } else { bgColor = "#efefef"; }
+			}
+			stringHTML = stringHTML + tableHTML;
+			document.getElementById("list").innerHTML = stringHTML;	
+
+			window.print(); 	
+		}
+	}
+
+	// ******************************************************************************************************************************************************************
+
+</script>
+</head>
+
+<body onLoad="createHTMLPage();">
+<input id="selectedPlant" type="hidden"  value="{Param.1}" style="display:none" readonly />
+<input id="selectedRoute" type="hidden"  value="{Param.2}" style="display:none" readonly />
+<div id="list" style="text-align: center;"></div>
+</body>
+</html>

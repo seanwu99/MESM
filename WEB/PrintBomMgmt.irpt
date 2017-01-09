@@ -1,0 +1,181 @@
+<!DOCTYPE html >
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<title>CT MODULE</title>
+
+	<style>
+		body  {
+			font-family: Arial;
+		}
+		#app_header {
+			margin: 0 auto;
+			height:80px;
+			width:1150px;
+			text-align: center;
+			margin-top: 20px;
+		}
+		#app_title {
+			text-align: center;
+			font-family: "Arial Black",Arial,Helvetica,sans-serif;
+			font-size:32px;
+			color: #007dc0;
+		}
+
+		#B-PrintList {
+			width:100px;
+			height:35px;
+			font-size:14px;
+		}
+
+		@media print{    
+
+			* { margin: 0 !important; padding: 0 !important; }
+
+    .			no-print, .no-print *	  {
+        				display: none !important;
+    			}
+			#B-PrintList { 
+   				display: none; 
+			}
+		}
+		@media all {
+			.page-break{ display: none; }
+		}
+		@media print {
+			.page-break{ display: block; page-break-before: always; }
+		}
+		.separatorLine { border-bottom: 3px solid #000; }
+
+	</style>
+
+	<script id="sap-ui-bootstrap"
+		src="/sapui5/resources/sap-ui-core.js"
+		data-sap-ui-theme="sap_goldreflection"
+		data-sap-ui-libs="sap.ui.core,sap.ui.commons,sap.ui.table"
+		data-sap-ui-language="en" >
+	</script>
+
+	<script type="text/javascript" src="Common/js/default.js"></script>
+
+<script type="text/javascript" id="app-init">
+
+	// Get Core SAP UI5
+	var oCore = sap.ui.getCore();
+
+	var plantID = 0;
+	var prof =0;
+	var productID = 0;
+	var productName = "";
+
+	// ****************************************************************************************************************************************************
+
+	function createHTMLPage (){
+		 plantID = selectedPlant.value;
+		productID = selectedProductID.value;
+		buildTableComponents(plantID, productID);
+	}
+
+	// ******************************************************************************************************************************************************************
+	function buildTableComponents(plantID, productID) {
+		var Server_SQL = "";
+		document.getElementById("list").innerHTML = "<img src='Common/img/pls_wait.gif' alt='wait ..' />";
+		var stringHTML = "";
+		var componentID = 0;
+ 	     	var componentName = "";
+   	 	var componentDescription = "";
+		var componentQuantity = 0;
+   	  	var componentUOM = "";
+		var compomentSAPID = "";
+		var componentAssemblyPart = "";
+		var comp_SAMS_ExtendedCost = 0;
+		var comp_SAMS_Labor = 0;
+		var comp_SAMS_Burden = 0;
+		var comp_SAMS_OverheadCost = 0;
+		var comp_SAMS_AdditionalCost = 0;
+		var comp_SAMS_Freight = 0;
+		var comp_SAMS_MLB = 0;
+		var comp_SAMS_PCC = "";
+		var  comp_Active = 0;
+
+		var d = new Date();
+		var date = [ d.getFullYear(), d.getMonth() + 1, d.getDate() ]; 
+		var time = [ d.getHours(), d.getMinutes(), d.getSeconds() ];
+		for ( var i = 1; i < 3; i++ ) { 
+		     if ( date[i] < 10 ) { 
+		       date[i] = "0" + date[i]; 
+		     } 
+		}
+		for ( var i = 1; i < 3; i++ ) { 
+		     if ( time[i] < 10 ) { 
+		       time[i] = "0" + time[i]; 
+		     } 
+		} 
+
+		var dateStr = date.join("-")  + " " + time.join(":");
+		var bgColor = "#efefef";
+
+		Param1 = plantID;
+		Param2 = productID;
+
+       		var timestamp = new Date().getTime();
+		var paramStr = "Param.1="+encodeURIComponent(Param1)+"&Param.2="+encodeURIComponent(Param2);
+		var tableHTML = "";
+			
+		getData("/XMII/Illuminator?QueryTemplate=MESM/COMPONENTS/QUERIES/get_Components&"+paramStr+"&ts="+timestamp+"&Content-Type=text/xml", parseJsonMaterialsList);
+	
+		function parseJsonMaterialsList(jsondata){
+
+			tableHTML = tableHTML +"<table id=\"top-hdr\" cellspacing=0 cellpadding=4 border=0 align=center width=1200 style=\"margin:0px;font-size:12px;font-family: Arial;margin-top:0px;\">";
+			tableHTML = tableHTML +"<tr style=\"font-weight:bold;border-bottom:2px solid #666;background-color:#cfcfcf;\"><td style=\"width:150px;text-align:center;\">Component Name</td><td style=\"width:150px;text-align:center;\">Description</td><td style=\"width:50px;text-align:center;\">Quantity</td><td style=\"width:50px;text-align:center;\">UOM</td><td style=\"width:100px;text-align:center;\">Extended $</td><td style=\"width:100px;text-align:center;\">Labor</td><td style=\"width:100px;text-align:center;\">Burden</td><td style=\"width:100px;text-align:center;\">Overhead</td><td style=\"width:100px;text-align:center;\">Additional $</td><td style=\"width:100px;text-align:center;\">Freight</td><td style=\"width:100px;text-align:center;\">MLB</td><td style=\"width:50px;text-align:center;\">PCC</td><td style=\"width:20px;text-align:center;\">Active</td></tr>";
+		
+			if(bgColor=="#efefef") { bgColor = "#ffffff"; } else { bgColor = "#efefef"; }
+		
+			for (var i=0; i<jsondata.length; i++){
+				if(bgColor=="#efefef") { bgColor = "#ffffff"; } else { bgColor = "#efefef"; }
+
+				componentID = jsondata[i]['componentID'];
+				componentName = jsondata[i]['componentName'];
+				componentDescription = jsondata[i]['componentDescription'];
+				componentQuantity = jsondata[i]['componentQuantity'];
+				componentUOM = jsondata[i]['componentUOM'];
+				compomentSAPID = jsondata[i]['compomentSAPID'];
+				componentAssemblyPart  = jsondata[i]['componentAssemblyPart'];
+				comp_SAMS_ExtendedCost  = jsondata[i]['comp_SAMS_ExtendedCost'];
+				comp_SAMS_Labor = jsondata[i]['comp_SAMS_Labor'];
+				comp_SAMS_Burden  = jsondata[i]['comp_SAMS_Burden'];
+				comp_SAMS_OverheadCost = jsondata[i]['comp_SAMS_OverheadCost'];
+				comp_SAMS_AdditionalCost  = jsondata[i]['comp_SAMS_AdditionalCost'];
+				comp_SAMS_Freight  = jsondata[i]['comp_SAMS_Freight'];
+				comp_SAMS_MLB = jsondata[i]['comp_SAMS_MLB'];
+				comp_SAMS_PCC = jsondata[i]['comp_SAMS_PCC'];
+				comp_Active  = jsondata[i]['Active'];	
+				if(comp_Active == 0) {
+					comp_Active = "NO";
+				}else {
+					comp_Active = "YES";
+				}
+				tableHTML = tableHTML +"<tr style=\"background-color:"+bgColor+";\"><td style=\"width:150px;text-align:center;\">"+componentName+"</td><td style=\"width:150px;text-align:center;\">"+componentDescription+"</td><td style=\"width:50px;text-align:center;\">"+componentQuantity+"</td><td style=\"width:50px;text-align:center;\">"+componentUOM+"</td><td style=\"width:100px;text-align:center;\">"+comp_SAMS_ExtendedCost+"</td><td style=\"width:100px; text-align:center;\">"+comp_SAMS_Labor +"</td><td style=\"width:100px;text-align:center;\">"+comp_SAMS_Burden +"</td><td style=\"width:100px;text-align:center;\">"+comp_SAMS_OverheadCost+"</td><td style=\"width:100px;text-align:center;\">"+comp_SAMS_AdditionalCost+"</td><td style=\"width:100px;text-align:center;\">"+comp_SAMS_Freight+"</td><td style=\"width:100px;text-align:center;\">"+comp_SAMS_MLB+"</td><td style=\"width:50px;text-align:center;\">"+comp_SAMS_PCC+"</td><td style=\"width:20px;text-align:center;\">"+comp_Active+"</td></tr>";
+			}
+			tableHTML = tableHTML + "<tr><td colspan=13 style=\"border-top:2px solid #666;background-color:#fff;font-weight:bold;\" align=left> " + dateStr + " -- " + i + " Records </td></tr></table>";
+			stringHTML = tableHTML;
+			document.getElementById("list").innerHTML = stringHTML;	
+
+			window.print(); 	
+		}
+	}
+</script>
+
+</head>
+<body onLoad="createHTMLPage();  ">
+<input id="selectedPlant" type="hidden"  value="{Param.1}" style="display:none" readonly />
+<input id="selectedProductID" type="hidden"  value="{Param.2}" style="display:none" readonly />
+<input id="selectedProductName" type="hidden"  value="{Param.3}" style="display:none" readonly />
+<div id="app_header" >
+	<div id="app_title">BILL OF MATERIALS ({Param.3})</div>
+	<div id="page_title"></div>
+</div>
+<div id="list" style="text-align: center;"></div>
+</body>
+</html>

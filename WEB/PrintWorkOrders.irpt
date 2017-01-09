@@ -1,0 +1,297 @@
+<!DOCTYPE html >
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>CT MODULE</title>
+	<style>
+		body  {
+   			background-size: 120px;
+			background-repeat: no-repeat;
+    			background-attachment: fixed;
+    			background-position: right 40px top 10px;
+			font-family: Arial;
+		}
+		table {
+  			  margin: 0 auto;
+		}
+
+		#app_header {
+ 			padding: 10px;
+ 			padding-left: 40px;
+ 			padding-top: 15px;
+ 			padding-bottom: 0px;
+			height:80px;
+			width:1150px;
+			text-align: center;
+		}
+		#app_title {
+			width:100%;
+			text-align: center;
+			font-family: "Arial Black",Arial,Helvetica,sans-serif;
+			font-size:32px;
+			color: #007dc0;
+			margin-bottom; 20px;
+		}
+
+		#B-PrintList {
+			width:100px;
+			height:35px;
+			font-size:14px;
+		}
+
+		@media print{    
+
+			* { margin: 0 !important; padding: 0 !important; }
+
+    .			no-print, .no-print *	  {
+        				display: none !important;
+    			}
+			#B-PrintList { 
+   				display: none; 
+			}
+		}
+		@media all {
+			.page-break{ display: none; }
+		}
+		@media print {
+			.page-break{ display: block; page-break-before: always; }
+		}
+		.separatorLine { border-bottom: 3px solid #000; }
+
+	</style>
+
+	<script id="sap-ui-bootstrap"
+		src="/sapui5/resources/sap-ui-core.js"
+		data-sap-ui-theme="sap_goldreflection"
+		data-sap-ui-libs="sap.ui.core,sap.ui.commons,sap.ui.table"
+		data-sap-ui-language="en" >
+	</script>
+
+	<script type="text/javascript" src="Common/js/default.js"></script>
+
+<script type="text/javascript" id="app-init">
+
+	// Get Core SAP UI5
+	var oCore = sap.ui.getCore();
+
+	var plantID = 0;
+	var lineID = 0;
+	var statusID = 0;
+	var dateFrom = '';
+	var dateTo = '';
+	var lineType = '';
+
+	// ****************************************************************************************************************************************************
+
+	function createHTMLPage (){
+
+		plantID = selectedPlant.value;
+		lineID = selectedLine.value;
+		statusID = selectedStatus.value;
+		dateFrom = selectedDateFrom.value;
+		dateTo = selectedDateTo.value;
+		lineType = selectedLineType.value;
+		
+		buildTableOrders();
+	}
+
+	// ******************************************************************************************************************************************************************
+	function buildTableOrders() {
+		var Server_SQL = "";
+		var QueryTitle = "WORKORDER LIST";
+		var d = new Date();
+		var date = [ d.getFullYear(), d.getMonth() + 1, d.getDate() ]; 
+		var time = [ d.getHours(), d.getMinutes(), d.getSeconds() ];
+		for ( var i = 1; i < 3; i++ ) { 
+		     if ( date[i] < 10 ) { 
+		       date[i] = "0" + date[i]; 
+		     } 
+		}
+		for ( var i = 1; i < 3; i++ ) { 
+		     if ( time[i] < 10 ) { 
+		       time[i] = "0" + time[i]; 
+		     } 
+		} 
+
+		var dateStr = date.join("-")  + " " + time.join(":");
+
+		var timestamp = new Date().getTime();
+
+		document.getElementById("list").innerHTML = "<img src='Common/img/pls_wait.gif' alt='wait ..' />";
+
+		var stringHTML = "";
+
+		var orderID = "";
+		var unitName = "";
+		var materialID = "";
+		var materialName = "";
+		var materialDescription = "";
+		var modifiedOn = "";
+		var modifiedBy = "";
+		var scheduledStart = "";
+		var scheduledFinish = "";
+		var scheduledQty = "";
+		var createdBy = "";
+		var createdOn = "";
+		var actualQty = "";
+		var scrapQty = "";
+		var orderStatusName = "";
+		var orderStatusFLRName = "";
+		var longText = "";
+
+		var bgColor = "#efefef";
+
+		var tableHTML = "";
+
+		var Param1 = plantID;
+		var Param2 = lineID;
+		var Param3 = statusID;
+		var Param4 = dateFrom;
+		var Param5 = dateTo;
+		if ((lineType == "FLR") || (lineType == "ASB"))
+			var Param6 = 1;
+		else
+			var Param6 = 0;
+		var paramStr = "Param.1="+encodeURIComponent(Param1)+"&Param.2="+encodeURIComponent(Param2)+"&Param.3="+encodeURIComponent(Param3)+"&Param.4="+encodeURIComponent(Param4)+"&Param.5="+encodeURIComponent(Param5)+"&Param.6="+encodeURIComponent(Param6);
+		// alert(paramStr);		
+ 		getData("/XMII/Illuminator?QueryTemplate=MESM/ORDERS/QUERIES/get_Orders&"+paramStr+"&ts="+timestamp+"&Content-Type=text/xml", parseJsonOrdersList);
+				
+		function parseJsonOrdersList(jsondata){
+			if (lineType == "FLR")
+				tableHTML = tableHTML + "<table id=\"top-hdr\" cellspacing=0 cellpadding=10 border=0 align=center width=1030 style=\"margin-top:0px;font-family: Arial;\"><tr style=\"border-top:2px solid #666;margin-top:0px;background-color:#ffffff;\"><td colspan=13 style=\"font-size:28px;font-weight:bold;color: #007dc0;text-align:center\">" + "CARRIER ORDERS" + "</td></tr><tr style=\"font-size:11px;font-weight:bold;border-top:2px solid #666;margin-top:0px;background-color:#cfcfcf;\">";
+			else
+			if (lineType == "ASB")
+				tableHTML = tableHTML + "<table id=\"top-hdr\" cellspacing=0 cellpadding=10 border=0 align=center width=1030 style=\"margin-top:0px;font-family: Arial;\"><tr style=\"border-top:2px solid #666;margin-top:0px;background-color:#ffffff;\"><td colspan=13 style=\"font-size:28px;font-weight:bold;color: #007dc0;text-align:center\">" + "ASSEMBLY ORDERS" + "</td></tr><tr style=\"font-size:11px;font-weight:bold;border-top:2px solid #666;margin-top:0px;background-color:#cfcfcf;\">";
+			else
+				tableHTML = tableHTML + "<table id=\"top-hdr\" cellspacing=0 cellpadding=10 border=0 align=center width=1030 style=\"margin-top:0px;font-family: Arial;\"><tr style=\"border-top:2px solid #666;margin-top:0px;background-color:#ffffff;\"><td colspan=13 style=\"font-size:28px;font-weight:bold;color: #007dc0;text-align:center\">" + QueryTitle + " ( Line " + document.getElementById("selectedLineName").value + " )</td></tr><tr style=\"font-size:11px;font-weight:bold;border-top:2px solid #666;margin-top:0px;background-color:#cfcfcf;\">";
+			tableHTML = tableHTML + "<td style=\"width:100px; text-align:center;\">Order ID</td>";
+			tableHTML = tableHTML + "<td style=\"width:80px; text-align:center;\">Line</td>";
+			tableHTML = tableHTML + "<td style=\"width:80px; text-align:center;\">Material</td>";
+			tableHTML = tableHTML + "<td style=\"width:120px; text-align:center;\">Description</td>";
+			tableHTML = tableHTML + "<td style=\"width:100px; text-align:center;\">Sched Start</td>";
+			tableHTML = tableHTML + "<td style=\"width:100px; text-align:center;\">Sched End</td>";
+			tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">Sched Qty</td>";
+			tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">Yield Qty</td>";
+			tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">Reject Qty</td>";
+			if ((lineType == "FLR") || (lineType == "ASB")) {
+			tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">FLR</td></tr></table>";
+			}
+			else {
+			tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">ERP</td>";
+			tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">FLR</td></tr></table>";
+			}					
+	
+			for (var i=0; i<jsondata.length; i++){
+
+				orderID = jsondata[i]['orderFirstID'] + "-" + jsondata[i]['orderLastID'];
+				orderLastID = jsondata[i]['orderLastID'];
+				unitName = jsondata[i]['unitName'];
+				materialID = jsondata[i]['materialID'];
+				materialName = jsondata[i]['materialName'];
+				materialDescription = jsondata[i]['materialDescription'];
+				modifiedOn = jsondata[i]['modifiedOn'];
+				modifiedBy = jsondata[i]['modifiedBy'];
+				scheduledStart = jsondata[i]['scheduledStart'];
+				scheduledFinish = jsondata[i]['scheduledFinish'];
+				scheduledQty = jsondata[i]['scheduledQty'];
+				createdBy = jsondata[i]['createdBy'];
+				createdOn = jsondata[i]['createdOn'];
+				actualQty = jsondata[i]['actualQty'];
+				scrapQty = jsondata[i]['scrapQty'];
+				orderStatusName = jsondata[i]['orderStatusName'];
+				orderStatusFLRName = jsondata[i]['orderStatusFLRName'];
+				longText = jsondata[i]['longText'];
+
+				if (i==0) {
+					tableHTML = tableHTML + "<table id=\"data-val" + i + "\" cellspacing=0 cellpadding=4 border=0 align=center width=1030 style=\"border-top:2px solid #666;margin-top:0px; font-size:11px;font-family: Arial;\">";
+					tableHTML = tableHTML + "<tr style=\"background-color:" + bgColor + ";\">";
+					tableHTML = tableHTML + "<td style=\"width:100px; text-align:center;\">" + orderID + "</td>";
+					tableHTML = tableHTML + "<td style=\"width:80px; text-align:center;\">" + unitName + "</td>";
+					tableHTML = tableHTML + "<td style=\"width:80px; text-align:center;\">" + materialName + " </td>";
+					tableHTML = tableHTML + "<td style=\"width:120px; text-align:center;\">" + materialDescription + " </td>";
+					tableHTML = tableHTML + "<td style=\"width:100px; text-align:center;\">" + scheduledStart + " </td>";
+					tableHTML = tableHTML + "<td style=\"width:100px; text-align:center;\">" + scheduledFinish + " </td>";
+					tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">" + scheduledQty + " </td>";
+					tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">" + actualQty + "</td>";
+					tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">" + scrapQty + "</td>";
+					if ((lineType == "FLR") || (lineType == "ASB")) {
+					tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">" + orderStatusFLRName + "</td></tr></table>"; 
+					}
+					else {
+					tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">" + orderStatusName + "</td>";
+					tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">" + orderStatusFLRName + "</td></tr></table>"; 
+					}
+				}
+
+				if (i!=0) {
+				if (i==jsondata.length-1) {
+					tableHTML = tableHTML +  "<table id=\"data-val" + i + "\" cellspacing=0 cellpadding=4 border=0 align=center width=1030 style=\"border-bottom: 2px solid #666; margin-top:0px; font-size:11px; font-family: Arial;\">";
+					tableHTML = tableHTML + "<tr style=\"background-color:" + bgColor + ";\">";
+					tableHTML = tableHTML + "<td style=\"width:100px; text-align:center;\">" + orderID + "</td>";
+					tableHTML = tableHTML + "<td style=\"width:80px; text-align:center;\">" + unitName + "</td>";
+					tableHTML = tableHTML + "<td style=\"width:80px; text-align:center;\">" + materialName + " </td>";
+					tableHTML = tableHTML + "<td style=\"width:120px; text-align:center;\">" + materialDescription + " </td>";
+					tableHTML = tableHTML + "<td style=\"width:100px; text-align:center;\">" + scheduledStart + " </td>";
+					tableHTML = tableHTML + "<td style=\"width:100px; text-align:center;\">" + scheduledFinish + " </td>";
+					tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">" + scheduledQty + " </td>";
+					tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">" + actualQty + "</td>";
+					tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">" + scrapQty + "</td>";
+					if ((lineType == "FLR") || (lineType == "ASB")) {
+					tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">" + orderStatusFLRName + "</td></tr></table>"; 
+					}
+					else {
+					tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">" + orderStatusName + "</td>";
+					tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">" + orderStatusFLRName + "</td></tr></table>"; 
+					}
+
+					tableHTML = tableHTML + "<table id=\"data-bot" + "\" cellspacing=0 cellpadding=4 border=0 align=center width=1030 style=\"margin-top:0px; font-size:11px; font-family: Arial;font-weight:bold\">";
+					tableHTML = tableHTML + "<tr style=\"background-color:#ffffff;\"><td colspan=13 style=\"margin-top:0px;\" align=left>&nbsp;" + dateStr + " -- " + jsondata.length + " Records</td></tr></table>";
+				}
+				else {
+					tableHTML = tableHTML + "<table id=\"data-val" + i + "\" cellspacing=0 cellpadding=4 border=0 align=center width=1030 style=\"border-bottom: 0px solid #666; margin-top:0px; font-size:11px; font-family: Arial;\">";
+					tableHTML = tableHTML + "<tr style=\"background-color:" + bgColor + ";\">";
+					tableHTML = tableHTML + "<td style=\"width:100px; text-align:center;\">" + orderID + "</td>";
+					tableHTML = tableHTML + "<td style=\"width:80px; text-align:center;\">" + unitName + "</td>";
+					tableHTML = tableHTML + "<td style=\"width:80px; text-align:center;\">" + materialName + " </td>";
+					tableHTML = tableHTML + "<td style=\"width:120px; text-align:center;\">" + materialDescription + " </td>";
+					tableHTML = tableHTML + "<td style=\"width:100px; text-align:center;\">" + scheduledStart + " </td>";
+					tableHTML = tableHTML + "<td style=\"width:100px; text-align:center;\">" + scheduledFinish + " </td>";
+					tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">" + scheduledQty + " </td>";
+					tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">" + actualQty + "</td>";
+					tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">" + scrapQty + "</td>";
+					if ((lineType == "FLR") || (lineType == "ASB")) {
+					tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">" + orderStatusFLRName + "</td></tr></table>"; 
+					}
+					else {
+					tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">" + orderStatusName + "</td>";
+					tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">" + orderStatusFLRName + "</td></tr></table>"; 
+					}
+				}
+				}
+				if(bgColor=="#efefef") { bgColor = "#ffffff"; } else { bgColor = "#efefef"; }
+			}
+			stringHTML = stringHTML + tableHTML;
+			document.getElementById("list").innerHTML = stringHTML;	
+
+			window.print(); 	
+		}
+	}
+
+	// ******************************************************************************************************************************************************************
+
+</script>
+</head>
+
+<body onLoad="createHTMLPage();">
+<input id="selectedPlant" type="hidden"  value="{Param.1}" style="display:none" readonly />
+<input id="selectedLine" type="hidden"  value="{Param.2}" style="display:none" readonly />
+<input id="selectedStatus" type="hidden"  value="{Param.3}" style="display:none" readonly />
+<input id="selectedDateFrom" type="hidden"  value="{Param.4}" style="display:none" readonly />
+<input id="selectedDateTo" type="hidden"  value="{Param.5}" style="display:none" readonly />
+<input id="selectedStatusName" type="hidden"  value="{Param.6}" style="display:none" readonly />
+<input id="selectedLineName" type="hidden"  value="{Param.7}" style="display:none" readonly />
+<input id="selectedLineType" type="hidden"  value="{Param.8}" style="display:none" readonly />
+<div id="list" style="text-align: center;"></div>
+</body>
+</html>

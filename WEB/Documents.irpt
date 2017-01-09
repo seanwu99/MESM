@@ -1,0 +1,660 @@
+<!DOCTYPE html >
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>MES MODULE</title>
+	<style>
+	body {
+		//background-image: url("Common/img/logo.png");
+		background-size: 180px;
+		background-repeat: no-repeat;
+    		background-attachment: fixed;
+    		background-position: right 40px top 30px;
+		font-family: Arial;
+	}
+	#app_header {
+ 		padding: 10px;
+ 		padding-left: 40px;
+ 		padding-top: 15px;
+ 		padding-bottom: 0px;
+		height:80px;
+		width:400px;
+		text-align: center;
+	}
+	#app_title {
+		width:400px;
+		text-align: center;
+		font-family: "Arial Black",Arial,Helvetica,sans-serif;
+		font-size:32px;
+		color: #007dc0;
+		margin-bottom; 20px;
+	}
+	#mov_title, #doc_title {
+		width:470px;
+		text-align: center;
+		font-family: "Arial Black", Arial, Helvetica, sans-serif;
+		font-size:22px;
+		color: #007dc0;
+		margin-bottom; 30px;
+	}
+	#app_menu {
+		width:400px;
+		text-align: center;
+		font-family: Arial,Helvetica,sans-serif;
+	}
+	#page_title {
+		width:400px;
+		text-align: center;
+		font-family: "Arial Black",Arial,Helvetica,sans-serif;
+		font-size:28px;
+		color: #cfcfcf;
+	}
+	#mesm_content {
+ 		padding: 30px;
+ 		padding-top: 40px;
+	}
+	#__button0, #__button1, #__button2 {
+		margin-top:10px;
+		margin-left:5px;
+		margin-right:5px;
+	}
+
+	input[type=button] {
+  		color:#08233e;
+    		display:inline-block;
+  		font:2.4em Futura, ‘Century Gothic’, AppleGothic, sans-serif;
+  		font-size:70%;
+ 		padding:14px;
+  		background:url(overlay.png) repeat-x center #ffcc00;
+  		background-color:rgba(255,204,0,1);
+  		border:1px solid #ffcc00;
+  		-moz-border-radius:10px;
+  		-webkit-border-radius:10px;
+  		border-radius:10px;
+  		border-bottom:1px solid #9f9f9f;
+  		-moz-box-shadow:inset 0 1px 0 rgba(255,255,255,0.5);
+  		-webkit-box-shadow:inset 0 1px 0 rgba(255,255,255,0.5);
+  		box-shadow:inset 0 1px 0 rgba(255,255,255,0.5);
+  		cursor:pointer;
+ 	}
+
+	input[type=button]:hover {
+  		background-color:rgba(255,204,0,0.8);
+ 	}
+	</style>
+	<script id="sap-ui-bootstrap"
+		src="/sapui5/resources/sap-ui-core.js"
+		data-sap-ui-theme="sap_goldreflection"
+		data-sap-ui-libs="sap.ui.core,sap.ui.commons,sap.ui.table,sap.ui.ux3,sap.m"
+		data-sap-ui-language="en" >
+	</script>
+	<script type="text/javascript" src="Common/js/default.js"></script>
+
+	<script type="text/javascript" id="app-init">
+	// ******************************************************************************************************************************************************************
+	// Get Core SAP UI5
+	var oCore = sap.ui.getCore();
+	// Initialize screen
+	var nrRows = 13;
+	var selectedIndex =  -1;
+
+	// ******************************************************************************************************************************************************************
+	// initialize access
+	var level2Access = "";
+	var plant2Access = "";
+	// Initialize screen
+	var user_name = "";
+
+	var selectedDIR = 0;
+
+	// ****************************************************************************************************************************************************
+	function roleSecurity() {
+		var myRoles = document.getElementById("user_roles").value;
+		var role2Access = "MESM_" + document.getElementById("user_role").value;
+		user_name = document.getElementById("user_name").value;
+		if(myRoles.indexOf(role2Access)<0) {
+			 window.location.assign("security.irpt");
+		  } else {
+
+			var roleString = document.getElementById("user_role").value;
+			var roleArray = roleString.split("_");
+			level2Access = roleArray[0]; 
+				// alert("level : " + level2Access);
+			plant2Access =  roleArray[1];
+				// alert("plant : " + plant2Access);
+
+			var role_ADM = "MESM_ADM_"+plant2Access;
+			var role_OPS = "MESM_OPS_"+plant2Access;
+
+			// show menus
+			oMenuButton1.placeAt("app_menu");
+			oMenuButton2.placeAt("app_menu");
+			oMenuButton3.placeAt("app_menu");
+
+			// show documents
+			doList() ;
+
+			switch(role2Access) {
+			case "MESM_ADM_ALL":
+
+				// enable Cfg Hierarchy
+					oCore.byId("item1-0-1").setEnabled(true);
+				// enable Cfg Memory Maps Menu
+					oCore.byId("item1-0-3").setEnabled(true);
+				// enable Cfg Connectivity
+					oCore.byId("item1-0-4").setEnabled(true);
+				// enable Master Data
+					oCore.byId("item1-0-5").setEnabled(true);
+
+				// enable WO Management
+					oCore.byId("item2-0-1").setEnabled(true);
+				// enable Carrier Station Dashboard
+					oCore.byId("item2-0-2").setEnabled(true);
+				// enable Assembly Station Dashboard
+					oCore.byId("item2-0-3").setEnabled(true);
+
+				// enable Production Status Report
+					oCore.byId("item3-0-1").setEnabled(true);
+				// enable Item Traceability Report
+					oCore.byId("item3-0-2").setEnabled(true);
+				// enable Connector Diagnostics
+					oCore.byId("item3-0-3").setEnabled(true);
+				// enable Documentation
+					oCore.byId("item3-0-4").setEnabled(true);
+
+				// enable Cfg Memory Maps
+					oCore.byId("item1-4-1").setEnabled(true);
+				// enable Cfg Tag Types
+					oCore.byId("item1-4-2").setEnabled(true);
+				// enable Cfg Tag Functions
+					oCore.byId("item1-4-3").setEnabled(true);
+				// enable Cfg Tag Groups
+					oCore.byId("item1-4-4").setEnabled(true);
+				// enable Cfg Memory Map Transactions
+					oCore.byId("item1-4-5").setEnabled(true);
+
+				// enable Cfg Shop Floor Computers
+					oCore.byId("item1-5-1").setEnabled(true);
+				// enable Cfg Shop Floor Printers
+					oCore.byId("item1-5-2").setEnabled(true);
+				// enable Cfg PCo Servers
+					oCore.byId("item1-5-3").setEnabled(true);
+				// enable Cfg PCo Agents
+					oCore.byId("item1-5-4").setEnabled(true);
+				// enable Cfg Sql Servers
+					oCore.byId("item1-5-5").setEnabled(true);
+				// enable Cfg Operators
+					oCore.byId("item1-5-6").setEnabled(true);
+
+				// enable Equipment Hierarchy
+					oCore.byId("item1-6-1").setEnabled(true);
+				// enable Cfg Hierarchy Levels
+					oCore.byId("item1-6-2").setEnabled(true);
+
+				// Enable UOM Maintenance
+					oCore.byId("item1-7-1").setEnabled(true);
+				// Enable Product Maintenance
+					oCore.byId("item1-7-2").setEnabled(true);
+				// Enable BOM Maintenance
+					oCore.byId("item1-7-3").setEnabled(true);
+				// Enable Routing Maintenance
+					oCore.byId("item1-7-4").setEnabled(true);
+
+				// update screen
+				document.getElementById("page_title").innerHTML="ADMINISTRATOR";
+				break;
+			case role_ADM:
+
+				// enable Cfg Hierarchy
+					oCore.byId("item1-0-1").setEnabled(true);
+				// enable Cfg Memory Maps Menu
+					oCore.byId("item1-0-3").setEnabled(true);
+				// enable Cfg Connectivity
+					oCore.byId("item1-0-4").setEnabled(true);
+				// enable Master Data
+					oCore.byId("item1-0-5").setEnabled(true);
+
+				// enable WO Management
+					oCore.byId("item2-0-1").setEnabled(true);
+				// enable Carrier Station Dashboard
+					oCore.byId("item2-0-2").setEnabled(true);
+				// enable Assembly Station Dashboard
+					oCore.byId("item2-0-3").setEnabled(true);
+
+				// enable Production Status Report
+					oCore.byId("item3-0-1").setEnabled(true);
+				// enable Item Traceability Report
+					oCore.byId("item3-0-2").setEnabled(true);
+				// enable Connector Diagnostics
+					oCore.byId("item3-0-3").setEnabled(true);
+				// enable Documentation
+					oCore.byId("item3-0-4").setEnabled(true);
+
+				// enable Cfg Memory Maps
+					oCore.byId("item1-4-1").setEnabled(true);
+				// enable Cfg Tag Types
+					oCore.byId("item1-4-2").setEnabled(true);
+				// enable Cfg Tag Functions
+					oCore.byId("item1-4-3").setEnabled(true);
+				// enable Cfg Tag Groups
+					oCore.byId("item1-4-4").setEnabled(true);
+				// enable Cfg Memory Map Transactions
+					oCore.byId("item1-4-5").setEnabled(true);
+
+				// enable Cfg Shop Floor Computers
+					oCore.byId("item1-5-1").setEnabled(true);
+				// enable Cfg Shop Floor Printers
+					oCore.byId("item1-5-2").setEnabled(true);
+				// enable Cfg PCo Servers
+					oCore.byId("item1-5-3").setEnabled(true);
+				// enable Cfg PCo Agents
+					oCore.byId("item1-5-4").setEnabled(true);
+				// enable Cfg Sql Servers
+					oCore.byId("item1-5-5").setEnabled(true);
+				// enable Cfg Operators
+					oCore.byId("item1-5-6").setEnabled(true);
+
+				// enable Equipment Hierarchy
+					oCore.byId("item1-6-1").setEnabled(true);
+				// enable Cfg Hierarchy Levels
+					oCore.byId("item1-6-2").setEnabled(true);
+
+				// Enable UOM Maintenance
+					oCore.byId("item1-7-1").setEnabled(true);
+				// Enable Product Maintenance
+					oCore.byId("item1-7-2").setEnabled(true);
+				// Enable BOM Maintenance
+					oCore.byId("item1-7-3").setEnabled(true);
+				// Enable Routing Maintenance
+					oCore.byId("item1-7-4").setEnabled(true);
+
+				// update screen
+				document.getElementById("page_title").innerHTML="ADM PLANT "+plant2Access;
+				break;
+			case "MESM_OPS_ALL":
+
+				// enable WO Management
+					oCore.byId("item2-0-1").setEnabled(true);
+				// enable Carrier Station Dashboard
+					oCore.byId("item2-0-2").setEnabled(true);
+				// enable Assembly Station Dashboard
+					oCore.byId("item2-0-3").setEnabled(true);
+
+				// enable Production Status Report
+					oCore.byId("item3-0-1").setEnabled(true);
+				// enable Item Traceability Report
+					oCore.byId("item3-0-2").setEnabled(true);
+				// enable Connector Diagnostics
+					oCore.byId("item3-0-3").setEnabled(true);
+				// enable Documentation
+					oCore.byId("item3-0-4").setEnabled(true);
+
+				// update screen
+				document.getElementById("page_title").innerHTML="OPS ALL PLANTS";
+
+				break;
+			case role_OPS:
+
+				// enable WO Management
+					oCore.byId("item2-0-1").setEnabled(true);
+				// enable Carrier Station Dashboard
+					oCore.byId("item2-0-2").setEnabled(true);
+				// enable Assembly Station Dashboard
+					oCore.byId("item2-0-3").setEnabled(true);
+
+				// enable Production Status Report
+					oCore.byId("item3-0-1").setEnabled(true);
+				// enable Item Traceability Report
+					oCore.byId("item3-0-2").setEnabled(true);
+				// enable Connector Diagnostics
+					oCore.byId("item3-0-3").setEnabled(true);
+				// enable Documentation
+					oCore.byId("item3-0-4").setEnabled(true);
+
+				// update screen
+				document.getElementById("page_title").innerHTML="OPS PLANT "+plant2Access;
+
+				break;
+			default:
+				alert("MES Module Role Unknown: " + role2Access);
+				break;
+			}
+		  }
+	}
+	// ******************************************************************************************************************************************************************
+	var oMenuButton1 = new sap.ui.commons.MenuButton({text: "Settings", icon: "Common/img/map.png"}); 
+	var oMenuButton2 = new sap.ui.commons.MenuButton({ text: "Dashboards", icon: "Common/img/cloud.png"}); 
+	var oMenuButton3 = new sap.ui.commons.MenuButton({text: "Reports", icon: "Common/img/list.png"});
+
+	// Create the menu
+	var oMenu1 = new sap.ui.commons.Menu("menu1", {ariaDescription: "Application Setup", enabled:true});
+	// Create the items and add them to the menu
+	var oMenuItem1 = new sap.ui.commons.MenuItem("item1-0-1",{text: "Enterprise Hierarchy", enabled: false});
+	oMenu1.addItem(oMenuItem1);
+	var oMenuItem2 = new sap.ui.commons.MenuItem("item1-0-2",{text: " ???", enabled: false});
+	//oMenu1.addItem(oMenuItem2);
+	var oMenuItem3 = new sap.ui.commons.MenuItem("item1-0-3",{text: "MES Memory Maps", enabled: false});
+	oMenu1.addItem(oMenuItem3);
+	var oMenuItem4 = new sap.ui.commons.MenuItem("item1-0-4",{text: "Plant Connectivity", enabled: false});
+	oMenu1.addItem(oMenuItem4);
+	var oMenuItem5 = new sap.ui.commons.MenuItem("item1-0-5",{text: "Master Data Setup", enabled: false});
+	oMenu1.addItem(oMenuItem5);
+
+	var oMenu4 = new sap.ui.commons.Menu("menu4", {ariaDescription: "Memory Maps Setup", enabled:true});
+	oMenuItem3.setSubmenu(oMenu4);
+	//Create the items and add them to the sub menu
+	var oMenuItem41 = new sap.ui.commons.MenuItem("item1-4-1",{text: "Memory Map Tags", enabled: false});
+	oMenu4.addItem(oMenuItem41);
+	var oMenuItem45 = new sap.ui.commons.MenuItem("item1-4-5",{text: "Memory Map Transactions", enabled: false});
+	oMenu4.addItem(oMenuItem45);
+	var oMenuItem44 = new sap.ui.commons.MenuItem("item1-4-4",{text: "PLC Tag Groups", enabled: false});
+	oMenu4.addItem(oMenuItem44);
+	var oMenuItem42 = new sap.ui.commons.MenuItem("item1-4-2",{text: "PLC Tag Types", enabled: false});
+	oMenu4.addItem(oMenuItem42);
+	var oMenuItem43 = new sap.ui.commons.MenuItem("item1-4-3",{text: "PLC Tag Functions", enabled: false});
+	oMenu4.addItem(oMenuItem43);
+
+	var oMenu5 = new sap.ui.commons.Menu("menu5", {ariaDescription: "Connectivity Setup", enabled:true});
+	oMenuItem4.setSubmenu(oMenu5);
+	//Create the items and add them to the sub menu
+	var oMenuItem56 = new sap.ui.commons.MenuItem("item1-5-6",{text: "Shop Floor Operators", enabled: false});
+	oMenu5.addItem(oMenuItem56);
+	var oMenuItem51 = new sap.ui.commons.MenuItem("item1-5-1",{text: "Shop Floor Computers", enabled: false});
+	oMenu5.addItem(oMenuItem51);
+	var oMenuItem52 = new sap.ui.commons.MenuItem("item1-5-2",{text: "Shop Floor Printers", enabled: false});
+	oMenu5.addItem(oMenuItem52);
+	var oMenuItem53 = new sap.ui.commons.MenuItem("item1-5-3",{text: "Plant Connectivity Servers", enabled: false});
+	oMenu5.addItem(oMenuItem53);
+	var oMenuItem54 = new sap.ui.commons.MenuItem("item1-5-4",{text: "Plant Connectivity Agents", enabled: false});
+	oMenu5.addItem(oMenuItem54);
+	var oMenuItem55 = new sap.ui.commons.MenuItem("item1-5-5",{text: "Line Side SQL Servers", enabled: false});
+	oMenu5.addItem(oMenuItem55);
+
+	var oMenu6 = new sap.ui.commons.Menu("menu6", {ariaDescription: "Hierarchy Setup", enabled:true});
+	oMenuItem1.setSubmenu(oMenu6);
+	//Create the items and add them to the sub menu
+	var oMenuItem61 = new sap.ui.commons.MenuItem("item1-6-1",{text: "Hierarchy Management", enabled: false});
+	oMenu6.addItem(oMenuItem61);
+	var oMenuItem62 = new sap.ui.commons.MenuItem("item1-6-2",{text: "Hierarchy Levels Setup", enabled: false});
+	oMenu6.addItem(oMenuItem62);
+
+	var oMenu7 = new sap.ui.commons.Menu("menu7", {ariaDescription: "Master Data", enabled:true});
+	oMenuItem5.setSubmenu(oMenu7);
+	//Create the items and add them to the sub menu
+	var oMenuItem71 = new sap.ui.commons.MenuItem("item1-7-1",{text: "Units Of Measure", enabled: false});
+	oMenu7.addItem(oMenuItem71);
+	var oMenuItem72 = new sap.ui.commons.MenuItem("item1-7-2",{text: "Products Management", enabled: false});
+	oMenu7.addItem(oMenuItem72);
+	var oMenuItem73 = new sap.ui.commons.MenuItem("item1-7-3",{text: "Bills of Materials", enabled: false});
+	oMenu7.addItem(oMenuItem73);
+	var oMenuItem74 = new sap.ui.commons.MenuItem("item1-7-4",{text: "Products Routing", enabled: false});
+	oMenu7.addItem(oMenuItem74);
+
+	// Create the menu
+	var oMenu2 = new sap.ui.commons.Menu("menu2", {ariaDescription: "User Dashboards"});
+	// Create the items and add them to the menu
+	var oMenuItem21 = new sap.ui.commons.MenuItem("item2-0-1",{text: "Work Order Management", enabled:false});
+	oMenu2.addItem(oMenuItem21);
+	var oMenuItem22 = new sap.ui.commons.MenuItem("item2-0-2",{text: "Sub Assembly Station Dashboard", enabled:false});
+	oMenu2.addItem(oMenuItem22);
+	var oMenuItem23 = new sap.ui.commons.MenuItem("item2-0-3",{text: "Assembly Station Dashboard", enabled:false});
+	oMenu2.addItem(oMenuItem23);
+
+	// Create the menu
+	var oMenu3 = new sap.ui.commons.Menu("menu3", {ariaDescription: "User Reports", enabled:true});
+	// Create the items and add them to the menu
+	var oMenuItem31 = new sap.ui.commons.MenuItem("item3-0-1",{text: "Production Status Report", enabled:false});
+	oMenu3.addItem(oMenuItem31);
+	var oMenuItem32 = new sap.ui.commons.MenuItem("item3-0-2",{text: "Item Traceability Report", enabled:false});
+	oMenu3.addItem(oMenuItem32);
+	var oMenuItem33 = new sap.ui.commons.MenuItem("item3-0-3",{text: "Connector Diagnostics", enabled:false});
+	oMenu3.addItem(oMenuItem33);
+	var oMenuItem34 = new sap.ui.commons.MenuItem("item3-0-4",{text: "Operator Documentation", enabled:false});
+	oMenu3.addItem(oMenuItem34);
+
+	//Attach the Menu to the MenuButton
+	oMenuButton1.setMenu(oMenu1);
+	oMenuButton2.setMenu(oMenu2);
+	oMenuButton3.setMenu(oMenu3);
+
+	//Attach an event to raise an alert when an item is selected (Button 1)
+	oMenuButton1.attachItemSelected(function (oEvent){
+	switch( oEvent.getParameter("itemId")) {
+		// Menu Settings 1
+		case "item1-6-1":
+				setTimeout("location.href = '" + "MgtHierarchy.irpt?ROLE=" + document.getElementById("user_role").value + "'",0);
+			break;
+		case "item1-6-2":
+				setTimeout("location.href = '" + "LvlHierarchy.irpt?ROLE=" + document.getElementById("user_role").value + "'",0);
+			break;
+
+		// Menu Settings 2
+		case "item1-4-1":
+				setTimeout("location.href = '" + "MemMapTags.irpt?ROLE=" + document.getElementById("user_role").value + "'",0);
+			break;
+		case "item1-4-5":
+				setTimeout("location.href = '" + "MemMapTrxs.irpt?ROLE=" + document.getElementById("user_role").value + "'",0);
+			break;
+		case "item1-4-4":
+				setTimeout("location.href = '" + "TagCommGroups.irpt?ROLE=" + document.getElementById("user_role").value + "'",0);
+			break;
+		case "item1-4-2":
+				setTimeout("location.href = '" + "TagTypes.irpt?ROLE=" + document.getElementById("user_role").value + "'",0);
+			break;
+		case "item1-4-3":
+				setTimeout("location.href = '" + "TagFunctions.irpt?ROLE=" + document.getElementById("user_role").value + "'",0);
+			break;
+
+		// Menu Settings 3
+		case "item1-5-6":
+				setTimeout("location.href = '" + "Operators.irpt?ROLE=" + document.getElementById("user_role").value + "'",0);
+			break;
+		case "item1-5-1":
+				setTimeout("location.href = '" + "Stations.irpt?ROLE=" + document.getElementById("user_role").value + "'",0);
+			break;
+		case "item1-5-2":
+				setTimeout("location.href = '" + "Printers.irpt?ROLE=" + document.getElementById("user_role").value + "'",0);
+			break;
+		case "item1-5-3":
+				setTimeout("location.href = '" + "PCoServers.irpt?ROLE=" + document.getElementById("user_role").value + "'",0);
+			break;
+		case "item1-5-4":
+				setTimeout("location.href = '" + "PCoAgents.irpt?ROLE=" + document.getElementById("user_role").value + "'",0);
+			break;
+		case "item1-5-5":
+				setTimeout("location.href = '" + "SqlServers.irpt?ROLE=" + document.getElementById("user_role").value + "'",0);
+			break;
+
+		// Menu Settings 4
+		case "item1-7-1":
+			setTimeout("location.href = '" + "UnitsOfMeasure.irpt?ROLE=" + document.getElementById("user_role").value + "'",0);
+			break;
+		case "item1-7-2":
+			setTimeout("location.href = '" + "ProductsMgmt.irpt?ROLE=" + document.getElementById("user_role").value + "'",0);
+			break;
+		case "item1-7-3":
+			setTimeout("location.href = '" + "BomMgmt.irpt?ROLE=" + document.getElementById("user_role").value + "'",0);
+			break;
+		case "item1-7-4":
+			setTimeout("location.href = '" + "RoutingMgmt.irpt?ROLE=" + document.getElementById("user_role").value + "'",0);
+			break;
+
+		// Menu Default
+		default:
+				// alert("Items \"" + oEvent.getParameter("itemId") + "\" was selected.");
+			break;
+	}
+	});
+
+	//Attach an event to raise an alert when an item is selected. (Button 2)
+	oMenuButton2.attachItemSelected(function (oEvent){
+	switch( oEvent.getParameter("itemId")) {
+		case "item2-0-1":
+			setTimeout("location.href = '" + "WorkOrders.irpt?ROLE=" + document.getElementById("user_role").value + "'",0);
+			break;
+		case "item2-0-2":
+			setTimeout("location.href = '" + "CarrierDashboard.irpt?ROLE=" + document.getElementById("user_role").value + "'",0);
+			break;
+		case "item2-0-3":
+			setTimeout("location.href = '" + "AssemblyDashboard.irpt?ROLE=" + document.getElementById("user_role").value + "'",0);
+			break;
+		default:
+				// alert("Items \"" + oEvent.getParameter("itemId") + "\" was selected.");
+			break;
+	}
+	});
+
+	//Attach an event to raise an alert when an item is selected. (Button 3)
+	oMenuButton3.attachItemSelected(function (oEvent){
+	switch( oEvent.getParameter("itemId")) {
+		// Menu Reports
+		case "item3-0-1":
+			setTimeout("location.href = '" + "ProductionStatus.irpt?ROLE=" + document.getElementById("user_role").value + "'",0);
+			break;
+		case "item3-0-2":
+			setTimeout("location.href = '" + "ItemTraceability.irpt?ROLE=" + document.getElementById("user_role").value + "'",0);
+			break;
+		case "item3-0-3":
+			setTimeout("location.href = '" + "MESM.irpt?ROLE=" + document.getElementById("user_role").value + "'",0);
+			break;
+		case "item3-0-4":
+			setTimeout("location.href = '" + "Documents.irpt?ROLE=" + document.getElementById("user_role").value + "&DIR=Data000'",0);
+			break;
+		default:
+				//alert("Items \"" + oEvent.getParameter("itemId") + "\" was selected.");
+			break;
+	}
+	});
+	// ******************************************************************************************************************************************************************
+	// Create Video Overlay
+	var oMatrixVideo = new sap.ui.commons.layout.MatrixLayout({
+		id : 'MatrixVideo',
+		layoutFixed : true,
+		width: '800px',
+		columns : 1,
+		widths : ['920px'] 
+	});
+	var oVHTML = new sap.ui.core.HTML();
+	var oVContent = "";
+	oVHTML.setContent(oVContent);
+	oMatrixVideo.createRow(oVHTML);
+
+	var oOverlayContainerVideo = new sap.ui.ux3.OverlayDialog({openButtonVisible: false, closeButtonVisible: false});
+	oOverlayContainerVideo.setHeight('630px');
+	oOverlayContainerVideo.setWidth('920px');
+	oOverlayContainerVideo.addContent(oMatrixVideo);	
+
+	// ******************************************************************************************************************************************************************
+	function doVideo(file) {
+		if(!oOverlayContainerVideo.isOpen()){
+			file= file.substr(0,file.length-4);
+          			// set content
+			var timestamp = new Date().getTime();  // <source src="movie.mp4" type='video/mp4; codecs="avc1.4D401E, mp4a.40.2"'>
+			var oVContent = "<div style=\"padding: 0px; margin:0 auto;height:625px;width:925px;background:#565656;\"><center><video id=\"sampleMovie\" width=\"840\" height=\"545\" preload controls><source src=\""+file+".mp4\" type='video/mp4; codecs=\"avc1.4D401E, avc1.42E01E, mp4a.40.2\"' /><source src=\""+file+".ogv\" type='video/ogg; codecs=\"theora, vorbis\"' /><source src=\""+file+".webm\" type='video/webm; codecs=\"vp8, vorbis\"' /></video><br /><input type=\"button\" style=\"width:100px;height:45px;font-size:18px;margin:10px;\" value=\"CLOSE\" onClick=\"closeVideo()\"></div>";
+			oVHTML.setContent(oVContent);
+			// open overlay
+			oOverlayContainerVideo.open();
+		}
+	};
+	// ******************************************************************************************************************************************************************
+	function closeVideo() {
+		if(oOverlayContainerVideo.isOpen()){
+			oOverlayContainerVideo.close();
+			var oVContent ="";
+			oVHTML.setContent(oVContent);
+		}
+	};
+	// ******************************************************************************************************************************************************************
+	// Create Drawing Overlay
+	var oMatrixDrawing = new sap.ui.commons.layout.MatrixLayout({
+		id : 'MatrixDrawing',
+		layoutFixed : true,
+		width: '1280px',
+		columns : 1,
+		widths : ['1280px'] 
+	});
+
+	var oDHTML = new sap.ui.core.HTML();
+	var oDContent = "";
+	oDHTML.setContent(oDContent);
+	oMatrixDrawing.createRow(oDHTML);
+
+	var oOverlayContainerDrawing = new sap.ui.ux3.OverlayDialog({openButtonVisible: false, closeButtonVisible: false});
+	oOverlayContainerDrawing.setHeight('725px');
+	oOverlayContainerDrawing.setWidth('1280px');
+	oOverlayContainerDrawing.addContent(oDHTML);	
+
+	// ******************************************************************************************************************************************************************
+	function doDrawing(file) {
+		if(!oOverlayContainerDrawing.isOpen()){
+          			// set content
+			var timestamp = new Date().getTime();
+                                    /* var pdf = file.pdf;
+                                      window.open(pdf);*/
+			var oDContent ="<div style=\"padding: 0px; margin:0 auto;height:100%;background:#565656;\"><center><object width=\"1278\" height=\"650\" type=\"application/pdf\" data=\""+file+"?#zoom=70&scrollbar=50&toolbar=0&navpanes=0&ts="+timestamp+"\" id=\"pdf_content\" style=\"margin:0;padding:0;\"><p> No PDF Option!</p></object><br /><input type=\"button\" style=\"width:100px;height:45px;font-size:18px;margin:10px;\" value=\"CLOSE\" onClick=\"closeDrawing()\"></div>";
+			oDHTML.setContent(oDContent);
+			// open overlay
+			oOverlayContainerDrawing.open();
+		}
+	};
+	// ******************************************************************************************************************************************************************
+	function closeDrawing() {
+		if(oOverlayContainerDrawing.isOpen()){
+			oOverlayContainerDrawing.close();
+			// var oDContent ="<div style=\"padding: 0px; margin:0 auto;width:1278px;height:100%;background:#565656;\"></div>";
+			var oDContent ="";
+			oDHTML.setContent(oDContent);
+		}
+	};
+	// ******************************************************************************************************************************************************************
+	function doList() {
+		document.getElementById("mesm_content").innerHTML = "<center><img src='Common/img/pls_wait.gif' alt='wait ..' /></center>";
+
+       		var oReqData;
+      		if (window.XMLHttpRequest) {
+     	     		oReqData = new XMLHttpRequest();
+      		}
+		if (oReqData != null) {
+			var timestamp = new Date().getTime();
+			var paramStr = "DIR_NAME="+encodeURIComponent("Data000");
+			var queryStr = "/XMII/Runner?Transaction=MESM/TRAINING/TRANSACTIONS/buildList&OutputParameter=*&Content-Type=text/html&"+paramStr+"&ts="+timestamp;
+			oReqData.open("GET", queryStr, true); 
+			oReqData.onreadystatechange = function() {
+				if (oReqData.readyState == 4) 
+					if (oReqData.status == 200) {
+						document.getElementById("mesm_content").innerHTML = " XML Header Received. Processing ...";
+					// Successful -- rebuild the screen
+						 stringHTML = oReqData.responseText;
+						document.getElementById("mesm_content").innerHTML = stringHTML;
+					} else {
+						alert("Error: " + oReqData.statusText);
+					}
+				}
+			oReqData.send();
+       		} else {
+          			window.alert("Error creating XmlHttpRequest object.");
+       		}
+
+	};
+	// ******************************************************************************************************************************************************************
+	</script>
+</head>
+
+<body onLoad="roleSecurity()">
+
+<input id="user_roles" type="hidden" value="{IllumLoginRoles}" style="display:block;width:1000px;" readonly />
+<input id="user_role" type="hidden" value="{ROLE}" style="display:block;width:1000px;" readonly />
+<input id="user_name" type="hidden" value="{IllumLoginName}" style="display: block;width:1000px;" readonly />
+<input id="user_dir" type="hidden" value="{DIR}" style="display: block;width:100px;" readonly />
+<input id="user_address" type="hidden" value="{Machine}" style="display:block;width:1000px;" readonly />
+<input id="user_firstname" type="hidden" value="{firstname}" style="display:block;width:800px;" readonly />
+<input id="user_lastname" type="hidden" value="{lastname}" style="display:block;width:800px;" readonly />
+<div id="app_header" >
+<div id="app_title">DOCUMENTATION</div>
+<div id="app_menu" style="display:none;"></div>
+<div id="page_title">DEFAULT ROLE</div>
+</div>
+<div id="mesm_content" style="width:1000px;margin:auto;"></div>
+</body>
+</html>

@@ -1,0 +1,993 @@
+<!DOCTYPE html >
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>CT MODULE</title>
+	<style>
+	body {
+		//background-image: url("Common/img/logo.png");
+		background-size: 180px;
+		background-repeat: no-repeat;
+    		background-attachment: fixed;
+    		background-position: right 40px top 30px;
+		font-family: Arial;
+	}
+	#app_header {
+ 		padding: 10px;
+ 		padding-left: 40px;
+ 		padding-top: 15px;
+ 		padding-bottom: 0px;
+		height:80px;
+		width:400px;
+		text-align: center;
+	}
+	#app_title {
+		width:400px;
+		text-align: center;
+		font-family: "Arial Black",Arial,Helvetica,sans-serif;
+		font-size:32px;
+		color: #007dc0;
+		margin-bottom; 20px;
+	}
+	#app_menu {
+		width:400px;
+		text-align: center;
+		font-family: Arial,Helvetica,sans-serif;
+	}
+	#page_title {
+		width:400px;
+		text-align: center;
+		font-family: "Arial Black",Arial,Helvetica,sans-serif;
+		font-size:28px;
+		color: #cfcfcf;
+	}
+	#mesm_content {
+ 		padding: 30px;
+ 		padding-top: 40px;
+	}
+
+	#__button0, #__button1, #__button2 {
+		margin-top:10px;
+		margin-left:5px;
+		margin-right:5px;
+	}
+	
+	#MatrixT, #MatrixB {
+		margin:10px auto;
+	}
+
+	#B-Add, #B-Edit, #B-Delete, #B-MvUp, #B-MvDn {
+		width:100px;
+		height:35px;
+		font-size:14px;
+	}
+
+	#__cell2, #__cell3, #__cell4, #__cell5, #__cell6 {
+		text-align:center;
+	}
+
+	#__cell6, #__cell20,#__cell21, #__cell35, #__cell36, #__cell42 {
+		text-align:center;
+		height: 36px;
+	}
+
+	#__cell7, #__cell9, #__cell11, #__cell13, #__cell15,  #__cell17,  #__cell22, #__cell24, #__cell26, #__cell28, #__cell30, #__cell32, #__cell37, #__cell39 {
+		padding:10px;
+		padding-right:20px;
+		text-align:right;
+	}
+
+	#L-AddHrchy, #L-EditHrchy, #L-Details {
+		margin-top:15px;
+		padding:5px;
+		font-family: "Arial Black",Arial,Helvetica,sans-serif;
+		font-size:32px;
+		height:35px;
+		color: #007dc0;
+	}
+	#B-AddHrchy, #B-EditHrchy, #B-AddDetails {
+		width:100px;
+		height:35px;
+		font-size:14px;
+	}
+	#input_desc , #input_desce {
+		width:250px;
+	}
+
+	#B-New,#B-View,#B-Edit,#B-FinalConfirmation,#B-Routing{
+		width:100px;
+		height:35px;
+		font-size:14px;
+	}
+
+	#L-ViewOrder {
+		margin-top:15px;
+		padding:5px;
+		font-family: "Arial Black",Arial,Helvetica,sans-serif;
+		font-size:27px;
+		height:35px;
+		color: #007dc0;
+	}
+
+		
+	#MatrixAC {
+		margin-left: 20px;
+	}
+
+	 #B-ACSave {
+		width:100px;
+		height:35px;
+		font-size:14px;
+	}
+	</style>
+
+	<script id="sap-ui-bootstrap"
+		src="/sapui5/resources/sap-ui-core.js"
+		data-sap-ui-theme="sap_goldreflection"
+		data-sap-ui-libs="sap.ui.core,sap.ui.commons,sap.ui.table,sap.ui.ux3,sap.m"
+		data-sap-ui-language="en" >
+	</script>
+	<script type="text/javascript" src="Common/js/default.js"></script>
+	<script src="Common/js/jquerydatetimepicker/build/jquery.datetimepicker.full.js"></script>
+
+	<script type="text/javascript" id="app-init">
+	// ******************************************************************************************************************************************************************
+	// Get Core SAP UI5
+	var oCore = sap.ui.getCore();
+	// Initialize screen
+	var nrRows = 13;
+	var selectedIndex =  -1;
+	// ******************************************************************************************************************************************************************
+	// initialize access
+	var level2Access = "";
+	var plant2Access = "";
+	// Initialize screen
+	var selectedPlant = 0;
+           var clock_ID = '0';
+	  var plant_ID = '0';
+	var user_name = "";
+	var nrRows = 18;
+ 	var recordID = "";
+	var unitType = "";
+	var unitName = "";
+	var unitDescr = "";
+	var idUnitParent = "";
+	var unitActive = "";
+	var unitSqlServer = "";
+	var unitSAPID = "";
+	var unitPCoServerID = "";
+	var unitPCoAgentID = "";
+	var unitPCoComPort = "";
+	var unitOpcChnName = "";
+	var unitOpcDevName = "";
+	var unitMemMapPlc = "";
+	var unitIPAddress = "";
+	var ModifiedBy = "";
+	var ModifiedOn = "";
+	var CreatedBy = "";
+	var CreatedOn = "";
+
+		var selectedOrderLast_id = 100096;
+         var selectedJob_id = '900_100096_1';
+
+          // VIEW
+	var selectedComponentID = "";
+	var selectedComponentLotID = "";
+
+
+
+	// ****************************************************************************************************************************************************
+	function roleSecurity() {
+		var myRoles = document.getElementById("user_roles").value;
+		var role2Access = "MESM_" + document.getElementById("user_role").value;
+		user_name = document.getElementById("user_name").value;
+ 		if(myRoles.indexOf(role2Access)<0) {
+			window.location.assign("security.irpt");
+		 } else {
+			var roleString = document.getElementById("user_role").value;
+			var roleArray = roleString.split("_");
+			level2Access = roleArray[0]; 
+				// alert("level : " + level2Access);
+			plant2Access =  roleArray[1];
+				// alert("plant : " + plant2Access);
+			document.getElementById("page_title").innerHTML=role2Access;
+			//updatePlants(plant2Access); 
+
+		getTreeData(plant2Access); 
+
+			selectedPlant = plant2Access; 
+
+			// enable homepage
+			oCore.byId("item3-0-3").setEnabled(true);
+			// show menus
+			oMenuButton1.placeAt("app_menu");
+			oMenuButton2.placeAt("app_menu");
+			oMenuButton3.placeAt("app_menu");
+
+			var role_ADM = "MESM_ADM_"+plant2Access;
+			var role_ENG = "MESM_ENG_"+plant2Access;
+			var role_SUP = "MESM_SUP_"+plant2Access;
+			var role_OPS = "MESM_OPS_"+plant2Access;
+
+			switch(role2Access) {
+			case "MESM_ADM_ALL":
+				// enable Cfg Plants
+					oCore.byId("item1-0-1").setEnabled(true);
+				// enable Cfg Equipment
+					oCore.byId("item1-0-2").setEnabled(true);
+				// enable Cfg Memory Maps Menu
+					oCore.byId("item1-0-3").setEnabled(true);
+				// enable Cfg Connectivity
+					oCore.byId("item1-0-4").setEnabled(true);
+
+				// enable WO Management
+					oCore.byId("item2-0-1").setEnabled(true);
+						// enable Work orders admin
+						oCore.byId("item2-7-1").setEnabled(true);
+						// enable Components admin
+						oCore.byId("item2-7-2").setEnabled(true);
+						// enable Matreial admin
+						oCore.byId("item2-7-3").setEnabled(true);
+				// enable Carrier Station Dashboard
+					oCore.byId("item2-0-2").setEnabled(true);
+				// enable Assembly Station Dashboard
+					oCore.byId("item2-0-3").setEnabled(true);
+
+				// enable Production Status Report
+					oCore.byId("item3-0-1").setEnabled(true);
+				// enable Item Traceability Report
+					oCore.byId("item3-0-2").setEnabled(true);
+				// enable Connector Diagnostics
+					oCore.byId("item3-0-3").setEnabled(true);
+
+				// enable Cfg Memory Maps
+					oCore.byId("item1-4-1").setEnabled(true);
+				// enable Cfg Tag Types
+					oCore.byId("item1-4-2").setEnabled(true);
+				// enable Cfg Tag Functions
+					oCore.byId("item1-4-3").setEnabled(true);
+				// enable Cfg Tag Groups
+					oCore.byId("item1-4-4").setEnabled(true);
+				// enable Cfg Memory Map Transactions
+					oCore.byId("item1-4-5").setEnabled(true);
+
+				// enable Cfg Shop Floor Computers
+					oCore.byId("item1-5-1").setEnabled(true);
+				// enable Cfg Shop Floor Printers
+					oCore.byId("item1-5-2").setEnabled(true);
+				// enable Cfg PCo Servers
+					oCore.byId("item1-5-3").setEnabled(true);
+				// enable Cfg PCo Agents
+					oCore.byId("item1-5-4").setEnabled(true);
+				// enable Cfg Operators
+					oCore.byId("item1-5-5").setEnabled(true);
+
+				// enable Equipment Hierarchy
+					oCore.byId("item1-6-1").setEnabled(true);
+				// enable Cfg Hierarchy Levels
+					oCore.byId("item1-6-2").setEnabled(true);
+				// update screen
+				document.getElementById("page_title").innerHTML="ADM ALL PLANTS";
+				oMatrixT.placeAt('mesm_content');
+				oMatrixB.placeAt('mesm_content');
+				break;
+			case role_ADM:
+				// enable Cfg Equipment
+					oCore.byId("item1-0-2").setEnabled(true);
+				// enable Cfg Memory Maps Menu
+					oCore.byId("item1-0-3").setEnabled(true);
+				// enable Cfg Stations
+					oCore.byId("item1-0-4").setEnabled(true);
+
+				// enable WO Management
+					oCore.byId("item2-0-1").setEnabled(true);
+						// enable Work orders admin
+						oCore.byId("item2-7-1").setEnabled(true);
+						// enable Components admin
+						oCore.byId("item2-7-2").setEnabled(true);
+						// enable Matreial admin
+						oCore.byId("item2-7-3").setEnabled(true);
+				// enable Carrier Station Dashboard
+					oCore.byId("item2-0-2").setEnabled(true);
+				// enable Assembly Station Dashboard
+					oCore.byId("item2-0-3").setEnabled(true);
+
+				// enable Production Status Report
+					oCore.byId("item3-0-1").setEnabled(true);
+				// enable Item Traceability Report
+					oCore.byId("item3-0-2").setEnabled(true);
+				// enable Connector Diagnostics
+					oCore.byId("item3-0-3").setEnabled(true);
+
+				// enable Cfg Memory Maps
+					oCore.byId("item1-4-1").setEnabled(true);
+				// enable Cfg Tag Types
+					oCore.byId("item1-4-2").setEnabled(true);
+				// enable Cfg Tag Functions
+					oCore.byId("item1-4-3").setEnabled(true);
+				// enable Cfg Tag Groups
+					oCore.byId("item1-4-4").setEnabled(true);
+				// enable Cfg Memory Map Transactions
+					oCore.byId("item1-4-5").setEnabled(true);
+
+				// enable Cfg Shop Floor Computers
+					oCore.byId("item1-5-1").setEnabled(true);
+				// enable Cfg Shop Floor Printers
+					oCore.byId("item1-5-2").setEnabled(true);
+				// enable Cfg PCo Servers
+					oCore.byId("item1-5-3").setEnabled(true);
+				// enable Cfg PCo Agents
+					oCore.byId("item1-5-4").setEnabled(true);
+				// enable Cfg Operators
+					oCore.byId("item1-5-5").setEnabled(true);
+
+				// enable Equipment Hierarchy
+					oCore.byId("item1-6-1").setEnabled(true);
+				// enable Cfg Hierarchy Levels
+					oCore.byId("item1-6-2").setEnabled(true);
+				// update screen
+				document.getElementById("page_title").innerHTML="ADM PLANT "+plant2Access;
+				oMatrixT.placeAt('mesm_content');
+
+				break;
+			case "MESM_OPS_ALL":
+				document.getElementById("page_title").innerHTML="OPS ALL PLANTS";
+				oMatrixT.placeAt('mesm_content');
+
+				break;
+			case role_OPS:
+				document.getElementById("page_title").innerHTML="OPS PLANT "+plant2Access;
+				oMatrixT.placeAt('mesm_content');
+
+				break;
+			default:
+				alert("MES Module Role Unknown: " + role2Access);
+				oMatrixT.placeAt('mesm_content');
+
+				break;
+			}
+		  }
+	}
+	// ******************************************************************************************************************************************************************
+	var oMenuButton1 = new sap.ui.commons.MenuButton({text: "Settings", icon: "Common/img/map.png"}); 
+	var oMenuButton2 = new sap.ui.commons.MenuButton({ text: "Interfaces", icon: "Common/img/cloud.png"}); 
+	var oMenuButton3 = new sap.ui.commons.MenuButton({text: "Reports", icon: "Common/img/list.png"});
+
+	// Create the menu
+	var oMenu1 = new sap.ui.commons.Menu("menu1", {ariaDescription: "Application Setup"});
+	// Create the items and add them to the menu
+	var oMenuItem1 = new sap.ui.commons.MenuItem("item1-0-1",{text: "Enterprise Hierarchy", enabled: false});
+	oMenu1.addItem(oMenuItem1);
+	var oMenuItem2 = new sap.ui.commons.MenuItem("item1-0-2",{text: " ???", enabled: false});
+	//oMenu1.addItem(oMenuItem2);
+	var oMenuItem3 = new sap.ui.commons.MenuItem("item1-0-3",{text: "MES Memory Maps", enabled: true});
+	oMenu1.addItem(oMenuItem3);
+	var oMenuItem4 = new sap.ui.commons.MenuItem("item1-0-4",{text: "Plant Connectivity", enabled: true});
+	oMenu1.addItem(oMenuItem4);
+
+	var oMenu4 = new sap.ui.commons.Menu("menu4", {ariaDescription: "Memory Maps Setup", enabled:true});
+	oMenuItem3.setSubmenu(oMenu4);
+	//Create the items and add them to the sub menu
+	var oMenuItem41 = new sap.ui.commons.MenuItem("item1-4-1",{text: "Memory Map Tags", enabled: false});
+	oMenu4.addItem(oMenuItem41);
+	var oMenuItem42 = new sap.ui.commons.MenuItem("item1-4-2",{text: "PLC Tag Types", enabled: false});
+	oMenu4.addItem(oMenuItem42);
+	var oMenuItem43 = new sap.ui.commons.MenuItem("item1-4-3",{text: "PLC Tag Functions", enabled: false});
+	oMenu4.addItem(oMenuItem43);
+	var oMenuItem44 = new sap.ui.commons.MenuItem("item1-4-4",{text: "PLC Tag Comm Groups", enabled: false});
+	oMenu4.addItem(oMenuItem44);
+	var oMenuItem45 = new sap.ui.commons.MenuItem("item1-4-5",{text: "Memory Map Transactions", enabled: false});
+	oMenu4.addItem(oMenuItem45);
+
+	var oMenu5 = new sap.ui.commons.Menu("menu5", {ariaDescription: "Connectivity Setup", enabled:true});
+	oMenuItem4.setSubmenu(oMenu5);
+	//Create the items and add them to the sub menu
+	var oMenuItem55 = new sap.ui.commons.MenuItem("item1-5-5",{text: "Shop Floor Operators", enabled: false});
+	oMenu5.addItem(oMenuItem55);
+	var oMenuItem51 = new sap.ui.commons.MenuItem("item1-5-1",{text: "Shop Floor Computers", enabled: false});
+	oMenu5.addItem(oMenuItem51);
+	var oMenuItem52 = new sap.ui.commons.MenuItem("item1-5-2",{text: "Shop Floor Printers", enabled: false});
+	oMenu5.addItem(oMenuItem52);
+	var oMenuItem53 = new sap.ui.commons.MenuItem("item1-5-3",{text: "Plant Connectivity Servers", enabled: false});
+	oMenu5.addItem(oMenuItem53);
+	var oMenuItem54 = new sap.ui.commons.MenuItem("item1-5-4",{text: "Plant Connectivity Agents", enabled: false});
+	oMenu5.addItem(oMenuItem54);
+
+	var oMenu6 = new sap.ui.commons.Menu("menu6", {ariaDescription: "Hierarchy Setup", enabled:true});
+	oMenuItem1.setSubmenu(oMenu6);
+	//Create the items and add them to the sub menu
+	var oMenuItem61 = new sap.ui.commons.MenuItem("item1-6-1",{text: "Hierarchy Management", enabled: false});
+	oMenu6.addItem(oMenuItem61);
+	var oMenuItem62 = new sap.ui.commons.MenuItem("item1-6-2",{text: "Hierarchy Levels Setup", enabled: false});
+	oMenu6.addItem(oMenuItem62);
+
+	// Create the menu
+	var oMenu2 = new sap.ui.commons.Menu("menu2", {ariaDescription: "User Dashboards"});
+	// Create the items and add them to the menu
+	var oMenuItem21 = new sap.ui.commons.MenuItem("item2-0-1",{text: "Work Order Management", enabled:false});
+	oMenu2.addItem(oMenuItem21);
+	var oMenu7 = new sap.ui.commons.Menu("menu7", {ariaDescription: "Work Order Management", enabled:true});
+	oMenuItem21.setSubmenu(oMenu7);
+	//Create the items and add them to the sub menu
+		var oMenuItem71 = new sap.ui.commons.MenuItem("item2-7-1",{text: "Work Order Management", enabled: false});
+		oMenu7.addItem(oMenuItem71);
+		var oMenuItem72 = new sap.ui.commons.MenuItem("item2-7-2",{text: "Components Management", enabled: false});
+		oMenu7.addItem(oMenuItem72);
+		var oMenuItem73 = new sap.ui.commons.MenuItem("item2-7-3",{text: "Material Management", enabled: false});
+		oMenu7.addItem(oMenuItem73);
+		var oMenuItem74 = new sap.ui.commons.MenuItem("item2-7-4",{text: "Order Runtime", enabled: false});
+		oMenu7.addItem(oMenuItem74);
+
+	var oMenuItem22 = new sap.ui.commons.MenuItem("item2-0-2",{text: "Carrier Station Dashboard", enabled:false});
+	oMenu2.addItem(oMenuItem22);
+	var oMenuItem23 = new sap.ui.commons.MenuItem("item2-0-3",{text: "Assembly Station Dashboard", enabled:false});
+	oMenu2.addItem(oMenuItem23);
+
+	// Create the menu
+	var oMenu3 = new sap.ui.commons.Menu("menu3", {ariaDescription: "User Reports"});
+	// Create the items and add them to the menu
+	var oMenuItem31 = new sap.ui.commons.MenuItem("item3-0-1",{text: "Production Status Report", enabled:false});
+	oMenu3.addItem(oMenuItem31);
+	var oMenuItem32 = new sap.ui.commons.MenuItem("item3-0-2",{text: "Item Traceability Report", enabled:false});
+	oMenu3.addItem(oMenuItem32);
+	var oMenuItem33 = new sap.ui.commons.MenuItem("item3-0-3",{text: "Connector Diagnostics", enabled:false});
+	oMenu3.addItem(oMenuItem33);
+
+	//Attach the Menu to the MenuButton
+	oMenuButton1.setMenu(oMenu1);
+	oMenuButton2.setMenu(oMenu2);
+	oMenuButton3.setMenu(oMenu3);
+
+	//Attach an event to raise an alert when an item is selected (Button 1)
+	oMenuButton1.attachItemSelected(function (oEvent){
+	switch( oEvent.getParameter("itemId")) {
+		//case "item1-0-1":
+		//		setTimeout("location.href = '" + "Plants.irpt?ROLE=" + document.getElementById("user_role").value + "'",0);
+		//	break;
+		case "item1-4-1":
+				setTimeout("location.href = '" + "MemMap.irpt?ROLE=" + document.getElementById("user_role").value + "'",0);
+			break;
+		case "item1-4-2":
+				setTimeout("location.href = '" + "TagTypes.irpt?ROLE=" + document.getElementById("user_role").value + "'",0);
+			break;
+		case "item1-4-3":
+				setTimeout("location.href = '" + "TagFunctions.irpt?ROLE=" + document.getElementById("user_role").value + "'",0);
+			break;
+		case "item1-4-4":
+				setTimeout("location.href = '" + "TagCommGroups.irpt?ROLE=" + document.getElementById("user_role").value + "'",0);
+			break;
+		case "item1-4-5":
+				setTimeout("location.href = '" + "MemMapTrxs.irpt?ROLE=" + document.getElementById("user_role").value + "'",0);
+			break;
+		case "item1-5-1":
+				setTimeout("location.href = '" + "Stations.irpt?ROLE=" + document.getElementById("user_role").value + "'",0);
+			break;
+		case "item1-5-3":
+				setTimeout("location.href = '" + "PCoServers.irpt?ROLE=" + document.getElementById("user_role").value + "'",0);
+			break;
+		case "item1-5-4":
+				setTimeout("location.href = '" + "PCoAgents.irpt?ROLE=" + document.getElementById("user_role").value + "'",0);
+			break;
+		case "item1-5-5":
+				setTimeout("location.href = '" + "Operators.irpt?ROLE=" + document.getElementById("user_role").value + "'",0);
+			break;
+		case "item1-6-1":
+				setTimeout("location.href = '" + "MgtHierarchy.irpt?ROLE=" + document.getElementById("user_role").value + "'",0);
+			break;
+		case "item1-6-2":
+				setTimeout("location.href = '" + "LvlHierarchy.irpt?ROLE=" + document.getElementById("user_role").value + "'",0);
+			break;
+		default:
+				// alert("Items \"" + oEvent.getParameter("itemId") + "\" was selected.");
+			break;
+	}
+	});
+
+	//Attach an event to raise an alert when an item is selected. (Button 2)
+	oMenuButton2.attachItemSelected(function (oEvent){
+	switch( oEvent.getParameter("itemId")) {
+			case "item2-7-1":
+				setTimeout("location.href = '" + "Workorders.irpt?ROLE=" + document.getElementById("user_role").value + "'",0);
+				break;
+			case "item2-7-2":
+				setTimeout("location.href = '" + "Components.irpt?ROLE=" + document.getElementById("user_role").value + "'",0);
+				break;
+			case "item2-7-3":
+				setTimeout("location.href = '" + "Materials.irpt?ROLE=" + document.getElementById("user_role").value + "'",0);
+				break;
+			case "item2-0-2":
+				setTimeout("location.href = '" + "OrderRuntimeView.irpt?ROLE=" + document.getElementById("user_role").value + "'",0);
+				break;
+		default:
+				// alert("Items \"" + oEvent.getParameter("itemId") + "\" was selected.");
+			break;
+	}
+	});
+
+	//Attach an event to raise an alert when an item is selected. (Button 3)
+	oMenuButton3.attachItemSelected(function (oEvent){
+	switch( oEvent.getParameter("itemId")) {
+		case "item3-0-3":
+				setTimeout("location.href = '" + "MESM.irpt?ROLE=" + document.getElementById("user_role").value + "'",0);
+				break;
+		default:
+				//alert("Items \"" + oEvent.getParameter("itemId") + "\" was selected.");
+			break;
+	}
+	});
+
+// **********************	main matrix 	******************************************************************************************************************************
+
+	var oMatrixT = new sap.ui.commons.layout.MatrixLayout({
+		id : 'MatrixT',
+		layoutFixed : true,
+		width: '1150px',
+		columns : 1,
+		widths : ['1200px'] 
+	});
+
+// *******************************************************************************************************************************************************************
+
+	function createColumnsHrchy(){
+		oTable.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: "UNIT NAME"}),
+			template: new sap.ui.commons.TextView().bindProperty("text", "unitName"),
+			sortProperty: "unitName",
+			filterProperty: "unitName",
+			width: "150px"
+		}));
+		oTable.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: "ORDER ID"}),
+			template: new sap.ui.commons.TextView().bindProperty("text", "orderID"),
+			sortProperty: "orderID",
+			filterProperty: "orderID",
+			width: "150px"
+		}));
+		oTable.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: "JOB ID"}),
+			template: new sap.ui.commons.TextView().bindProperty("text", "jobID"),
+			sortProperty: "jobID",
+			filterProperty: "jobID",
+			width: "150px"
+		}));
+		oTable.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: "MATERIAL ID"}),
+			template: new sap.ui.commons.TextView().bindProperty("text", "materialID"),
+			sortProperty: "materialID",
+			filterProperty: "materialID",
+			width: "150px"
+		}));
+		oTable.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: "COMPONENT ID"}),
+			template: new sap.ui.commons.TextView().bindProperty("text", "componentID"),
+			sortProperty: "componentID",
+			filterProperty: "componentID",
+			width: "150px"
+		}));
+		oTable.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: "SERIAL NUMBER(S)"}),
+			template: new sap.ui.commons.TextView().bindProperty("text", "serialNumberID"),
+			sortProperty: "serialNumberID",
+			filterProperty: "serialNumberID",
+			width: "150px"
+		}));
+		oTable.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: "STATUS"}),
+			template: new sap.ui.commons.Image().bindProperty("src", "statusID"),
+			sortProperty: "statusID",
+			filterProperty: "statusID",
+			width: "50px"
+		}));
+	}
+
+	// Create a data model for oTable
+	var oModel = new sap.ui.model.json.JSONModel();
+
+	// *******************************	Get Tree Data	*********************************
+
+	function getTreeData(idPlant) {
+		oTable.clearSelection();
+		var timestamp = new Date().getTime();
+		oTable.unbindColumns();
+		oTable.removeAllColumns();
+		oTable.destroyColumns();
+		oTable.unbindRows();
+		var xmlHttp = new XMLHttpRequest();
+		var xmlDOM;
+		var http_string = "/XMII/Runner?Transaction=MESM/ORDERS/TRANSACTIONS/getHierarchyHeadersForOrder&SERVER_SQL=MESM&ts="+timestamp+"&OutputParameter=HC_OUT&Content-Type=text/xml";
+		xmlHttp.open("GET",http_string, false); 
+		xmlHttp.send();
+		xmlDOM = xmlHttp.responseXML.documentElement;
+		try {
+			if(xmlDOM.getElementsByTagName("Row")[0].firstChild) {
+				var opElement = xmlDOM.getElementsByTagName("Row")[0].firstChild;
+				var oDataFLMP = opElement.firstChild.data;
+				var ojsonDataFLMP = eval('(' + oDataFLMP + ')');
+				createColumnsHrchy();
+				oModel.setData(ojsonDataFLMP);
+				oTable.setModel(oModel);
+				oTable.bindRows("/root");
+			}
+		} catch(e) { 
+			alert(" Could not retrieve headers .."); 
+		}
+	}
+
+	// Create an instance of the table control
+
+	var oTable = new sap.ui.table.TreeTable({
+		columns: [
+		new sap.ui.table.Column({label: "UNIT NAME", template: "unitName",width:"205px"}),
+		new sap.ui.table.Column({label: "ORDER ID", template: "orderID" ,width: "165px"}),
+		new sap.ui.table.Column({label: "MATERIAL ID", template: "materialID",width:"165px"}),
+		new sap.ui.table.Column({label: "ORDER ID", template: "componentID",width:"165px"}),
+		new sap.ui.table.Column({label: "SERIAL NUMBER(S)", template: "serialID",width:"165px"}),
+	//	new sap.ui.table.Column({label: "STATUS", template: "status",width:"205px"})
+		new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: "STATUS"}),
+			template: new sap.ui.commons.Image().bindProperty("src", "status"),
+			width: "75px",
+			hAlign: "Center"
+		})],
+		selectionMode: sap.ui.table.SelectionMode.Single,
+		visibleRowCount: nrRows,
+		visibleRowCountMode: sap.ui.table.VisibleRowCountMode.Interactive,
+		allowColumnReordering: true,
+		expandFirstLevel: false,
+		expandSecondLevel:false,
+		selectionBehavior: sap.ui.table.SelectionBehavior.Row,
+		toggleOpenState: function(oEvent) {
+			var iRowIndex = oEvent.getParameter("rowIndex");
+			var oRowContext = oEvent.getParameter("rowContext");
+			var bExpanded = oEvent.getParameter("expanded");
+		}
+	});
+
+	// ***********************************************************************************
+
+	oTable.attachRowSelectionChange(function(oEvent) {
+		// Retrieve the selected row
+		var selIndex = oTable.getSelectedIndex();
+		selectedIndex = selIndex;
+		if (selIndex  >= 0) {
+
+		} else {
+		
+		}
+	});
+
+	oMatrixT.createRow(oTable);
+
+
+// **************************	main buttons matrix**************************************************************************************************************************
+
+	var oMatrixB = new sap.ui.commons.layout.MatrixLayout({
+		id : 'MatrixB',
+		layoutFixed : true,
+		width: '1100px',
+		columns : 5,
+		widths : ['210px','210px','210px','210px','210px'] 
+	});
+
+// ****************************************************************************************************************************************************
+	
+	var oButtonNew = new sap.ui.commons.Button({
+		id : 'B-New',
+		tooltip : "Add New Order",
+		text : 'Add',
+		enabled: true
+	});
+	oButtonNew.attachPress(doAdd);
+
+	var oButtonView = new sap.ui.commons.Button({
+		id : 'B-View',
+		tooltip : "View Order",
+		text : 'View',
+		enabled: false
+	});
+	//oButtonView.attachPress(doView);
+
+	var oButtonEdit = new sap.ui.commons.Button({
+		id : 'B-Edit',
+		tooltip : "Edit",
+		text : 'Edit',
+		enabled: false
+	});
+	//oButtonEdit.attachPress(doEdit);
+
+	var oButtonFinalConfirmation = new sap.ui.commons.Button({
+		id : 'B-FinalConfirmation',
+		tooltip : "Final Confirmation",
+		text : 'Final',
+		enabled: false
+	});
+	//oButtonNew.attachPress(doFinalConfirmation);
+
+	var oButtonRouting = new sap.ui.commons.Button({
+		id : 'B-Routing',
+		tooltip : "Order Routing",
+		text : 'Routing',
+		enabled: false
+	});
+	//oButtonView.attachPress(doRouting);
+
+	oMatrixB.createRow(oButtonNew,oButtonView,oButtonEdit,oButtonFinalConfirmation,oButtonRouting);
+
+// ******************************	Create VIEW Order Overlay	*****************************************************************************
+
+	var oMatrixAC = new sap.ui.commons.layout.MatrixLayout({
+		id : 'MatrixAC',
+		layoutFixed : true,
+		width: '950px',
+		columns : 5,
+		widths : ['190px','190px','190px','190px','190px'] 
+	});
+
+// ****************************************************************************************************************************************************
+
+	var oTitleAC = new sap.ui.commons.Label({
+		id : 'L-ViewOrder',
+		text : 'VIEW ORDER COMPONENTS'
+	});
+
+	oCell_RowAC1 = new sap.ui.commons.layout.MatrixLayoutCell({colSpan : 5,hAlign:'Center',separation:'Large'});
+	oCell_RowAC1 .addContent(oTitleAC);
+	oMatrixAC.createRow( oCell_RowAC1 );
+
+	function createColumnsComponentsTable() {
+		//Define the columns and the control templates to be used
+		oTableComp.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: "Order ID"}),
+			template: new sap.ui.commons.TextView().bindProperty("text", "orderID"),
+			sortProperty: "orderID",
+			filterProperty: "orderID",
+			width: "60px"
+		}));
+		oTableComp.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: "Job ID"}),
+			template: new sap.ui.commons.TextView().bindProperty("text", "jobID"),
+			sortProperty: "jobID",
+			filterProperty: "jobID",
+			width: "70px"
+		}));
+		oTableComp.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: "Component ID"}),
+			template: new sap.ui.commons.TextView().bindProperty("text", "componentID"),
+			sortProperty: "componentID",
+			filterProperty: "componentID",
+			width: "60px",
+			hAlign: "Center"
+		}));
+		oTableComp.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: "Scheduled QTY"}),
+			template: new sap.ui.commons.TextView().bindProperty("text", "scheduledQty"),
+			sortProperty: "scheduledQty",
+			filterProperty: "scheduledQty",
+			width: "60px",
+			hAlign: "Center"
+		}));
+		oTableComp.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: "Actual QTY"}),
+			template: new sap.ui.commons.TextView().bindProperty("text", "actualQty"),
+			sortProperty: "actualQty",
+			filterProperty: "actualQty",
+			width: "60px",
+			hAlign: "Center"
+		}));
+		oTableComp.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: "Lot ID"}),
+			template: new sap.ui.commons.TextView().bindProperty("text", "lotID"),
+			sortProperty: "lotID",
+			filterProperty: "lotID",
+			width: "50px",
+			hAlign: "Center"
+		}));
+		oTableComp.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: "First Serial #"}),
+			template: new sap.ui.commons.TextView().bindProperty("text", "min_sn"),
+			sortProperty: "min_sn",
+			filterProperty: "min_sn",
+			width: "110px",
+			hAlign: "Center"
+		}));
+		oTableComp.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: "Last Serial #"}),
+			template: new sap.ui.commons.TextView().bindProperty("text", "max_sn"),
+			sortProperty: "max_sn",
+			filterProperty: "max_sn",
+			width: "110px",
+			hAlign: "Center"
+		}));
+	}
+
+	// ****************************************************************************************************
+
+	//Create an instance of the table control
+	var oTableComp = new sap.ui.table.Table({
+		visibleRowCount: 5,
+		visibleRowCountMode: sap.ui.table.VisibleRowCountMode.Interactive,
+		firstVisibleRow: 0,
+		width: "950px",
+		selectionBehavior: sap.ui.table.SelectionBehavior.Row,
+		selectionMode: sap.ui.table.SelectionMode.Single
+	});
+
+	var oCellComp = new sap.ui.commons.layout.MatrixLayoutCell({colSpan: 5 });
+	oCellComp.addContent(oTableComp);
+
+	createColumnsComponentsTable(); 
+
+	oTableComp.attachRowSelectionChange(function(oEvent) {
+		// Retrieve the selected row
+		var selIndex = oTableComp.getSelectedIndex();
+		selectedIndex = selIndex;
+		if (selIndex  >= 0) {
+			// Retrieve the selected row
+			var selectedRow = oTableComp.getRows()[selIndex];
+			var selectedRowContext = oEvent.getParameter("rowContext");
+
+			selectedComponentID = oModelComp.getProperty("componentID", selectedRowContext); 
+				oTF_ACComponentName.setValue(selectedComponentID);  
+			 selectedComponentLotID = oModelComp.getProperty("lotID", selectedRowContext);   
+				oTF_ACLotID.setValue(selectedComponentLotID);
+
+		} else {
+			
+		}
+	});
+
+	//Bring the table onto the UI 
+	oMatrixAC.createRow(oCellComp);
+
+	var oLabelACRow3Space1 = new sap.ui.commons.Label({
+		id : 'L-ACRow3Space1',
+		height : '150px',
+		width : '50px', 
+		text : '  ' })
+
+	oMatrixAC.createRow(oLabelACRow3Space1 );
+	// *********
+
+	var oLabelACComponentName = new sap.ui.commons.Label({
+		id : 'L-ACComponentName',
+		visible : true,
+		text : ' COMPONENT NAME' });
+
+	var oTF_ACComponentName = new sap.ui.commons.TextField({
+		id : 'TF-ACComponentName',
+		tooltip : 'COMPONENT NAME',
+		editable : true,
+		visible : true,
+		width : '180px' 
+	});
+	oTF_ACComponentName.setTextAlign(sap.ui.core.TextAlign.Center);
+
+	var oLabelACLotID = new sap.ui.commons.Label({
+		id : 'L-ACLotID',
+		visible : true,
+		text : ' LOT ID ' });
+
+	var oTF_ACLotID = new sap.ui.commons.TextField({
+		id : 'TF-ACLotID',
+		tooltip : 'LOT ID',
+		editable : true,
+		visible : true,
+		width : '180px' 
+	});
+	oTF_ACLotID.setTextAlign(sap.ui.core.TextAlign.Center);
+
+	var oButtonACSave = new sap.ui.commons.Button({
+		id : 'B-ACSave',
+		tooltip : "Save",
+		text : 'ADD',
+		enabled: true
+	});
+	oButtonACSave.attachPress(doAddComponent);
+
+	oMatrixAC.createRow(oLabelACComponentName,oTF_ACComponentName,oLabelACLotID,oTF_ACLotID,oButtonACSave);
+	// *********
+
+	var oOverlayContainerView = new sap.ui.ux3.OverlayDialog({openButtonVisible: false});
+		oOverlayContainerView .setHeight('400px');
+		oOverlayContainerView .setWidth('990px');
+		oOverlayContainerView.addContent(oMatrixAC);
+
+	// *************************************************************************************************************************************************
+	
+	function doAdd() {
+		if(!oOverlayContainerView.isOpen()){
+			oOverlayContainerView.open();
+			updateoTableComponents();
+		}
+	}
+
+	var oModelComp =  new sap.ui.model.xml.XMLModel();
+
+	function updateoTableComponents() {
+		oTableComp.clearSelection();
+		var timestamp = new Date().getTime();
+		// alert(thePlant); 
+ 		var Param1 = selectedJob_id;		// selected orders category
+		var paramStr = "Param.1="+encodeURIComponent(Param1);
+		//alert(paramStr);
+ 		oModelComp.loadData("/XMII/Illuminator?QueryTemplate=MESM/ORDERS/QUERIES/get_OrderComponents&"+paramStr+"&ts="+timestamp+"&Content-Type=text/xml","",false);
+		oTableComp.setModel(oModelComp);
+		oTableComp.bindRows("/Rowset/Row");
+		oTableComp.getModel().refresh(true);
+	}
+
+	function doAddComponent(){
+		 //	selectedOrderFirst_id , selectedOrderLast_id 
+		//    selectedJob_id
+		var componentID = oCore.byId('TF-ACComponentName').getValue();
+		var lotID = oCore.byId('TF-ACLotID').getValue();
+		var actualQty	= 	1;					// default value for testing
+		//	createdBy
+		//	statusID
+
+		if(componentID=="") {
+			alert("Please Input Component ID ..");
+			oCore.byId("TF-ACComponentName").focus();
+			return;
+		} else {
+			if(lotID=="") {
+				alert("Please Input Lot ID ..");
+				oCore.byId("TF-ACLotID").focus();
+				return;
+			} else {
+				var Param1 = selectedOrderLast_id;
+				var Param2 =  selectedJob_id;
+				var Param3 = componentID;
+				var Param4 = lotID;
+				var Param5 =  actualQty;
+				var Param6 = user_name;
+				
+				var oReqData;
+      				if (window.XMLHttpRequest) {
+     	     				oReqData = new XMLHttpRequest();
+      				}
+				if (oReqData != null) {
+					var timestamp = new Date().getTime();
+					var paramStr = "Param.1="+encodeURIComponent(Param1)+"&Param.2="+encodeURIComponent(Param2)+"&Param.3="+encodeURIComponent(Param3)+"&Param.4="+encodeURIComponent(Param4)+"&Param.5="+encodeURIComponent(Param5)+"&Param.6="+encodeURIComponent(Param6);
+				//	alert(paramStr);
+					var queryStr = "/XMII/Illuminator?QueryTemplate=MESM/ORDERS/QUERIES/add_ComponentIssued&"+paramStr+"&ts="+timestamp+"&Content-Type=text/xml";
+					oReqData.open("GET", queryStr, true); 
+					oReqData.onreadystatechange = function() {
+						if (oReqData.readyState == 4) 
+							if (oReqData.status == 200) {
+								updateoTableComponents();	
+							} else {
+								alert("Error: " + oReqData.statusText);
+							}
+					}
+					oReqData.send();
+       				} else {
+          					window.alert("Error creating XmlHttpRequest object.");
+       				}
+			}
+		}
+	}
+
+	</script>
+</head>
+
+<body onLoad="roleSecurity()">
+
+	<input id="user_roles" type="hidden" value="{IllumLoginRoles}" style="display:block;width:1000px;" readonly />
+	<input id="user_role" type="hidden" value="{ROLE}" style="display:block;width:1000px;" readonly />
+	<input id="user_name" type="hidden" value="{IllumLoginName}" style="display: block;width:1000px;" readonly />
+	<input id="user_height" type="hidden" value="{HEIGHT}" style="display: block;width:100px;" readonly />
+	<input id="user_address" type="hidden" value="{Machine}" style="display:block;width:1000px;" readonly />
+
+	<div id="app_header" >
+		<div id="app_title">ORDER RUNTIME</div>
+		<div id="app_menu"></div>
+		<div id="page_title">DEFAULT SCREEN</div>
+	</div>
+
+	<div id="mesm_content" ></div>
+
+</body>
+
+</html>

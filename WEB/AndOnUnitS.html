@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title> -- </title>
+    <script src="Common/js/jquery.min.js"></script>
+    <script src="Common/js/jquery.kontrol.js"></script>
+    <script>
+        $(function($) {
+            var $all = $(".dial1, .dial2, .bars1, .bars2")
+                    , $body = $("body");
+
+            $(".bars1").bars({
+                fgColor:"#0099ff"
+                , bgColor:"#EEE"
+                /*, change : function (value) {
+                 console.log("change : ", value);
+                 }*/
+                /*, draw : function () {
+                 console.log(this.o);
+                 }*/
+            });
+
+            $(".bars2").bars({
+                fgColor:"#0099ff"
+                , bgColor:"#EEE"
+                /*, change : function (value) {
+                 console.log("change : ", value);
+                 }*/
+                /*, draw : function () {
+                 console.log(this.o);
+                 }*/
+            });
+
+            $(".dial1")
+                    .dial({
+                        fgColor:"green"
+                        , bgColor:"#666"
+                        , thickness : .3
+                        /*, change : function (value) {
+                         console.log("change : ", value);
+                         }*/
+                    })
+                    .css({display:'inline',padding:'0px 10px'});
+
+            $(".dial2")
+                    .dial({
+                        fgColor:"#DD0000"
+                        , bgColor:"#666"
+                        , thickness : .3
+                        /*, change : function (value) {
+                         console.log("change : ", value);
+                         }*/
+                    })
+                    .css({display:'inline',padding:'0px 10px'});
+
+            $(".height").bind(
+                    'click'
+                    , function(e) {
+                        $all.trigger("configure", {height:100});
+                    }
+            );
+
+        });
+
+function getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+
+function doOnLoad() {
+	document.getElementById("h1").innerHTML = getParameterByName('h1');
+
+	document.getElementById("ust").innerHTML = getParameterByName('ust');
+	document.getElementById('ust').style.backgroundColor=getParameterByName('uco');
+
+	var yd0 = getParameterByName('yd1');
+	var yd1 = getParameterByName('yd2');
+	var $Bars2 = $(".bars2");
+             $Bars2 
+             .find('input:eq(0)') 
+             .val(yd0)
+             .trigger('change');
+             $Bars2 
+             .find('input:eq(1)') 
+             .val(yd1)
+             .trigger('change');
+
+	var dial1 = getParameterByName("dial1");
+	var dial2 = getParameterByName("dial2");
+	var $Dial1 = $(".dial1");
+	var $Dial2 = $(".dial2");
+             $Dial1 
+             .val(dial1)
+             .trigger('change');
+             $Dial2
+             .val(dial2)
+             .trigger('change');
+
+	var sh0 = getParameterByName('sh1');
+	var sh1 = getParameterByName('sh2');
+	var sh2 = getParameterByName('sh3');
+	var sh3 = getParameterByName('sh4');
+	var sh4 = getParameterByName('sh5');
+	var sh5 = getParameterByName('sh6');
+	var sh6 = getParameterByName('sh7');
+	var sh7 = getParameterByName('sh8');
+	document.getElementById('sh1').value = sh1;
+	var $Bars1 = $(".bars1");
+             $Bars1 
+             .find('input:eq(0)') 
+             .val(sh0)
+             .trigger('change');
+             $Bars1 
+             .find('input:eq(1)') 
+             .val(sh1)
+             .trigger('change');
+             $Bars1 
+             .find('input:eq(2)') 
+             .val(sh2)
+             .trigger('change');
+             $Bars1 
+             .find('input:eq(3)') 
+             .val(sh3)
+             .trigger('change');
+             $Bars1 
+             .find('input:eq(4)') 
+             .val(sh4)
+             .trigger('change');
+             $Bars1 
+             .find('input:eq(5)') 
+             .val(sh5)
+             .trigger('change');
+             $Bars1 
+             .find('input:eq(6)') 
+             .val(sh6)
+             .trigger('change');
+             $Bars1 
+             .find('input:eq(7)') 
+             .val(sh7)
+             .trigger('change');
+}
+
+function doOnClick() {
+	var input_UNITID = getParameterByName("unitId");
+	setTimeout("parent.location.href = '" + "/XMII/CM/MESM/AndOnBoard.irpt?ROLE=ADM_ALL&UNIT=" + input_UNITID + "'",0);
+}
+    </script>
+    <style>
+        body{
+            margin: 0;
+            padding: 0;
+            background: #fff;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-weight: 300;
+            text-rendering: optimizelegibility;
+	background: #222;
+        }
+        #framework {
+	position: fixed;
+	top:8px;
+	left:8px;
+	background: #222;
+	color:#EEE;
+	width:280px;
+	height: 285px;
+	position: relative;
+	border: 7px solid #efefef;
+        }
+        h1 {
+	cursor: pointer;
+        }
+    </style>
+</head>
+<body onload="doOnLoad()">
+<div id="framework">
+<div class="title" style="font-size:20px;letter-spacing:-2px;line-height:10px;text-align:center;padding-top:20px;">
+    <h1 id="h1" onclick="doOnClick()">Line 3</h1>
+</div>
+
+    <div style="float:left;width:120px;padding:10px;">
+        <div style="margin-bottom:10px; font-sixe:20px; text-align:center; font-weight:bold;">UNIT STATUS</div>
+	<div id="ust" style="padding-top:80px; width:120px; height:30px; background:green; font-sixe:40px; text-align:center; font-weight:bold; color: white;">
+	Running ..
+	</div>
+    </div>
+
+    <div style="float:left; width:120px; padding:10px; font-sixe:20px; text-align:center; font-weight:bold;">
+        <div style="margin-bottom:10px">YIELD SCRAP</div>
+	<div id="eee" style="margin-left:30px;">
+        <fieldset class="bars2" data-height="120" data-width="60" data-cols="2" data-min="0" data-max="100">
+            <legend>&nbsp;</legend>
+            <input id="yd1" value=90>
+            <input id="yd2" value=10>
+        </fieldset>
+	</div>
+    </div>
+
+    <div style="clear:both"></div>
+<!--
+    <div style="float:left;width:120px;padding:10px;">
+        <div style="margin-top:10px; margin-bottom:10px; font-sixe:20px; text-align:center; font-weight:bold;">UNIT RUNTIME</div>
+        <input id="dial1" class="dial1" data-width="100" data-height="100" data-min=0 data-max=100 data-angleOffset="0" value="75">
+    </div>
+
+    <div style="float:left;width:120px;padding:10px;">
+        <div style="margin-top:10px; margin-bottom:10px; font-sixe:20px; text-align:center; font-weight:bold;">HR EFFORT</div>
+        <input id="dial2" class="dial2" data-width="100" data-height="100" data-min=0 data-max=100 data-angleOffset="0" value="65">
+    </div>
+
+    <div style="clear:both"></div>
+
+    <div style="width:280px;padding:10px; font-sixe:20px; text-align:center; font-weight:bold;">
+        <div style="margin-bottom:10px">8 HRS OUTPUT HISTORY</div>
+        <fieldset class="bars1" data-height="120" data-width="270" data-cols="8" data-min="0" data-max="100">
+            <legend>Shift History</legend>
+            <input id="sh1" value=90>
+            <input id="sh2" value=40>
+            <input id="sh3" value=37>
+            <input id="sh4" value=10>
+            <input id="sh5" value=12>
+            <input id="sh6" value=78>
+            <input id="sh7" value=100>
+            <input id="sh8" value=100>
+        </fieldset>
+    </div>
+
+<div style="clear:both"></div>
+</div>
+-->
+</div>
+</body>
+</html>
