@@ -1,0 +1,936 @@
+<!DOCTYPE html >
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>CT MODULE</title>
+	<style>
+	body{
+		background-image: url("Common/img/logo.png");
+		background-size: 180px;
+		background-repeat: no-repeat;
+    		background-attachment: fixed;
+    		background-position: right 40px top 30px;
+		font-family: Arial;
+	}
+	#app_header {
+ 		padding: 10px;
+ 		padding-left: 40px;
+ 		padding-top: 15px;
+ 		padding-bottom: 0px;
+		height:80px;
+		width:400px;
+		text-align: center;
+	}
+	#app_title {
+		width:400px;
+		text-align: center;
+		font-family: "Arial Black",Arial,Helvetica,sans-serif;
+		font-size:32px;
+		color: #007dc0;
+		margin-bottom; 20px;
+	}
+	#app_menu {
+		width:400px;
+		text-align: center;
+		font-family: Arial,Helvetica,sans-serif;
+	}
+	#page_title {
+		width:400px;
+		text-align: center;
+		font-family: "Arial Black",Arial,Helvetica,sans-serif;
+		font-size:28px;
+		color: #cfcfcf;
+	}
+	#mesm_content {
+ 		padding: 30px;
+ 		padding-top: 40px;
+	}
+	#mesm_buttons {
+ 		padding: 0px;
+ 		padding-top: 40px;
+	}
+	#__button0, #__button1, #__button2 {
+		margin-top:10px;
+		margin-left:5px;
+		margin-right:5px;
+	}
+
+	#MatrixT,#MatrixP,#MatrixMail,#MatrixMailF, #BtnsGrp {
+		margin:10px auto;
+	}
+
+	#__cell0, #__cell1, #__cell2, #__cell3, #__cell4, #__cell5, #__cell6 {
+		text-align:center;
+	}
+
+	#L-TRC, #L-PLANT  {
+		margin-top:15px;
+		padding:5px;
+		font-family: "Arial Black",Arial,Helvetica,sans-serif;
+		font-size:24px;
+		height:35px;
+		color: #007dc0;
+	}
+	#L-MailInfo  {
+		margin-top:15px;
+		padding:5px;
+		font-family: "Arial Black",Arial,Helvetica,sans-serif;
+		font-size:32px;
+		height:35px;
+		color: #007dc0;
+	}
+
+	#__cell11, #__cell12, #__cell13,#__cell18 {
+		text-align:center;
+	}
+	#__cell14 {
+		text-align:right;
+	}
+	#dropdnPlants {
+		width:200px;
+		text-align: center;
+	}
+
+	#input_barc {
+		width:400px;
+		text-align: center;
+	}
+
+	#B-Submit, #B-Search, #B-SendMail {
+		width:100px;
+		height:35px;
+		margin-top:15px;
+	}
+
+	#mesm_report {
+		text-align: center;
+	}
+
+	#B-Print, #B-Email, #B-NewSearch{
+		margin:0px auto;
+		margin-bottom:0px;
+		width: 185px;
+		height: 28px;
+	}
+
+	@media print {    
+	    .no-print, .no-print *{
+		display: none !important;
+	    }
+	    .do-print, .do-print *{
+		display: block !important;
+	    }
+	}
+	</style>
+
+	<script id="sap-ui-bootstrap"
+		src="/sapui5/resources/sap-ui-core.js"
+		data-sap-ui-theme="sap_goldreflection"
+		data-sap-ui-libs="sap.ui.core,sap.ui.commons,sap.ui.table,sap.ui.ux3"
+		data-sap-ui-language="en" >
+	</script>
+	<script type="text/javascript" src="Common/js/default.js"></script>
+
+	<script type="text/javascript" id="app-init">
+
+	// ******************************************************************************************************************************************************************
+	// Get Core SAP UI5
+	var oCore = sap.ui.getCore();
+	// ******************************************************************************************************************************************************************
+	// initialize access
+	var level2Access = "";
+	var plant2Access = "";
+	// Initialize screen
+	var user_name = "";
+
+	// selected row values 
+	var selectedSerialNumber = '';
+
+	var isSerialNumberSet = 0;
+
+	// ******************************************************************************************************************************************************************
+	function roleSecurity() {
+		var myRoles = document.getElementById("user_roles").value;
+		var role2Access = "MESM_" + document.getElementById("user_role").value;
+		user_name = document.getElementById("user_name").value;
+		//alert(user_name);
+		// alert(role2Access);
+ 		if(myRoles.indexOf(role2Access)<0) {
+			 window.location.assign("security.irpt");
+		  } else {
+			var roleString = document.getElementById("user_role").value;
+
+			var  report_serial_number = document.getElementById("report_serial_number").value;
+
+			if (report_serial_number =='{SN}'){
+				isSerialNumberSet = 0;
+			}
+			else{
+				isSerialNumberSet = 1;
+				selectedSerialNumber = report_serial_number;
+				//alert(selectedSerialNumber);
+				oCore.byId("TF-ITSerialNum").setValue (selectedSerialNumber);
+			}
+
+			var roleArray = roleString.split("_");
+			level2Access = roleArray[0]; 
+			// 	alert("level : " + level2Access);
+			plant2Access =  roleArray[1];
+			//	alert("plant : " + plant2Access);
+			
+			document.getElementById("page_title").innerHTML=role2Access;
+			// functions called when page LOADED
+			updatePlants(plant2Access); 
+			// enable homepage
+			oCore.byId("item3-0-3").setEnabled(true);
+			// show menus
+			oMenuButton1.placeAt("app_menu");
+			oMenuButton2.placeAt("app_menu");
+			oMenuButton3.placeAt("app_menu");
+
+			var role_ADM = "MESM_ADM_"+plant2Access;
+			var role_ENG = "MESM_ENG_"+plant2Access;
+			var role_SUP = "MESM_SUP_"+plant2Access;
+			var role_OPS = "MESM_OPS_"+plant2Access;
+
+			switch(role2Access) {
+			case "MESM_ADM_ALL":
+
+				// enable Cfg Hierarchy
+					oCore.byId("item1-0-1").setEnabled(true);
+				// enable Cfg Memory Maps
+					oCore.byId("item1-0-3").setEnabled(true);
+				// enable Cfg Connectivity
+					oCore.byId("item1-0-4").setEnabled(true);
+				// enable Master Data
+					oCore.byId("item1-0-5").setEnabled(true);
+
+				// SPC
+				// enable SPC home page
+					oCore.byId("item1-0-6").setEnabled(true);
+				// enable Plants submenu
+					oCore.byId("item1-0-7").setEnabled(true);
+				// enable  Stations submenu
+					oCore.byId("item1-0-8").setEnabled(true);
+				// enable Part submenu
+					oCore.byId("item1-0-9").setEnabled(true);
+				// enable Datapoints submenu
+					oCore.byId("item1-0-10").setEnabled(true);
+				// enable Operators submenu
+					oCore.byId("item1-0-11").setEnabled(true);
+				// enable Subscriptions submenu
+					oCore.byId("item1-0-12").setEnabled(true);
+
+				// enable WO Management
+					oCore.byId("item2-0-1").setEnabled(true);
+				// enable Carrier Station Dashboard
+					oCore.byId("item2-0-2").setEnabled(true);
+				// enable Assembly Station Dashboard
+					oCore.byId("item2-0-3").setEnabled(true);
+
+				// SPC
+				// enable SPC Dashboard
+					oCore.byId("item2-0-4").setEnabled(true);
+				// enable Saved File Charts
+					//	oCore.byId("item2-0-5").setEnabled(true);
+				// enable  PC History Logs
+					//	oCore.byId("item2-0-6").setEnabled(true);
+
+				// enable Production Status Shifts Report
+					oCore.byId("item3-0-1").setEnabled(true);
+				// enable Item Traceability Report
+					oCore.byId("item3-0-2").setEnabled(true);
+				// enable Connector Diagnostics
+					oCore.byId("item3-0-3").setEnabled(true);
+
+				// SPC
+				// enable Daily Activity
+					oCore.byId("item3-0-4").setEnabled(true);
+				// enable Weekly Activity
+					oCore.byId("item3-0-5").setEnabled(true);
+				// enable onthly Activity
+					oCore.byId("item3-0-6").setEnabled(true);
+
+				// enable Equipment Hierarchy
+					oCore.byId("item1-4-1").setEnabled(true);
+				// enable Cfg Hierarchy Levels
+					oCore.byId("item1-4-2").setEnabled(true);
+
+				// enable Cfg Memory Maps
+					oCore.byId("item1-5-1").setEnabled(true);
+				// enable Cfg Tag Types
+					oCore.byId("item1-5-2").setEnabled(true);
+				// enable Cfg Tag Functions
+					oCore.byId("item1-5-3").setEnabled(true);
+				// enable Cfg Tag Groups
+					oCore.byId("item1-5-4").setEnabled(true);
+				// enable Cfg Memory Map Transactions
+					oCore.byId("item1-5-5").setEnabled(true);
+
+				// enable Cfg Shop Floor Computers
+					oCore.byId("item1-6-1").setEnabled(true);
+				// enable Cfg Shop Floor Printers
+					oCore.byId("item1-6-2").setEnabled(true);
+				// enable Cfg PCo Servers
+					oCore.byId("item1-6-3").setEnabled(true);
+				// enable Cfg PCo Agents
+					oCore.byId("item1-6-4").setEnabled(true);
+				// enable Cfg Sql Servers
+					oCore.byId("item1-6-5").setEnabled(true);
+				// enable Cfg Operators
+					oCore.byId("item1-6-6").setEnabled(true);
+				// enable Cfg File Servers
+					oCore.byId("item1-6-7").setEnabled(true);
+				// enable Cfg File Agents
+					oCore.byId("item1-6-8").setEnabled(true);
+
+				// Enable UOM Maintenance
+					oCore.byId("item1-7-1").setEnabled(true);
+				// Enable Product Maintenance
+					oCore.byId("item1-7-2").setEnabled(true);
+				// Enable BOM Maintenance
+					oCore.byId("item1-7-3").setEnabled(true);
+				// Enable Routing Maintenance
+					oCore.byId("item1-7-4").setEnabled(true);
+
+				// SPC
+				// enable Plants  Maintenance
+					oCore.byId("item1-8-1").setEnabled(true);
+				// enable Import Plants
+					oCore.byId("item1-8-2").setEnabled(true);
+				// enable Export Plants
+					oCore.byId("item1-8-3").setEnabled(true);
+
+				// enable Stations   Maintenance
+					oCore.byId("item1-9-1").setEnabled(true);
+				// enable Import Stations
+					oCore.byId("item1-9-2").setEnabled(true);
+				// enable Export Stations
+					oCore.byId("item1-9-3").setEnabled(true);
+
+				// enable Parts Maintenance
+					oCore.byId("item1-10-1").setEnabled(true);
+				// enable Import Parts
+					oCore.byId("item1-10-2").setEnabled(true);
+				// enable Export Parts
+					oCore.byId("item1-10-3").setEnabled(true);
+
+				// enable Datapoints HDR
+					oCore.byId("item1-11-1").setEnabled(true);
+				// enable Datapoints SPC
+					oCore.byId("item1-11-2").setEnabled(true);
+				// enable Import Datapoints
+					oCore.byId("item1-11-3").setEnabled(true);
+				// enable Export Datapoints
+					oCore.byId("item1-11-4").setEnabled(true);
+
+				// enable Operatord Maintenance
+					oCore.byId("item1-12-1").setEnabled(true);
+				// enable Import Operators
+					oCore.byId("item1-12-2").setEnabled(true);
+				// enable  Export Operators
+					oCore.byId("item1-12-3").setEnabled(true);
+										
+				// enable Subscriptions Maintenance 
+					oCore.byId("item1-13-1").setEnabled(true);
+				// enable Import Subscriptions
+					oCore.byId("item1-13-2").setEnabled(true);
+				// enable Export Subscriptions
+					oCore.byId("item1-13-3").setEnabled(true);
+	
+				// update screen
+				document.getElementById("page_title").innerHTML="ADM ALL PLANTS";
+				oMatrixT.placeAt('mesm_content');
+				oMatrixP.placeAt('mesm_buttons');
+				break;
+			case role_ADM:
+				// enable Cfg Hierarchy
+					oCore.byId("item1-0-1").setEnabled(true);
+				// enable Cfg Memory Maps
+					oCore.byId("item1-0-3").setEnabled(true);
+				// enable Cfg Connectivity
+					oCore.byId("item1-0-4").setEnabled(true);
+				// enable Master Data
+					oCore.byId("item1-0-5").setEnabled(true);
+
+				// SPC
+				// enable SPC home page
+					oCore.byId("item1-0-6").setEnabled(true);
+				// enable Plants submenu
+					oCore.byId("item1-0-7").setEnabled(true);
+				// enable  Stations submenu
+					oCore.byId("item1-0-8").setEnabled(true);
+				// enable Part submenu
+					oCore.byId("item1-0-9").setEnabled(true);
+				// enable   Datapoints submenu
+					oCore.byId("item1-0-10").setEnabled(true);
+				// enable Operators submenu
+					oCore.byId("item1-0-11").setEnabled(true);
+				// enable Subscriptions submenu
+					oCore.byId("item1-0-12").setEnabled(true);
+
+				// enable WO Management
+					oCore.byId("item2-0-1").setEnabled(true);
+				// enable Carrier Station Dashboard
+					oCore.byId("item2-0-2").setEnabled(true);
+				// enable Assembly Station Dashboard
+					oCore.byId("item2-0-3").setEnabled(true);
+
+				// SPC
+				// enable SPC Dashboard
+					oCore.byId("item2-0-4").setEnabled(true);
+				// enable Saved File Charts
+					//	oCore.byId("item2-0-5").setEnabled(true);
+				// enable  PC History Logs
+					//	oCore.byId("item2-0-6").setEnabled(true);
+
+				// enable Production Status Report
+					oCore.byId("item3-0-1").setEnabled(true);
+				// enable Item Traceability Report
+					oCore.byId("item3-0-2").setEnabled(true);
+				// enable Connector Diagnostics
+					oCore.byId("item3-0-3").setEnabled(true);
+
+				// SPC
+				// enable Daily Activity
+					oCore.byId("item3-0-4").setEnabled(true);
+				// enable Weekly Activity
+					oCore.byId("item3-0-5").setEnabled(true);
+				// enable onthly Activity
+					oCore.byId("item3-0-6").setEnabled(true);
+
+				// enable Equipment Hierarchy
+					oCore.byId("item1-4-1").setEnabled(true);
+				// enable Cfg Hierarchy Levels
+					oCore.byId("item1-4-2").setEnabled(true);
+
+				// enable Cfg Memory Maps
+					oCore.byId("item1-5-1").setEnabled(true);
+				// enable Cfg Tag Types
+					oCore.byId("item1-5-2").setEnabled(true);
+				// enable Cfg Tag Functions
+					oCore.byId("item1-5-3").setEnabled(true);
+				// enable Cfg Tag Groups
+					oCore.byId("item1-5-4").setEnabled(true);
+				// enable Cfg Memory Map Transactions
+					oCore.byId("item1-5-5").setEnabled(true);
+
+				// enable Cfg Shop Floor Computers
+					oCore.byId("item1-6-1").setEnabled(true);
+				// enable Cfg Shop Floor Printers
+					oCore.byId("item1-6-2").setEnabled(true);
+				// enable Cfg PCo Servers
+					oCore.byId("item1-6-3").setEnabled(true);
+				// enable Cfg PCo Agents
+					oCore.byId("item1-6-4").setEnabled(true);
+				// enable Cfg Sql Servers
+					oCore.byId("item1-6-5").setEnabled(true);
+				// enable Cfg Operators
+					oCore.byId("item1-6-6").setEnabled(true);
+				// enable Cfg File Servers
+					oCore.byId("item1-6-7").setEnabled(true);
+				// enable Cfg File Agents
+					oCore.byId("item1-6-8").setEnabled(true);
+
+				// Enable UOM Maintenance
+					oCore.byId("item1-7-1").setEnabled(true);
+				// Enable Product Maintenance
+					oCore.byId("item1-7-2").setEnabled(true);
+				// Enable BOM Maintenance
+					oCore.byId("item1-7-3").setEnabled(true);
+				// Enable Routing Maintenance
+					oCore.byId("item1-7-4").setEnabled(true);
+
+				// SPC
+				// enable Plants  Maintenance
+					oCore.byId("item1-8-1").setEnabled(true);
+				// enable Import Plants
+					oCore.byId("item1-8-2").setEnabled(true);
+				// enable Export Plants
+					oCore.byId("item1-8-3").setEnabled(true);
+
+				// enable Stations   Maintenance
+					oCore.byId("item1-9-1").setEnabled(true);
+				// enable Import Stations
+					oCore.byId("item1-9-2").setEnabled(true);
+				// enable Export Stations
+					oCore.byId("item1-9-3").setEnabled(true);
+
+				// enable Parts Maintenance
+					oCore.byId("item1-10-1").setEnabled(true);
+				// enable Import Parts
+					oCore.byId("item1-10-2").setEnabled(true);
+				// enable Export Parts
+					oCore.byId("item1-10-3").setEnabled(true);
+
+				// enable Datapoints HDR
+					oCore.byId("item1-11-1").setEnabled(true);
+				// enable Datapoints SPC
+					oCore.byId("item1-11-2").setEnabled(true);
+				// enable Import Datapoints
+					oCore.byId("item1-11-3").setEnabled(true);
+				// enable Export Datapoints
+					oCore.byId("item1-11-4").setEnabled(true);
+
+				// enable Operatord Maintenance
+					oCore.byId("item1-12-1").setEnabled(true);
+				// enable Import Operators
+					oCore.byId("item1-12-2").setEnabled(true);
+				// enable  Export Operators
+					oCore.byId("item1-12-3").setEnabled(true);
+										
+				// enable Subscriptions Maintenance 
+					oCore.byId("item1-13-1").setEnabled(true);
+				// enable Import Subscriptions
+					oCore.byId("item1-13-2").setEnabled(true);
+				// enable Export Subscriptions
+					oCore.byId("item1-13-3").setEnabled(true);
+	
+				// update screen
+				document.getElementById("page_title").innerHTML="ADM PLANT "+plant2Access;
+					oMatrixT.placeAt('mesm_content');
+					oMatrixP.placeAt('mesm_buttons');
+				break;
+			case "MESM_OPS_ALL":
+				// enable WO Management
+					oCore.byId("item2-0-1").setEnabled(true);
+				// enable Carrier Station Dashboard
+					oCore.byId("item2-0-2").setEnabled(true);
+				// enable Assembly Station Dashboard
+					oCore.byId("item2-0-3").setEnabled(true);
+
+				// SPC
+				// enable SPC Dashboard
+					oCore.byId("item2-0-4").setEnabled(true);
+				// enable Saved File Charts
+					//	oCore.byId("item2-0-5").setEnabled(true);
+				// enable  PC History Logs
+					//	oCore.byId("item2-0-6").setEnabled(true);
+
+				// enable Production Status Report
+					oCore.byId("item3-0-1").setEnabled(true);
+				// enable Item Traceability Report
+					oCore.byId("item3-0-2").setEnabled(true);
+				// enable Connector Diagnostics
+					oCore.byId("item3-0-3").setEnabled(true);
+
+				// SPC
+				// enable Daily Activity
+					oCore.byId("item3-0-4").setEnabled(true);
+				// enable Weekly Activity
+					oCore.byId("item3-0-5").setEnabled(true);
+				// enable onthly Activity
+					oCore.byId("item3-0-6").setEnabled(true);
+
+				document.getElementById("page_title").innerHTML="OPS ALL PLANTS";
+					oMatrixT.placeAt('mesm_content');
+					oMatrixP.placeAt('mesm_buttons');
+				break;
+			case role_OPS:
+		// enable WO Management
+					oCore.byId("item2-0-1").setEnabled(true);
+				// enable Carrier Station Dashboard
+					oCore.byId("item2-0-2").setEnabled(true);
+				// enable Assembly Station Dashboard
+					oCore.byId("item2-0-3").setEnabled(true);
+
+				// SPC
+				// enable SPC Dashboard
+					oCore.byId("item2-0-4").setEnabled(true);
+				// enable Saved File Charts
+					//	oCore.byId("item2-0-5").setEnabled(true);
+				// enable  PC History Logs
+					//	oCore.byId("item2-0-6").setEnabled(true);
+
+				// enable Production Status Report
+					oCore.byId("item3-0-1").setEnabled(true);
+				// enable Item Traceability Report
+					oCore.byId("item3-0-2").setEnabled(true);
+				// enable Connector Diagnostics
+					oCore.byId("item3-0-3").setEnabled(true);
+
+				// SPC
+				// enable Daily Activity
+					oCore.byId("item3-0-4").setEnabled(true);
+				// enable Weekly Activity
+					oCore.byId("item3-0-5").setEnabled(true);
+				// enable onthly Activity
+					oCore.byId("item3-0-6").setEnabled(true);
+
+				document.getElementById("page_title").innerHTML="OPS PLANT "+plant2Access;
+					oMatrixT.placeAt('mesm_content');
+					oMatrixP.placeAt('mesm_buttons');
+				break;
+			default:
+				alert("MES Module Role Unknown: " + role2Access);
+				break;
+			}
+		  }
+	}
+
+	// ************************************	MENU		******************************************************************************************************************************
+
+	var timestamp = new Date().getTime();
+
+	var jsFile=document.createElement('script');
+	jsFile.setAttribute("type","text/javascript");
+	jsFile.setAttribute("src", "Common/js/menu.js?ts="+timestamp);
+	document.getElementsByTagName("head")[0].appendChild(jsFile);
+
+	// ******************************************************************************************************************************************************************
+	var oMatrixT = new sap.ui.commons.layout.MatrixLayout({
+		id : 'MatrixT',
+		layoutFixed : true,
+		width: '900px',
+		columns : 1,
+		widths : ['900px'] });
+
+	var oLabelPlant = new sap.ui.commons.Label({
+		id : 'L-PLANT',
+		text : 'PRODUCTION FACILITY'
+	});
+
+	oMatrixT.createRow(oLabelPlant);
+
+       	var oDropdownBoxPlants = new sap.ui.commons.DropdownBox({
+		id : "dropdnPlants",
+		tooltip : 'Active Plants',
+		editable : true,
+		change: function(oEvent){
+			// alert(oEvent.oSource.getSelectedKey());
+		}
+	});
+	oMatrixT.createRow(oDropdownBoxPlants);
+
+	oSpace1 = new sap.ui.commons.Label({
+		id : 'L-Space1',
+		text : ''
+	});
+
+	oMatrixT.createRow(oSpace1);
+
+	var oLabelTRC = new sap.ui.commons.Label({
+		id : 'L-TRC',
+		text : 'SERIAL # INPUT'
+	});
+	oMatrixT.createRow(oLabelTRC);
+
+	var oInput_BARC = new sap.ui.commons.TextField({
+		id: 'input_barc',
+		liveChange : function(oEvent) {
+		 // alert(oEvent.getParameter("liveValue"));
+		}
+	});
+	oInput_BARC.setTextAlign(sap.ui.core.TextAlign.Center);
+	oMatrixT.createRow(oInput_BARC);
+
+	var oButton1 = new sap.ui.commons.Button({
+		id : 'B-Submit',
+		tooltip : "Submit Query",
+		text : 'SUBMIT',
+		enabled: true
+	}); 
+	oButton1.attachPress(doSubmit);
+
+	var oButton2 = new sap.ui.commons.Button({
+		id : 'B-Search',
+		tooltip : "Search Serial Numbers",
+		text : 'SEARCH',
+		enabled: true
+	});
+	oButton2.attachPress(doSearch);
+
+	var oBtnsGrp = new sap.ui.commons.layout.MatrixLayout({
+		id : 'BtnsGrp',
+		layoutFixed : true,
+		width: '400px',
+		columns : 2,
+		widths : ['200px','200px'] });
+
+	oBtnsGrp.createRow(oButton1,oButton2)
+	oMatrixT.createRow(oBtnsGrp);
+
+	// ******************************************************************************************************************************************************************
+	function updatePlants(idPlant) {
+		var timestamp = new Date().getTime();
+		getData("/XMII/Illuminator?QueryTemplate=MESM/PLANTS/TRANSACTIONS/getActivePlants_xAcute&Param.1="+idPlant+"&ts="+timestamp+"&Content-Type=text/xml", parseJsonPlantsList);
+		function parseJsonPlantsList(jsondata){
+			oDropdownBoxPlants.destroyItems();
+
+			for (var i=0; i<jsondata.length; i++){
+				item_key = jsondata[i]['PLANT'];
+				item_text = jsondata[i]['DESC'];
+				oItem = new sap.ui.core.ListItem({
+					key : item_key,
+					text : item_text });
+				oDropdownBoxPlants.addItem(oItem);
+			}
+			oDropdownBoxPlants.setSelectedKey(idPlant);
+		}
+	}
+	// ******************************************************************************************************************************************************************
+	function doSubmit() {
+		var miiDataServer = oDropdownBoxPlants.getSelectedKey();
+		var plantName = oDropdownBoxPlants.getValue();
+		if(miiDataServer == "0000") {
+			alert("Please select production facility ..");
+			oCore.byId("dropdnPlants").focus();
+			return;
+		}
+		var scanValue = oCore.byId("input_barc").getValue();
+		if(scanValue == "") {
+			alert("Please input a Serial Number to search ..");
+			oCore.byId("input_barc").focus();
+			return;
+		} 
+
+		document.getElementById("mesm_content").style.display= "none";
+		document.getElementById("mesm_report").innerHTML = "<img src='Common/img/pls_wait.gif' alt='wait ..' />";
+		document.getElementById("mesm_buttons").style.display= "block";
+
+		var stringHTML = "";
+
+       		var oReqData;
+      		if (window.XMLHttpRequest) {
+     	     		oReqData = new XMLHttpRequest();
+      		}
+
+		if (oReqData != null) {
+			var timestamp = new Date().getTime();
+			var paramStr = "SERNUM="+encodeURIComponent(scanValue);
+			// alert(paramStr);
+			var queryStr = "/XMII/Runner?Transaction=MESM/REPORTS/TRANSACTIONS/buildItemTraceability&OutputParameter=*&Content-Type=text/html&"+paramStr+"&ts="+timestamp;
+			// alert(queryStr);
+			oReqData.open("GET", queryStr, true); 
+			oReqData.onreadystatechange = function() {
+				if (oReqData.readyState == 4) 
+					if (oReqData.status == 200) {
+						document.getElementById("mesm_report").innerHTML = " XML Header Received. Processing ...";
+						// Successful -- rebuild the screen
+						stringHTML = oReqData.responseText;
+						//alert(stringHTML);
+						document.getElementById("mesm_report").innerHTML = stringHTML;
+					} else {
+						alert("Error: " + oReqData.statusText);
+					}
+				}
+			oReqData.send();
+       		} else {
+          			window.alert("Error creating XmlHttpRequest object.");
+       		}
+	}
+	// ******************************************************************************************************************************************************************
+	function doSearch() {
+		var miiDataServer = oDropdownBoxPlants.getSelectedKey();
+		var plantName = oDropdownBoxPlants.getValue();
+		if(miiDataServer == "0000") {
+			alert("Please select production facility ..");
+			oCore.byId("dropdnPlants").focus();
+			return;
+		}
+
+		alert("Search for SN .. in progress");
+
+		return;
+	}
+	// ******************************************************************************************************************************************************************
+	var oMatrixP = new sap.ui.commons.layout.MatrixLayout({
+		id : 'MatrixP',
+		layoutFixed : true,
+		width: '600px',
+		columns : 3,
+		widths : ['200px','200px','200px']
+	 });
+	var oButtonP = new sap.ui.commons.Button({
+		id : 'B-Print',
+		tooltip : "Print Report",
+		text : 'PRINT REPORT',
+		enabled: true
+	});
+	oButtonP.attachPress(doPrint);
+	var oButtonE = new sap.ui.commons.Button({
+		id : 'B-Email',
+		tooltip : "Email Report",
+		text : 'EMAIL REPORT',
+		enabled: true
+	});
+	oButtonE.attachPress(doEmail);
+	var oButtonN = new sap.ui.commons.Button({
+		id : 'B-NewSearch',
+		tooltip : "New Search",
+		text : 'NEW SEARCH',
+		enabled: true
+	});
+	oButtonN.attachPress(doNewSearch);
+	oMatrixP.createRow(oButtonP, oButtonE, oButtonN);
+	// ******************************************************************************************************************************************************************
+	function doPrint() {
+		$('body').css('background', 'transparent');
+		window.print();
+		$('body').css('background-image', 'url("Common/img/logo.png")');
+		$('body').css('background-size', '180px');
+		$('body').css('background-repeat', 'no-repeat');
+		$('body').css('background-attachment', 'fixed');
+		$('body').css('background-position', 'right 40px top 30px');
+	}
+	// ******************************************************************************************************************************************************************
+	// create email overlay
+	var oMatrixMail = new sap.ui.commons.layout.MatrixLayout({
+		id : 'MatrixMail',
+		layoutFixed : true,
+		width: '490px',
+		columns : 1,
+		widths : ['500px'] 
+	});
+
+	var oMatrixMailF = new sap.ui.commons.layout.MatrixLayout({
+		id : 'MatrixMailF',
+		layoutFixed : true,
+		width: '490px',
+		columns : 3,
+		widths : ['180px','140px','170px'] 
+	});
+
+	var oTitleMail = new sap.ui.commons.Label({
+		id : 'L-MailInfo',
+		text : 'EMAIL INFORMATION'
+	});
+	oMatrixMail.createRow( oTitleMail );
+
+	var oLabelSystemMail = new sap.ui.commons.Label({
+		id : 'L-SysMail',
+		text : ' System Mail : '
+	});
+	oMatrixMail.createRow( oLabelSystemMail );
+
+	var oLabelSystemNote = new sap.ui.commons.Label({
+		id : 'L-SysNote',
+		text : ' Messages can be relayed to xxxxxxxxxxx@dana.com addresses only! '
+	});
+	oMatrixMail.createRow( oLabelSystemNote );
+
+	var oLabelRecipient = new sap.ui.commons.Label({
+		id : 'L-Recipient',
+		text : ' Send eMail To  '
+	});
+
+	var oInputRecipient = new sap.ui.commons.TextField('input_recipient');
+	oInputRecipient.setTextAlign(sap.ui.core.TextAlign.Right);
+
+	var oLabelDomain = new sap.ui.commons.Label({
+		id : 'L-Domain',
+		text : ' @dana.com '
+	});
+
+	oMatrixMailF.createRow( oLabelRecipient, oInputRecipient, oLabelDomain );
+	oMatrixMail.createRow( oMatrixMailF );
+
+	var oButtonMail = new sap.ui.commons.Button({
+		id : 'B-SendMail',
+		tooltip : "Send report data via eMail",
+		text : 'SUBMIT',
+		enabled: true
+	});
+	oButtonMail.attachPress(doSendEmail);
+	oMatrixMail.createRow( oButtonMail );
+
+	var oOverlayContainerMail = new sap.ui.ux3.OverlayDialog({openButtonVisible: false});
+	oOverlayContainerMail.setHeight('250px');
+	oOverlayContainerMail.setWidth('600px');
+	oOverlayContainerMail.addContent(oMatrixMail);	
+
+	// ******************************************************************************************************************************************************************
+	function doEmail() {
+		 // collect email data
+		var recipient = document.getElementById("user_email").value;
+		recipient = recipient.toLowerCase();
+		var firstname = document.getElementById("user_firstname").value;
+		var lastname = document.getElementById("user_lastname").value;
+		var allname = firstname+"."+lastname;
+		// show email overlay
+		if(!oOverlayContainerMail.isOpen()){
+          			oCore.byId("L-SysMail").setText("System configured eMail address : " + recipient);
+			if (recipient.indexOf("@dana.com")>0 ) {
+          			    oCore.byId("input_recipient").setValue(recipient.substr(0, recipient.indexOf("@dana.com")));
+			} else {
+          			    oCore.byId("input_recipient").setValue(allname.toLowerCase());
+			}
+			oOverlayContainerMail.open();
+		}
+	}
+	// ******************************************************************************************************************************************************************
+	function doSendEmail() {
+		var dataserver = oDropdownBoxPlants.getSelectedKey();
+		var querytitle = oDropdownBoxPlants.getValue();
+		var queryparam = oCore.byId("input_barc").getValue();
+		var recipient = oCore.byId("input_recipient").getValue() + "@dana.com";
+
+		var scanValue = oCore.byId("input_barc").getValue();
+		// all good - call TRX
+       		var oSendMail;
+      		if (window.XMLHttpRequest) {
+     	     		oSendMail = new XMLHttpRequest();
+      		}
+		if (oSendMail != null) {
+			var timestamp = new Date().getTime();
+			var paramStr = "SERNUM="+encodeURIComponent(scanValue)+"&MailRecipient="+encodeURIComponent(recipient);
+			// alert(paramStr);
+			var queryStr = "/XMII/Runner?Transaction=MESM/REPORTS/TRANSACTIONS/mailItemTraceability&OutputParameter=XML_RESULT&Content-Type=text/xml&"+paramStr+"&ts="+timestamp;
+			// alert(queryStr);
+			oSendMail.open("GET", queryStr, true); 
+			oSendMail.onreadystatechange = function() {
+				if (oSendMail.readyState == 4) 
+					if (oSendMail.status == 200) {
+						// Successful -- rebuild the screen
+						var xmlDOC = oSendMail.responseXML;
+						if(xmlDOC.getElementsByTagName("TRXRESULT")[0] && xmlDOC.getElementsByTagName("TRXRESULT")[0].childNodes[0]) {
+							var trxMessage = xmlDOC.getElementsByTagName("TRXRESULT")[0].childNodes[0].nodeValue;
+							alert(trxMessage);
+							oOverlayContainerMail.close();
+						} else { 
+							alert("Please do try again later .. ");
+						}
+					} else {
+						alert("Error: " + oSendMail.statusText);
+					}
+				}
+			oSendMail.send();
+       		} else {
+          			window.alert("Error creating XmlHttpRequest object.");
+       		}
+	}
+	// ******************************************************************************************************************************************************************
+	function doNewSearch() {
+		document.getElementById("mesm_report").innerHTML = "";
+		document.getElementById("mesm_buttons").style.display= "none";
+		document.getElementById("mesm_content").style.display= "block";
+	}
+	// ******************************************************************************************************************************************************************
+	</script>
+
+</head>
+
+<body onLoad="roleSecurity()">
+
+<input id="user_roles" type="hidden" value="{IllumLoginRoles}" style="display:block;width:1000px;" readonly />
+<input id="user_role" type="hidden" value="{ROLE}" style="display:block;width:1000px;" readonly />
+<input id="report_serial_number" type="hidden" value="{SN}" style="display:block;width:1000px;" readonly />
+<input id="user_address" type="hidden" value="{Machine}" style="display:block;width:1000px;" readonly />
+<input id="user_email" type="hidden" value="{email}" style="display:block;width:800px;" readonly />
+<input id="user_firstname" type="hidden" value="{firstname}" style="display:block;width:800px;" readonly />
+<input id="user_lastname" type="hidden" value="{lastname}" style="display:block;width:800px;" readonly />
+<input id="user_name" type="hidden" value="{IllumLoginName}" style="display: block;width:1000px;" readonly />
+<input id="user_height" type="hidden" value="{HEIGHT}" style="display: block;width:100px;" readonly />
+<input id="user_address" type="hidden" value="{Machine}" style="display:block;width:1000px;" readonly />
+<div id="app_header" class="no-print" style="margin-bottom:30px;" >
+<div id="app_title">ITEM TRACEABILITY</div>
+<div id="app_menu"></div>
+<div id="page_title">DEFAULT SCREEN</div>
+</div>
+<div id="mesm_title1"  style="width:100%;text-align: center;font-size:36px; color: #007dc0; margin-top; 20px; margin-bottom; 20px;font-weight:bold; display:none;" class="do-print">ITEM TRACEABILITY</div>
+<div id="mesm_content" class="no-print"></div>
+<div id="mesm_buttons" class="no-print" style="display:none;"></div>
+<div id="mesm_report" ></div>
+</body>
+</html>

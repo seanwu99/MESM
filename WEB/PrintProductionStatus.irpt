@@ -1,0 +1,316 @@
+<!DOCTYPE html >
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>CT MODULE</title>
+	<style>
+		body  {
+   			background-size: 120px;
+			background-repeat: no-repeat;
+    			background-attachment: fixed;
+    			background-position: right 40px top 10px;
+			font-family: Arial;
+		}
+		table {
+  			  margin: 0 auto;
+		}
+
+		#app_header {
+ 			padding: 10px;
+ 			padding-left: 40px;
+ 			padding-top: 15px;
+ 			padding-bottom: 0px;
+			height:80px;
+			width:1150px;
+			text-align: center;
+		}
+		#app_title {
+			width:100%;
+			text-align: center;
+			font-family: "Arial Black",Arial,Helvetica,sans-serif;
+			font-size:32px;
+			color: #007dc0;
+			margin-bottom; 20px;
+		}
+
+		#B-PrintList {
+			width:100px;
+			height:35px;
+			font-size:14px;
+		}
+
+		@media print{    
+
+			* { margin: 0 !important; padding: 0 !important; }
+
+    			.no-print, .no-print *	  {
+        				display: none !important;
+    			}
+			#B-PrintList { 
+   				display: none; 
+			}
+		}
+		@media all {
+			.page-break{ display: none; }
+		}
+		@media print {
+			.page-break{ display: block; page-break-before: always; }
+		}
+		.separatorLine { border-bottom: 3px solid #000; }
+
+	</style>
+
+	<script id="sap-ui-bootstrap"
+		src="/sapui5/resources/sap-ui-core.js"
+		data-sap-ui-theme="sap_goldreflection"
+		data-sap-ui-libs="sap.ui.core,sap.ui.commons,sap.ui.table"
+		data-sap-ui-language="en" >
+	</script>
+
+	<script type="text/javascript" src="Common/js/default.js"></script>
+
+<script type="text/javascript" id="app-init">
+
+	// Get Core SAP UI5
+	var oCore = sap.ui.getCore();
+
+	var plantID = 0;
+	var lineID = 0;
+	var lineNamePrd = '';
+	var orderNumber = '';
+	var dateFrom = '';
+	var dateTo = '';
+	var lineRecID = 0;
+	var lineRecName = '';
+	var operation = '';
+	var typePR = '';
+
+	// ******************************************************************************************************************************************************************
+	function createHTMLPage(){
+		plantID = selectedPlant.value;
+		lineID = selectedLine.value;
+		lineNamePrd = selectedLineName.value;
+		orderNumber = selectedOrderNumber.value;
+		dateFrom = selectedDateFrom.value;
+		dateTo = selectedDateTo.value;
+		lineRecID = selectedLineRecID.value;
+		lineRecName = selectedLineRecName.value;
+		operation = selectedOperation.value;
+		typePR = selectedTypePR.value;
+		//alert(plantID + " >> " + lineID + " >> " +  lineNamePrd + " >> " +  orderNumber + " >> " +  dateFrom + " >> " +  dateTo + " >> " +  lineRecID + " >> " +  lineRecName + " >> " +  operation  + " >> " +  typePR);
+		buildTableProductionStatus();
+	}
+
+	// ******************************************************************************************************************************************************************
+	function buildTableProductionStatus() {
+		var Server_SQL = "";
+		var QueryTitle = "PRODUCTION STATUS LIST";
+		var d = new Date();
+		var date = [ d.getFullYear(), d.getMonth() + 1, d.getDate() ]; 
+		var time = [ d.getHours(), d.getMinutes(), d.getSeconds() ];
+		for ( var i = 1; i < 3; i++ ) { 
+		     if ( date[i] < 10 ) { 
+		       date[i] = "0" + date[i]; 
+		     } 
+		}
+		for ( var i = 1; i < 3; i++ ) { 
+		     if ( time[i] < 10 ) { 
+		       time[i] = "0" + time[i]; 
+		     } 
+		} 
+
+		var dateStr = date.join("-")  + " " + time.join(":");
+
+		var timestamp = new Date().getTime();
+
+		document.getElementById("list").innerHTML = "<img src='Common/img/pls_wait.gif' alt='wait ..' />";
+
+		var stringHTML = "";
+
+		var plantName = "";
+		var plantRecID = "";
+		var lineName = "";
+		var unitID = "";
+		var workOrder = "";
+		var maxQty = "";
+		var totalCnf = "";
+		var goodCnf = "";
+		var failCnf = "";
+		var opStart = "";
+		var opFinal = "";
+		var lastTS = "";
+
+		var partType = "";
+		var shift1 = "";
+		var shift2 = "";
+		var shift3 = "";
+		var totalParts = "";
+
+		var bgColor = "#efefef";
+
+		var tableHTML = "";
+
+		var Param1 = plantID;
+		if (lineRecID > 0)
+			var Param2 = lineRecID;
+		else
+			var Param2 = lineID;
+		var Param3 = dateFrom;
+		var Param4 = dateTo;
+		var Param5 = orderNumber;
+		var Param6 = operation;
+
+		if (lineRecID > 0) {
+			if (typePR.toUpperCase() == "HOURLY") {
+				var paramStr = "Param.1="+encodeURIComponent(Param1)+"&Param.2="+encodeURIComponent(Param2)+"&Param.3="+encodeURIComponent(Param3)+"&Param.4="+encodeURIComponent(Param4)+"&Param.5="+encodeURIComponent(Param5)+"&Param.6="+encodeURIComponent(Param6)+"&Param.7=ALL";
+ 				getData("/XMII/Illuminator?QueryTemplate=MESM/REPORTS/QUERIES/getProductionStatusByHours&"+paramStr+"&ts="+timestamp+"&Content-Type=text/xml", parseJsonPSByHoursList);
+			} else {
+				var paramStr = "Param.1="+encodeURIComponent(Param1)+"&Param.2="+encodeURIComponent(Param2)+"&Param.3="+encodeURIComponent(Param3)+"&Param.4="+encodeURIComponent(Param4)+"&Param.5="+encodeURIComponent(Param5)+"&Param.6="+encodeURIComponent(Param6)+"&Param.7=ALL";
+ 				getData("/XMII/Illuminator?QueryTemplate=MESM/REPORTS/QUERIES/getProductionStatusByShifts&"+paramStr+"&ts="+timestamp+"&Content-Type=text/xml", parseJsonPSByShiftsList);
+			}
+		}
+		else {
+			var paramStr = "Param.1="+encodeURIComponent(Param1)+"&Param.2="+encodeURIComponent(Param2)+"&Param.3="+encodeURIComponent(Param3)+"&Param.4="+encodeURIComponent(Param4);
+ 			getData("/XMII/Illuminator?QueryTemplate=MESM/REPORTS/QUERIES/getProductionStatus&"+paramStr+"&ts="+timestamp+"&Content-Type=text/xml", parseJsonPSList);
+		}
+		// alert(paramStr);
+				
+		function parseJsonPSList(jsondata){
+
+			tableHTML = tableHTML +"<table id=\"top-hdr\" cellspacing=0 cellpadding=4 border=0 align=center width=1030 style=\"margin:0px;font-size:12px;font-family: Arial;margin-top:0px;\">";
+			tableHTML = tableHTML +"<tr style=\"font-weight:bold;border-bottom:2px solid #666;background-color:#cfcfcf;\">";
+			tableHTML = tableHTML + "<td style=\"width:100px; text-align:center;\">PLANT</td>";
+			tableHTML = tableHTML + "<td style=\"width:80px; text-align:center;\">LINE</td>";
+			tableHTML = tableHTML + "<td style=\"width:80px; text-align:center;\">ORDER NO</td>";
+			tableHTML = tableHTML + "<td style=\"width:100px; text-align:center;\">TOTAL</td>";
+			tableHTML = tableHTML + "<td style=\"width:100px; text-align:center;\">CONFIRMED</td>";
+			tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">GOOD</td>";
+			tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">FAILED</td>";
+			tableHTML = tableHTML + "<td style=\"width:120px; text-align:center;\">LAST UPDATED</td></tr>";
+	
+			for (var i=0; i<jsondata.length; i++){
+
+				plantName = jsondata[i]['plantName'];
+				plantRecID = jsondata[i]['plantRecID'];
+				lineName = jsondata[i]['lineName'];
+				lineRecID = jsondata[i]['lineRecID'];
+				workOrder = jsondata[i]['workOrder'];
+				maxQty = jsondata[i]['maxQty'];
+				totalCnf = jsondata[i]['totalCnf'];
+				goodCnf = jsondata[i]['goodCnf'];
+				failCnf = jsondata[i]['failCnf'];
+				opStart = jsondata[i]['opStart'];
+				opFinal = jsondata[i]['opFinal'];
+				lastTS = jsondata[i]['lastTS'];
+
+				tableHTML = tableHTML + "<tr style=\"background-color:" + bgColor + ";\">";
+				tableHTML = tableHTML + "<td style=\"width:100px; text-align:center;\">" + plantName + "</td>";
+				tableHTML = tableHTML + "<td style=\"width:80px; text-align:center;\">" + lineName + "</td>";
+				tableHTML = tableHTML + "<td style=\"width:80px; text-align:center;\">" + workOrder + "</td>";
+				tableHTML = tableHTML + "<td style=\"width:100px; text-align:center;\">" + maxQty + "</td>";
+				tableHTML = tableHTML + "<td style=\"width:100px; text-align:center;\">" + totalCnf + "</td>";
+				tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">" + goodCnf + "</td>";
+				tableHTML = tableHTML + "<td style=\"width:60px; text-align:center;\">" + failCnf + "</td>";
+				tableHTML = tableHTML + "<td style=\"width:120px; text-align:center;\">" + lastTS + "</td></tr>";
+
+				if(bgColor=="#efefef") { bgColor = "#ffffff"; } else { bgColor = "#efefef"; }
+			}
+			tableHTML = tableHTML + "<tr><td colspan=8 style=\"border-top:2px solid #666;background-color:#fff;font-weight:bold;\" align=left> " + dateStr + " -- " + i + " Records </td></tr></table>";
+			stringHTML = stringHTML + tableHTML;
+			document.getElementById("list").innerHTML = stringHTML;	
+
+			window.print(); 	
+		}
+
+		function parseJsonPSByShiftsList(jsondata){
+
+			tableHTML = tableHTML +"<table id=\"top-hdr\" cellspacing=0 cellpadding=4 border=0 align=center width=1030 style=\"margin:0px;font-size:12px;font-family: Arial;margin-top:0px;\">";
+			tableHTML = tableHTML +"<tr style=\"font-weight:bold;border-bottom:2px solid #666;background-color:#cfcfcf;\">";
+			tableHTML = tableHTML + "<td style=\"width:200px; text-align:center;\">PART TYPE</td>";
+			tableHTML = tableHTML + "<td style=\"width:200px; text-align:center;\">Shift 1 >> 7:00AM to 3:00PM</td>";
+			tableHTML = tableHTML + "<td style=\"width:200px; text-align:center;\">Shift 2 >> 3:00PM to 11:00PM</td>";
+			tableHTML = tableHTML + "<td style=\"width:200px; text-align:center;\">Shift 3 >> 11:00PM to 7:00AM</td>";
+			tableHTML = tableHTML + "<td style=\"width:200px; text-align:center;\">TOTAL PARTS</td></tr>";
+	
+			for (var i=0; i<jsondata.length; i++){
+
+				partType = jsondata[i]['PARTTYPE'];
+				shift1 = jsondata[i]['Shift1'];
+				shift2 = jsondata[i]['Shift2'];
+				shift3 = jsondata[i]['Shift3'];
+				totalParts = jsondata[i]['TOTALPARTS'];
+
+				tableHTML = tableHTML + "<tr style=\"background-color:" + bgColor + ";\">";
+				tableHTML = tableHTML + "<td style=\"width:200px; text-align:center;\">" + partType + "</td>";
+				tableHTML = tableHTML + "<td style=\"width:200px; text-align:center;\">" + shift1 + "</td>";
+				tableHTML = tableHTML + "<td style=\"width:200px; text-align:center;\">" + shift2 + "</td>";
+				tableHTML = tableHTML + "<td style=\"width:200px; text-align:center;\">" + shift3 + "</td>";
+				tableHTML = tableHTML + "<td style=\"width:200px; text-align:center;\">" + totalParts + "</td></tr>";
+
+				if(bgColor=="#efefef") { bgColor = "#ffffff"; } else { bgColor = "#efefef"; }
+			}
+			tableHTML = tableHTML + "<tr><td colspan=5 style=\"border-top:2px solid #666;background-color:#fff;font-weight:bold;\" align=left> " + dateStr + " -- " + i + " Records </td></tr></table>";
+			stringHTML = stringHTML + tableHTML;
+			document.getElementById("list").innerHTML = stringHTML;	
+
+			window.print(); 	
+		}
+
+		function parseJsonPSByHoursList(jsondata){
+
+			tableHTML = tableHTML +"<table id=\"top-hdr\" cellspacing=0 cellpadding=4 border=0 align=center width=1030 style=\"margin:0px;font-size:12px;font-family: Arial;margin-top:0px;\">";
+			tableHTML = tableHTML +"<tr style=\"font-weight:bold;border-bottom:2px solid #666;background-color:#cfcfcf;\">";
+			tableHTML = tableHTML + "<td style=\"width:300px; text-align:center;\">HOURS</td>";
+			tableHTML = tableHTML + "<td style=\"width:200px; text-align:center;\">GOOD PARTS</td>";
+			tableHTML = tableHTML + "<td style=\"width:200px; text-align:center;\">FAILED PARTS</td>";
+			tableHTML = tableHTML + "<td style=\"width:200px; text-align:center;\">UNKNOWN PARTS</td>";
+			tableHTML = tableHTML + "<td style=\"width:200px; text-align:center;\">TOTAL PARTS</td></tr>";
+	
+			for (var i=0; i<jsondata.length; i++){
+
+				hoursInt = jsondata[i]['HOURINT'];
+				goodParts = jsondata[i]['GoodParts'];
+				failedParts = jsondata[i]['FailedParts'];
+				unknownParts = jsondata[i]['UnknownParts'];
+				totalParts = jsondata[i]['TOTALPARTS'];
+
+				tableHTML = tableHTML + "<tr style=\"background-color:" + bgColor + ";\">";
+				tableHTML = tableHTML + "<td style=\"width:300px; text-align:center;\">" + hoursInt + "</td>";
+				tableHTML = tableHTML + "<td style=\"width:200px; text-align:center;\">" + goodParts + "</td>";
+				tableHTML = tableHTML + "<td style=\"width:200px; text-align:center;\">" + failedParts + "</td>";
+				tableHTML = tableHTML + "<td style=\"width:200px; text-align:center;\">" + unknownParts + "</td>";
+				tableHTML = tableHTML + "<td style=\"width:200px; text-align:center;\">" + totalParts + "</td></tr>";
+
+				if(bgColor=="#efefef") { bgColor = "#ffffff"; } else { bgColor = "#efefef"; }
+			}
+			tableHTML = tableHTML + "<tr><td colspan=5 style=\"border-top:2px solid #666;background-color:#fff;font-weight:bold;\" align=left> " + dateStr + " -- " + i + " Records </td></tr></table>";
+			stringHTML = stringHTML + tableHTML;
+			document.getElementById("list").innerHTML = stringHTML;	
+
+			window.print(); 	
+		}
+	}
+	// ******************************************************************************************************************************************************************
+
+</script>
+</head>
+
+<body onLoad="createHTMLPage();">
+<input id="selectedPlant" type="hidden" value="{Param.1}" style="display:none" readonly />
+<input id="selectedLine" type="hidden" value="{Param.2}" style="display:none" readonly />
+<input id="selectedDateFrom" type="hidden" value="{Param.3}" style="display:none" readonly />
+<input id="selectedDateTo" type="hidden" value="{Param.4}" style="display:none" readonly />
+<input id="selectedOrderNumber" type="hidden" value="{Param.5}" style="display:none" readonly />
+<input id="selectedLineName" type="hidden" value="{Param.6}" style="display:none" readonly />
+<input id="selectedLineRecID" type="hidden" value="{Param.7}" style="display:none" readonly />
+<input id="selectedLineRecName" type="hidden" value="{Param.8}" style="display:none" readonly />
+<input id="selectedOperation" type="hidden" value="{Param.9}" style="display:none" readonly />
+<input id="selectedTypePR" type="hidden" value="{Param.10}" style="display:none" readonly />
+<div id="app_header" >
+	<div id="app_title">PRODUCTION STATUS LIST ({Param.8})</div>
+	<div id="page_title"></div>
+</div>
+<div id="list" style="text-align: center;"></div>
+</body>
+</html>

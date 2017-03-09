@@ -1,0 +1,2214 @@
+<!DOCTYPE html >
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<title>CT MODULE</title>
+	<style>
+	body{
+		background-image: url("Common/img/logo.png");
+		background-size: 180px;
+		background-repeat: no-repeat;
+    		background-attachment: fixed;
+    		background-position: right 40px top 30px;
+		font-family: Arial;
+	}
+	#app_header {
+ 		padding: 10px;
+ 		padding-left: 40px;
+ 		padding-top: 15px;
+ 		padding-bottom: 0px;
+		height:80px;
+		width:400px;
+		text-align: center;
+	}
+	#app_title {
+		width:400px;
+		text-align: center;
+		font-family: "Arial Black",Arial,Helvetica,sans-serif;
+		font-size:32px;
+		color: #007dc0;
+		margin-bottom; 20px;
+	}
+	#app_menu {
+		width:400px;
+		text-align: center;
+		font-family: Arial,Helvetica,sans-serif;
+	}
+	#page_title {
+		width:400px;
+		text-align: center;
+		font-family: "Arial Black",Arial,Helvetica,sans-serif;
+		font-size:28px;
+		color: #cfcfcf;
+	}
+	#mesm_content {
+  		padding: 30px;
+ 		padding-top: 40px;
+	}
+	#__button0, #__button1, #__button2 {
+		margin-top:10px;
+		margin-left:5px;
+		margin-right:5px;
+	}	
+	#MatrixP, #MatrixT, #MatrixB,  #MatrixV {
+		margin:10px auto;
+	}
+	#__cell1,#__cell2 {
+		text-align: right;
+	}
+	#__cell3, #__cell4,#__cell5, #__cell6, #__cell7,#__cell8 {
+		text-align:center;
+	} 
+	#B-New,#B-Edit,#B-Delete,#B-Print,#B-Email,#B-SendMail {
+		width:100px;
+		height:35px;
+		font-size:14px;
+	}
+	#L-NewMaterial,#L-EditMaterial ,#L-MailInfo{
+		margin-top:15px;
+		padding:5px;
+		font-family: "Arial Black",Arial,Helvetica,sans-serif;
+		font-size:27px;
+		height:35px;
+		color: #007dc0;
+	}
+	#__cell9,#__cell10, #__cell11, #__cell13,  #__cell16{
+		text-align:center;
+	}
+	#__cell12 {
+		text-align:right;
+	}
+	#__cell14 {
+		text-align:left;
+	}
+
+	 #__cell18, #__cell20, #__cell22, #__cell24, #__cell26, #__cell28, #__cell30, #__cell32, #__cell34, #__cell36, #__cell38, #__cell40, #__cell42, #__cell44, #__cell46, #__cell48, #__cell50, #__cell52{
+		padding:10px;
+		padding-right:20px;
+		text-align:right;
+	}
+
+ 	#__cell59, #__cell61, #__cell63, #__cell65, #__cell67, #__cell69, #__cell71, #__cell73, #__cell75, #__cell77, #__cell79, #__cell81, #__cell83, #__cell85, #__cell87, #__cell89, #__cell91, #__cell93{
+		padding:10px;
+		padding-right:20px;
+		text-align:right;
+	}
+	#MatrixNM, #MatrixEM {
+		margin-left: 20px;
+	}
+	#MatrixMail,#MatrixMailF{
+		margin:10px auto;
+	}
+	#B-NMSave,#B-NMReset,#B-EMSave,#B-EMReset {
+		width:100px;
+		height:35px;
+		font-size:14px;
+	}
+	</style>
+	<script id="sap-ui-bootstrap"
+		src="/sapui5/resources/sap-ui-core.js"
+		data-sap-ui-theme="sap_goldreflection"
+		data-sap-ui-libs="sap.ui.core,sap.ui.commons,sap.ui.table,sap.ui.ux3"
+		data-sap-ui-language="en" >
+	</script>
+	<script type="text/javascript" src="Common/js/default.js"></script>
+	<script type="text/javascript" id="app-init">
+	// ******************************************************************************************************************************************************************
+	// Get Core SAP UI5
+	var oCore = sap.ui.getCore();
+	// Initialize screen
+	var nrRows = 13;
+	var selectedIndex =  -1;
+	// ******************************************************************************************************************************************************************
+	// initialize access
+	var level2Access = "";
+	var plant2Access = "";
+	var plantName = "";
+	// Initialize screen
+	var user_name = "";
+
+	// FILTERS
+	var selectedPlant = 0;
+	var selectedRoute = '';
+	var materialID = ''; 
+	var materialName = '';
+	var materialDescription = '';
+	var specialRequirementCode = '';
+	var materialRevision = '';
+	var maxQuantity = '';
+	var materialCommodity = '';
+	var materialModel = '';
+	var materialType = '';
+	var materialAccount = '';
+	var materialRouteName = '';
+	var materialRouteDesc = '';
+	var materialUOM = '';
+	var materialBOM = '';
+	var materialSAPID = '';
+	var Active = '';
+	var materialDerivativeNo = '';
+	var materialFinalPartNo = '';
+	var materialCustPartNo = '';
+	var materialFinalPartDesc = '';
+	var materialFinalPartRatio = '';
+	// ****************************************************************************************************************************************************
+	function roleSecurity() {
+		var myRoles = document.getElementById("user_roles").value;
+		var role2Access = "MESM_" + document.getElementById("user_role").value;
+		user_name = document.getElementById("user_name").value;
+		// alert(role2Access);
+ 		if(myRoles.indexOf(role2Access)<0) {
+			 window.location.assign("security.irpt");
+		  } else {
+			var roleString = document.getElementById("user_role").value;
+			var roleArray = roleString.split("_");
+			level2Access = roleArray[0]; 
+				// alert("level : " + level2Access);
+			plant2Access =  roleArray[1];
+				//alert("plant : " + plant2Access);
+			createTableMaterials();
+			updatePlants(plant2Access); 
+			document.getElementById("page_title").innerHTML=role2Access;
+
+			// enable homepage
+			oCore.byId("item3-0-3").setEnabled(true);
+			// show menus
+			oMenuButton1.placeAt("app_menu");
+			oMenuButton2.placeAt("app_menu");
+			oMenuButton3.placeAt("app_menu");
+
+			var role_ADM = "MESM_ADM_"+plant2Access;
+			var role_ENG = "MESM_ENG_"+plant2Access;
+			var role_SUP = "MESM_SUP_"+plant2Access;
+			var role_OPS = "MESM_OPS_"+plant2Access;
+
+			switch(role2Access) {
+			case "MESM_ADM_ALL":
+
+				// enable Cfg Hierarchy
+					oCore.byId("item1-0-1").setEnabled(true);
+				// enable Cfg Memory Maps
+					oCore.byId("item1-0-3").setEnabled(true);
+				// enable Cfg Connectivity
+					oCore.byId("item1-0-4").setEnabled(true);
+				// enable Master Data
+					oCore.byId("item1-0-5").setEnabled(true);
+
+				// SPC
+				// enable SPC home page
+					oCore.byId("item1-0-6").setEnabled(true);
+				// enable Plants submenu
+					oCore.byId("item1-0-7").setEnabled(true);
+				// enable  Stations submenu
+					oCore.byId("item1-0-8").setEnabled(true);
+				// enable Part submenu
+					oCore.byId("item1-0-9").setEnabled(true);
+				// enable Datapoints submenu
+					oCore.byId("item1-0-10").setEnabled(true);
+				// enable Operators submenu
+					oCore.byId("item1-0-11").setEnabled(true);
+				// enable Subscriptions submenu
+					oCore.byId("item1-0-12").setEnabled(true);
+
+				// enable WO Management
+					oCore.byId("item2-0-1").setEnabled(true);
+				// enable Carrier Station Dashboard
+					oCore.byId("item2-0-2").setEnabled(true);
+				// enable Assembly Station Dashboard
+					oCore.byId("item2-0-3").setEnabled(true);
+
+				// SPC
+				// enable SPC Dashboard
+					oCore.byId("item2-0-4").setEnabled(true);
+				// enable Saved File Charts
+					//	oCore.byId("item2-0-5").setEnabled(true);
+				// enable  PC History Logs
+					//	oCore.byId("item2-0-6").setEnabled(true);
+
+				// enable Production Status Shifts Report
+					oCore.byId("item3-0-1").setEnabled(true);
+				// enable Item Traceability Report
+					oCore.byId("item3-0-2").setEnabled(true);
+				// enable Connector Diagnostics
+					oCore.byId("item3-0-3").setEnabled(true);
+
+				// SPC
+				// enable Daily Activity
+					oCore.byId("item3-0-4").setEnabled(true);
+				// enable Weekly Activity
+					oCore.byId("item3-0-5").setEnabled(true);
+				// enable onthly Activity
+					oCore.byId("item3-0-6").setEnabled(true);
+
+				// enable Equipment Hierarchy
+					oCore.byId("item1-4-1").setEnabled(true);
+				// enable Cfg Hierarchy Levels
+					oCore.byId("item1-4-2").setEnabled(true);
+
+				// enable Cfg Memory Maps
+					oCore.byId("item1-5-1").setEnabled(true);
+				// enable Cfg Tag Types
+					oCore.byId("item1-5-2").setEnabled(true);
+				// enable Cfg Tag Functions
+					oCore.byId("item1-5-3").setEnabled(true);
+				// enable Cfg Tag Groups
+					oCore.byId("item1-5-4").setEnabled(true);
+				// enable Cfg Memory Map Transactions
+					oCore.byId("item1-5-5").setEnabled(true);
+
+				// enable Cfg Shop Floor Computers
+					oCore.byId("item1-6-1").setEnabled(true);
+				// enable Cfg Shop Floor Printers
+					oCore.byId("item1-6-2").setEnabled(true);
+				// enable Cfg PCo Servers
+					oCore.byId("item1-6-3").setEnabled(true);
+				// enable Cfg PCo Agents
+					oCore.byId("item1-6-4").setEnabled(true);
+				// enable Cfg Sql Servers
+					oCore.byId("item1-6-5").setEnabled(true);
+				// enable Cfg Operators
+					oCore.byId("item1-6-6").setEnabled(true);
+				// enable Cfg File Servers
+					oCore.byId("item1-6-7").setEnabled(true);
+				// enable Cfg File Agents
+					oCore.byId("item1-6-8").setEnabled(true);
+
+				// Enable UOM Maintenance
+					oCore.byId("item1-7-1").setEnabled(true);
+				// Enable Product Maintenance
+					oCore.byId("item1-7-2").setEnabled(true);
+				// Enable BOM Maintenance
+					oCore.byId("item1-7-3").setEnabled(true);
+				// Enable Routing Maintenance
+					oCore.byId("item1-7-4").setEnabled(true);
+
+				// SPC
+				// enable Plants  Maintenance
+					oCore.byId("item1-8-1").setEnabled(true);
+				// enable Import Plants
+					oCore.byId("item1-8-2").setEnabled(true);
+				// enable Export Plants
+					oCore.byId("item1-8-3").setEnabled(true);
+
+				// enable Stations   Maintenance
+					oCore.byId("item1-9-1").setEnabled(true);
+				// enable Import Stations
+					oCore.byId("item1-9-2").setEnabled(true);
+				// enable Export Stations
+					oCore.byId("item1-9-3").setEnabled(true);
+
+				// enable Parts Maintenance
+					oCore.byId("item1-10-1").setEnabled(true);
+				// enable Import Parts
+					oCore.byId("item1-10-2").setEnabled(true);
+				// enable Export Parts
+					oCore.byId("item1-10-3").setEnabled(true);
+
+				// enable Datapoints HDR
+					oCore.byId("item1-11-1").setEnabled(true);
+				// enable Datapoints SPC
+					oCore.byId("item1-11-2").setEnabled(true);
+				// enable Import Datapoints
+					oCore.byId("item1-11-3").setEnabled(true);
+				// enable Export Datapoints
+					oCore.byId("item1-11-4").setEnabled(true);
+
+				// enable Operatord Maintenance
+					oCore.byId("item1-12-1").setEnabled(true);
+				// enable Import Operators
+					oCore.byId("item1-12-2").setEnabled(true);
+				// enable  Export Operators
+					oCore.byId("item1-12-3").setEnabled(true);
+										
+				// enable Subscriptions Maintenance 
+					oCore.byId("item1-13-1").setEnabled(true);
+				// enable Import Subscriptions
+					oCore.byId("item1-13-2").setEnabled(true);
+				// enable Export Subscriptions
+					oCore.byId("item1-13-3").setEnabled(true);
+	
+				// update screen
+				document.getElementById("page_title").innerHTML="ADM ALL PLANTS";
+				oMatrixP.placeAt('mesm_content');
+				oMatrixT.placeAt('mesm_content');
+				oMatrixB.placeAt('mesm_content');
+				break;
+			case role_ADM:
+				// enable Cfg Hierarchy
+					oCore.byId("item1-0-1").setEnabled(true);
+				// enable Cfg Memory Maps
+					oCore.byId("item1-0-3").setEnabled(true);
+				// enable Cfg Connectivity
+					oCore.byId("item1-0-4").setEnabled(true);
+				// enable Master Data
+					oCore.byId("item1-0-5").setEnabled(true);
+
+				// SPC
+				// enable SPC home page
+					oCore.byId("item1-0-6").setEnabled(true);
+				// enable Plants submenu
+					oCore.byId("item1-0-7").setEnabled(true);
+				// enable  Stations submenu
+					oCore.byId("item1-0-8").setEnabled(true);
+				// enable Part submenu
+					oCore.byId("item1-0-9").setEnabled(true);
+				// enable   Datapoints submenu
+					oCore.byId("item1-0-10").setEnabled(true);
+				// enable Operators submenu
+					oCore.byId("item1-0-11").setEnabled(true);
+				// enable Subscriptions submenu
+					oCore.byId("item1-0-12").setEnabled(true);
+
+				// enable WO Management
+					oCore.byId("item2-0-1").setEnabled(true);
+				// enable Carrier Station Dashboard
+					oCore.byId("item2-0-2").setEnabled(true);
+				// enable Assembly Station Dashboard
+					oCore.byId("item2-0-3").setEnabled(true);
+
+				// SPC
+				// enable SPC Dashboard
+					oCore.byId("item2-0-4").setEnabled(true);
+				// enable Saved File Charts
+					//	oCore.byId("item2-0-5").setEnabled(true);
+				// enable  PC History Logs
+					//	oCore.byId("item2-0-6").setEnabled(true);
+
+				// enable Production Status Report
+					oCore.byId("item3-0-1").setEnabled(true);
+				// enable Item Traceability Report
+					oCore.byId("item3-0-2").setEnabled(true);
+				// enable Connector Diagnostics
+					oCore.byId("item3-0-3").setEnabled(true);
+
+				// SPC
+				// enable Daily Activity
+					oCore.byId("item3-0-4").setEnabled(true);
+				// enable Weekly Activity
+					oCore.byId("item3-0-5").setEnabled(true);
+				// enable onthly Activity
+					oCore.byId("item3-0-6").setEnabled(true);
+
+				// enable Equipment Hierarchy
+					oCore.byId("item1-4-1").setEnabled(true);
+				// enable Cfg Hierarchy Levels
+					oCore.byId("item1-4-2").setEnabled(true);
+
+				// enable Cfg Memory Maps
+					oCore.byId("item1-5-1").setEnabled(true);
+				// enable Cfg Tag Types
+					oCore.byId("item1-5-2").setEnabled(true);
+				// enable Cfg Tag Functions
+					oCore.byId("item1-5-3").setEnabled(true);
+				// enable Cfg Tag Groups
+					oCore.byId("item1-5-4").setEnabled(true);
+				// enable Cfg Memory Map Transactions
+					oCore.byId("item1-5-5").setEnabled(true);
+
+				// enable Cfg Shop Floor Computers
+					oCore.byId("item1-6-1").setEnabled(true);
+				// enable Cfg Shop Floor Printers
+					oCore.byId("item1-6-2").setEnabled(true);
+				// enable Cfg PCo Servers
+					oCore.byId("item1-6-3").setEnabled(true);
+				// enable Cfg PCo Agents
+					oCore.byId("item1-6-4").setEnabled(true);
+				// enable Cfg Sql Servers
+					oCore.byId("item1-6-5").setEnabled(true);
+				// enable Cfg Operators
+					oCore.byId("item1-6-6").setEnabled(true);
+				// enable Cfg File Servers
+					oCore.byId("item1-6-7").setEnabled(true);
+				// enable Cfg File Agents
+					oCore.byId("item1-6-8").setEnabled(true);
+
+				// Enable UOM Maintenance
+					oCore.byId("item1-7-1").setEnabled(true);
+				// Enable Product Maintenance
+					oCore.byId("item1-7-2").setEnabled(true);
+				// Enable BOM Maintenance
+					oCore.byId("item1-7-3").setEnabled(true);
+				// Enable Routing Maintenance
+					oCore.byId("item1-7-4").setEnabled(true);
+
+				// SPC
+				// enable Plants  Maintenance
+					oCore.byId("item1-8-1").setEnabled(true);
+				// enable Import Plants
+					oCore.byId("item1-8-2").setEnabled(true);
+				// enable Export Plants
+					oCore.byId("item1-8-3").setEnabled(true);
+
+				// enable Stations   Maintenance
+					oCore.byId("item1-9-1").setEnabled(true);
+				// enable Import Stations
+					oCore.byId("item1-9-2").setEnabled(true);
+				// enable Export Stations
+					oCore.byId("item1-9-3").setEnabled(true);
+
+				// enable Parts Maintenance
+					oCore.byId("item1-10-1").setEnabled(true);
+				// enable Import Parts
+					oCore.byId("item1-10-2").setEnabled(true);
+				// enable Export Parts
+					oCore.byId("item1-10-3").setEnabled(true);
+
+				// enable Datapoints HDR
+					oCore.byId("item1-11-1").setEnabled(true);
+				// enable Datapoints SPC
+					oCore.byId("item1-11-2").setEnabled(true);
+				// enable Import Datapoints
+					oCore.byId("item1-11-3").setEnabled(true);
+				// enable Export Datapoints
+					oCore.byId("item1-11-4").setEnabled(true);
+
+				// enable Operatord Maintenance
+					oCore.byId("item1-12-1").setEnabled(true);
+				// enable Import Operators
+					oCore.byId("item1-12-2").setEnabled(true);
+				// enable  Export Operators
+					oCore.byId("item1-12-3").setEnabled(true);
+										
+				// enable Subscriptions Maintenance 
+					oCore.byId("item1-13-1").setEnabled(true);
+				// enable Import Subscriptions
+					oCore.byId("item1-13-2").setEnabled(true);
+				// enable Export Subscriptions
+					oCore.byId("item1-13-3").setEnabled(true);
+	
+				// update screen
+				document.getElementById("page_title").innerHTML="ADM PLANT "+plant2Access;
+				oMatrixP.placeAt('mesm_content');
+				oMatrixT.placeAt('mesm_content');
+				oMatrixB.placeAt('mesm_content');
+				break;
+			case "MESM_OPS_ALL":
+				// enable WO Management
+					oCore.byId("item2-0-1").setEnabled(true);
+				// enable Carrier Station Dashboard
+					oCore.byId("item2-0-2").setEnabled(true);
+				// enable Assembly Station Dashboard
+					oCore.byId("item2-0-3").setEnabled(true);
+
+				// SPC
+				// enable SPC Dashboard
+					oCore.byId("item2-0-4").setEnabled(true);
+				// enable Saved File Charts
+					//	oCore.byId("item2-0-5").setEnabled(true);
+				// enable  PC History Logs
+					//	oCore.byId("item2-0-6").setEnabled(true);
+
+				// enable Production Status Report
+					oCore.byId("item3-0-1").setEnabled(true);
+				// enable Item Traceability Report
+					oCore.byId("item3-0-2").setEnabled(true);
+				// enable Connector Diagnostics
+					oCore.byId("item3-0-3").setEnabled(true);
+
+				// SPC
+				// enable Daily Activity
+					oCore.byId("item3-0-4").setEnabled(true);
+				// enable Weekly Activity
+					oCore.byId("item3-0-5").setEnabled(true);
+				// enable onthly Activity
+					oCore.byId("item3-0-6").setEnabled(true);
+
+				document.getElementById("page_title").innerHTML="OPS ALL PLANTS";
+				oMatrixP.placeAt('mesm_content');
+				oMatrixT.placeAt('mesm_content');
+				oMatrixB.placeAt('mesm_content');
+				break;
+			case role_OPS:
+		// enable WO Management
+					oCore.byId("item2-0-1").setEnabled(true);
+				// enable Carrier Station Dashboard
+					oCore.byId("item2-0-2").setEnabled(true);
+				// enable Assembly Station Dashboard
+					oCore.byId("item2-0-3").setEnabled(true);
+
+				// SPC
+				// enable SPC Dashboard
+					oCore.byId("item2-0-4").setEnabled(true);
+				// enable Saved File Charts
+					//	oCore.byId("item2-0-5").setEnabled(true);
+				// enable  PC History Logs
+					//	oCore.byId("item2-0-6").setEnabled(true);
+
+				// enable Production Status Report
+					oCore.byId("item3-0-1").setEnabled(true);
+				// enable Item Traceability Report
+					oCore.byId("item3-0-2").setEnabled(true);
+				// enable Connector Diagnostics
+					oCore.byId("item3-0-3").setEnabled(true);
+
+				// SPC
+				// enable Daily Activity
+					oCore.byId("item3-0-4").setEnabled(true);
+				// enable Weekly Activity
+					oCore.byId("item3-0-5").setEnabled(true);
+				// enable onthly Activity
+					oCore.byId("item3-0-6").setEnabled(true);
+
+				document.getElementById("page_title").innerHTML="OPS PLANT "+plant2Access;
+				oMatrixP.placeAt('mesm_content');
+				oMatrixT.placeAt('mesm_content');
+				oMatrixB.placeAt('mesm_content');
+				break;
+			default:
+				alert("MES Module Role Unknown: " + role2Access);
+				break;
+			}
+		  }
+	}
+
+	// ************************************	MENU		******************************************************************************************************************************
+
+	var timestamp = new Date().getTime();
+
+	var jsFile=document.createElement('script');
+	jsFile.setAttribute("type","text/javascript");
+	jsFile.setAttribute("src", "Common/js/menu.js?ts="+timestamp);
+	document.getElementsByTagName("head")[0].appendChild(jsFile);
+
+	// ******************************************************************************************************************************************************************
+	var oMatrixP = new sap.ui.commons.layout.MatrixLayout({
+		id : 'MatrixP',
+		layoutFixed : true,
+		width: '1200px',
+		columns : 3,
+		widths : ['210px','780px','210px'] 
+	});
+
+	var oLabelPlants = new sap.ui.commons.Label({
+		id : 'L-Plants',
+		visible : true,
+		text : 'SELECTED PLANT' 
+	});
+
+	var oDropdownBoxRoutes = new sap.ui.commons.DropdownBox({
+		id : "RoutesList",
+		tooltip : 'Product Routes',
+		editable : true,
+		width : '180px',
+		change: function(oEvent){
+			selectedRoute = oDropdownBoxRoutes.getSelectedKey();
+			updateTableMaterials();
+		}
+	});
+
+	var oDropdownBoxPlants = new sap.ui.commons.DropdownBox({
+		id : "PlantList",
+		tooltip : 'Plants',
+		editable : true,
+		width : '200px',
+		change: function(oEvent){
+			var endplant = oDropdownBoxPlants.getSelectedItemId();
+			var result = endplant.substring(6,endplant.length);
+			selectedPlant = result;
+			plantName = oDropdownBoxPlants.getValue();
+			updateRoutes(oDropdownBoxPlants.getSelectedKey(selectedPlant));
+		}
+	});
+
+	oMatrixP.createRow(oDropdownBoxRoutes, oLabelPlants,oDropdownBoxPlants);
+	// ******************************************************************************************************************************************************************
+	function updatePlants(idPlant) {
+		var timestamp = new Date().getTime();
+		getData("/XMII/Illuminator?QueryTemplate=MESM/PLANTS/TRANSACTIONS/getActivePlants_xAcute&Param.1="+idPlant+"&ts="+timestamp+"&Content-Type=text/xml", parseJsonPlantsList);
+		function parseJsonPlantsList(jsondata){
+			oDropdownBoxPlants.destroyItems();
+			for (var i=0; i<jsondata.length; i++){
+				item_id = jsondata[i]['ID'];
+				item_key = jsondata[i]['PLANT'];
+				item_text = jsondata[i]['DESC'];
+				oItem = new sap.ui.core.ListItem("plant_"+item_id,{
+					key : item_key,
+					text : item_text });
+				oDropdownBoxPlants.addItem(oItem);
+			}
+			oDropdownBoxPlants.setSelectedKey(idPlant);
+			var endplant = oDropdownBoxPlants.getSelectedItemId();
+			var result = endplant.substring(6,endplant.length);
+			selectedPlant = result;
+			plantName = oDropdownBoxPlants.getValue();
+			updateRoutes(oDropdownBoxPlants.getSelectedKey());
+		}
+	};
+	// ******************************************************************************************************************************************************************
+	function updateRoutes(idPlant) {
+		var timestamp = new Date().getTime();
+		getData("/XMII/Illuminator?QueryTemplate=MESM/PLANTS/TRANSACTIONS/getActiveRoutes_xAcute&Param.1="+idPlant+"&ts="+timestamp+"&Content-Type=text/xml", parseJsonRoutesList);
+		function parseJsonRoutesList(jsondata){
+			oDropdownBoxRoutes.destroyItems();
+			for (var i=0; i<jsondata.length; i++){
+				item_key = jsondata[i]['KEY'];
+				item_text = jsondata[i]['TEXT'];
+				oItem = new sap.ui.core.ListItem({
+					key : item_key,
+					text : item_text });
+				oDropdownBoxRoutes.addItem(oItem);
+			}
+			selectedRoute = oDropdownBoxRoutes.getSelectedKey();
+			updateTableMaterials();
+		}
+	};
+	// ******************************************************************************************************************************************************************
+	var oMatrixT = new sap.ui.commons.layout.MatrixLayout({
+		id : 'MatrixT',
+		layoutFixed : true,
+		width: '1200px',
+		columns : 1,
+		widths : ['1200px'] 
+	});
+
+	//Create an instance of the table control
+	var oTable = new sap.ui.table.Table({
+		visibleRowCount: nrRows,
+		visibleRowCountMode: sap.ui.table.VisibleRowCountMode.Interactive,
+		firstVisibleRow: 0,
+		width: "1200px",
+		selectionBehavior: sap.ui.table.SelectionBehavior.Row,
+		selectionMode: sap.ui.table.SelectionMode.Single
+	});
+
+	//Bring the table onto the UI 
+	oMatrixT.createRow(oTable);
+
+	// ******************************************************************************************************************************************************************
+	function createTableMaterials() {
+		// Bind the table rows to this model
+		var timestamp = new Date().getTime();
+		var Param1 = -1;
+		var Param2 = 'Z';
+		var paramStr = "Param.1="+encodeURIComponent(Param1)+"&Param.2="+encodeURIComponent(Param2);
+		//alert(paramStr);
+		oModel.loadData("/XMII/Illuminator?QueryTemplate=MESM/MATERIALS/QUERIES/get_Materials&"+paramStr+"&ts="+timestamp+"&Content-Type=text/xml","",false);
+		// alert(oModel.getXML());
+		createColumnsMaterials();
+		oTable.setModel(oModel);
+		oTable.bindRows("/Rowset/Row");
+	};
+	// ******************************************************************************************************************************************************************
+	function updateTableMaterials() {
+		oTable.clearSelection();
+		var timestamp = new Date().getTime();
+		var Param1 = selectedPlant;
+		var Param2 = selectedRoute;
+		var paramStr = "Param.1="+encodeURIComponent(Param1)+"&Param.2="+encodeURIComponent(Param2);
+		//alert(paramStr);
+ 		oModel.loadData("/XMII/Illuminator?QueryTemplate=MESM/MATERIALS/QUERIES/get_Materials&"+paramStr+"&ts="+timestamp+"&Content-Type=text/xml","",false);
+		oTable.getModel().refresh(true);
+	};
+	// ******************************************************************************************************************************************************************
+	function createColumnsMaterials() {
+		oTable.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: "NAME"}),
+			template: new sap.ui.commons.TextView().bindProperty("text", "materialName"),
+			sortProperty: "materialName",
+			filterProperty: "materialName",
+			width: "150px",
+			hAlign: "Center"
+		}));
+		oTable.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: "DESCRIPTION"}),
+			template: new sap.ui.commons.TextView().bindProperty("text", "materialDescription"),
+			sortProperty: "materialDescription",
+			filterProperty: "materialDescription",
+			width: "150px",
+			hAlign: "Center"
+		}));
+		oTable.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: "CODE"}),
+			template: new sap.ui.commons.TextView().bindProperty("text", "specialRequirementCode"),
+			sortProperty: "specialRequirementCode",
+			filterProperty: "specialRequirementCode",
+			width: "55px"
+		}));
+		oTable.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: "REV"}),
+			template: new sap.ui.commons.TextView().bindProperty("text", "materialRevision"),
+			sortProperty: "materialRevision",
+			filterProperty: "materialRevision",
+			width: "55px"
+		}));
+		oTable.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: "QTY"}),
+			template: new sap.ui.commons.TextView().bindProperty("text", "maxQuantity"),
+			sortProperty: "maxQuantity",
+			filterProperty: "maxQuantity",
+			width: "90px",
+			hAlign: "Center"
+		}));
+		oTable.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: " COM"}),
+			template: new sap.ui.commons.TextView().bindProperty("text", "materialCommodity"),
+			sortProperty: "materialCommodity",
+			filterProperty: "materialCommodity",
+			width: "75px"
+		}));
+		oTable.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: " MODEL"}),
+			template: new sap.ui.commons.TextView().bindProperty("text", "materialModel"),
+			sortProperty: "materialModel",
+			filterProperty: "materialModel",
+			width: "75px"
+		}));
+		oTable.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: " TYPE"}),
+			template: new sap.ui.commons.TextView().bindProperty("text", "materialType"),
+			sortProperty: "materialType",
+			filterProperty: "materialType",
+			width: "50px"
+		}));
+		oTable.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: " ACCT"}),
+			template: new sap.ui.commons.TextView().bindProperty("text", "materialAccount"),
+			sortProperty: "materialAccount",
+			filterProperty: "materialAccount",
+			width: "75px"
+		}));
+		oTable.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: " ROUTE"}),
+			template: new sap.ui.commons.TextView().bindProperty("text", "routeDesc"),
+			sortProperty: "routeDesc",
+			filterProperty: "routeDesc",
+			width: "140px"
+		}));		
+		oTable.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: " UOM"}),
+			template: new sap.ui.commons.TextView().bindProperty("text", "UOMName"),
+			sortProperty: "UOMName",
+			filterProperty: "UOMName",
+			width: "75px"
+		}));
+		oTable.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: " BOM"}),
+			template: new sap.ui.commons.Image().bindProperty("src", "src_bom"),
+			width: "75px",
+			hAlign: "Center"
+		}));
+		oTable.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: " ACT"}),
+			template: new sap.ui.commons.Image().bindProperty("src", "src_act"),
+			width: "75px",
+			hAlign: "Center"
+		}));
+	};
+	// ******************************************************************************************************************************************************************
+	oTable.attachRowSelectionChange(function(oEvent) {
+		// Retrieve the selected row
+		var selIndex = oTable.getSelectedIndex();
+		selectedIndex = selIndex;
+		oButtonPrint.setEnabled(true); 
+		oButtonEmail.setEnabled(true); 
+		if (selIndex  >= 0) {
+			oButtonNew.setEnabled(false); 
+			oButtonEdit.setEnabled(true); 
+			oButtonDelete.setEnabled(true); 
+			// Retrieve the selected row
+			var selectedRow = oTable.getRows()[selIndex];
+			// sap.ui.commons.MessageBox.alert(selectedRow);
+			var selectedRowContext = oEvent.getParameter("rowContext");
+ 	 		materialID = oModel.getProperty("materialID", selectedRowContext);    
+			materialName = oModel.getProperty("materialName", selectedRowContext);
+			materialDescription = oModel.getProperty("materialDescription", selectedRowContext);
+			specialRequirementCode = oModel.getProperty("specialRequirementCode", selectedRowContext);
+			materialRevision = oModel.getProperty("materialRevision", selectedRowContext);
+			maxQuantity = oModel.getProperty("maxQuantity", selectedRowContext);
+			materialCommodity = oModel.getProperty("materialCommodity", selectedRowContext);
+			materialModel = oModel.getProperty("materialModel", selectedRowContext);
+			materialType = oModel.getProperty("materialType", selectedRowContext);
+			materialAccount = oModel.getProperty("materialAccount", selectedRowContext);
+			materialRouteName = oModel.getProperty("routeName", selectedRowContext);
+			materialRouteDesc = oModel.getProperty("routeDesc", selectedRowContext);
+			materialUOM = oModel.getProperty("materialUOM", selectedRowContext);
+			materialBOM = oModel.getProperty("materialBOM", selectedRowContext);
+			materialSAPID = oModel.getProperty("materialSAPID", selectedRowContext);
+			Active = oModel.getProperty("Active", selectedRowContext);
+			materialDerivativeNo = oModel.getProperty("materialDerivativeNo", selectedRowContext);
+			materialFinalPartNo = oModel.getProperty("materialFinalPartNo", selectedRowContext);
+			materialCustPartNo = oModel.getProperty("materialCustPartNo", selectedRowContext);
+			materialFinalPartDesc = oModel.getProperty("materialFinalPartDesc", selectedRowContext);
+			materialFinalPartRatio = oModel.getProperty("materialFinalPartRatio", selectedRowContext);
+		} else {
+			oButtonNew.setEnabled(true); 
+			oButtonEdit.setEnabled(false); 
+			oButtonDelete.setEnabled(false); 
+	 		materialID = '';   
+			materialName = '';
+			materialDescription = '';
+			specialRequirementCode = '';
+			materialRevision = '';
+			maxQuantity = '';
+			materialCommodity = '';
+			materialModel = '';
+			materialType = '';
+			materialAccount = '';
+			materialRouteName = '';
+			materialRouteDesc = '';
+			materialUOM = '';
+			materialBOM = '';
+			materialSAPID = '';
+			Active = '';
+			materialDerivativeNo = '';
+			materialFinalPartNo = '';
+			materialCustPartNo = '';
+			materialFinalPartDesc = '';
+			materialFinalPartRatio = '';
+			selectedIndex =  -1;
+ 			// alert ("No Selection ..");
+		}
+	});
+
+	var oModel =  new sap.ui.model.xml.XMLModel();
+	// ******************************************************************************************************************************************************************
+	var oMatrixB = new sap.ui.commons.layout.MatrixLayout({
+		id : 'MatrixB',
+		layoutFixed : true,
+		width: '750px',
+		columns : 5,
+		widths : ['150px','150px','150px','150px','150px'] 
+	});
+
+	var oButtonNew = new sap.ui.commons.Button({
+		id : 'B-New',
+		tooltip : "Add  New Material",
+		text : 'Add',
+		enabled: true
+	});
+	oButtonNew.attachPress(doNew);
+
+	var oButtonEdit = new sap.ui.commons.Button({
+		id : 'B-Edit',
+		tooltip : "Edit",
+		text : 'Edit',
+		enabled: false
+	});
+	oButtonEdit.attachPress(doEdit);
+
+	var oButtonDelete= new sap.ui.commons.Button({
+		id : 'B-Delete',
+		tooltip : "Delete",
+		text : 'Delete',
+		enabled: false
+	});
+	oButtonDelete.attachPress(doDeleteMaterial);
+
+	var oButtonPrint= new sap.ui.commons.Button({
+		id : 'B-Print',
+		tooltip : "Print",
+		text : 'Print',
+		enabled: true
+	});
+	oButtonPrint.attachPress(doOnPrintPage);
+
+	var oButtonEmail= new sap.ui.commons.Button({
+		id : 'B-Email',
+		tooltip : "Email",
+		text : 'Email',
+		enabled: true
+	});
+	oButtonEmail.attachPress(doEmail);
+
+	oMatrixB.createRow(oButtonNew,oButtonEdit,oButtonDelete,oButtonPrint,oButtonEmail);
+
+	// ******************************************************************************************************************************************************************
+	function doDeleteMaterial() {
+		if (materialID > 0){
+			var Param1 = escapeSQLString(materialID);
+		   	var oReqData;
+      			if (window.XMLHttpRequest) {
+     	     			oReqData = new XMLHttpRequest();
+      			}
+			if (oReqData != null) {
+				var timestamp = new Date().getTime();
+				var paramStr = "Param.1="+encodeURIComponent(Param1);
+				//alert(paramStr);
+				var queryStr = "/XMII/Illuminator?QueryTemplate=MESM/MATERIALS/QUERIES/delete_Material&"+paramStr+"&ts="+timestamp+"&Content-Type=text/xml";
+				// alert(queryStr);
+				oReqData.open("GET", queryStr, true); 
+				oReqData.onreadystatechange = function() {
+					if (oReqData.readyState == 4) 
+						if (oReqData.status == 200) {
+							// Successful -- rebuild the screen
+							updateTableMaterials();
+						} else {
+							// Not Successful -- alert the user
+							alert("Error: " + oReqData.statusText);
+						}
+				}
+				oReqData.send();
+       			} else {
+          				window.alert("Error creating XmlHttpRequest object.");
+       			}
+		}
+	};
+	// ***************************************************************************************************************************************************
+	function doOnPrintPage() {
+		// retrieve parameters
+		var Param1 = escapeSQLString(selectedPlant);
+		var Param2 = escapeSQLString(selectedRoute);
+		var paramStr = "Param.1="+encodeURIComponent(Param1)+"&Param.2="+encodeURIComponent(Param2);
+
+		//alert(paramStr);
+
+		var w = window.innerWidth
+			|| document.documentElement.clientWidth
+			|| document.body.clientWidth;
+		w = w-40;
+		var h = window.innerHeight
+			|| document.documentElement.clientHeight
+			|| document.body.clientHeight;
+		h=h-20;
+		var WindowObject = window.open("PrintProductsMgmt.irpt?"+paramStr  , "PrintWindow","width="+w+",height="+h+",top=10,left=10,toolbars=no,scrollbars=yes,status=no,resizable=yes");
+		WindowObject.focus();
+	};
+	// ******************************************************************************************************************************************************************
+	var oMatrixMail = new sap.ui.commons.layout.MatrixLayout({
+		id : 'MatrixMail',
+		layoutFixed : true,
+		width: '490px',
+		columns : 1,
+		widths : ['500px'] 
+	});
+
+	var oMatrixMailF = new sap.ui.commons.layout.MatrixLayout({
+		id : 'MatrixMailF',
+		layoutFixed : true,
+		width: '490px',
+		columns : 3,
+		widths : ['180px','140px','170px'] 
+	});
+
+	var oTitleMail = new sap.ui.commons.Label({
+		id : 'L-MailInfo',
+		text : 'EMAIL INFORMATION'
+	});
+	oMatrixMail.createRow( oTitleMail );
+
+	var oLabelSystemMail = new sap.ui.commons.Label({
+		id : 'L-SysMail',
+		text : ' System Mail : '
+	});
+	oMatrixMail.createRow( oLabelSystemMail );
+
+	var oLabelSystemNote = new sap.ui.commons.Label({
+		id : 'L-SysNote',
+		text : ' Messages can be relayed to xxxxxxxxxxx@dana.com addresses only! '
+	});
+	oMatrixMail.createRow( oLabelSystemNote );
+
+	var oLabelRecipient = new sap.ui.commons.Label({
+		id : 'L-Recipient',
+		text : ' Send eMail To  '
+	});
+
+	var oInputRecipient = new sap.ui.commons.TextField('input_recipient');
+	oInputRecipient.setTextAlign(sap.ui.core.TextAlign.Right);
+
+	var oLabelDomain = new sap.ui.commons.Label({
+		id : 'L-Domain',
+		text : ' @dana.com '
+	});
+
+	oMatrixMailF.createRow( oLabelRecipient, oInputRecipient, oLabelDomain );
+	oMatrixMail.createRow( oMatrixMailF );
+
+	var oButtonMail = new sap.ui.commons.Button({
+		id : 'B-SendMail',
+		tooltip : "Send report data via eMail",
+		text : 'SUBMIT',
+		enabled: true
+	});
+	oButtonMail.attachPress(doSendEmail);
+	oMatrixMail.createRow( oButtonMail );
+
+	var oOverlayContainerMail = new sap.ui.ux3.OverlayDialog({openButtonVisible: false});
+	oOverlayContainerMail.setHeight('270px');
+	oOverlayContainerMail.setWidth('700px');
+	oOverlayContainerMail.addContent(oMatrixMail);	
+	// ******************************************************************************************************************************************************************
+	function doEmail() {
+		 // collect email data
+		var recipient = document.getElementById("user_email").value;
+		recipient = recipient.toLowerCase();
+		var firstname = document.getElementById("user_firstname").value;
+		var lastname = document.getElementById("user_lastname").value;
+		var allname = firstname+"."+lastname;
+		// show email overlay
+		if(!oOverlayContainerMail.isOpen()){
+          			oCore.byId("L-SysMail").setText("System configured eMail address : " + recipient);
+			if (recipient.indexOf("@dana.com")>0 ) {
+          			    oCore.byId("input_recipient").setValue(recipient.substr(0, recipient.indexOf("@dana.com")));
+			} else {
+          			    oCore.byId("input_recipient").setValue(allname.toLowerCase());
+			}
+			oOverlayContainerMail.open();
+		}
+	}
+	// ******************************************************************************************************************************************************************
+	function doSendEmail() {
+		 var plantE = escapeSQLString(selectedPlant);
+		var routeE = escapeSQLString(selectedRoute);
+		var recipient = oCore.byId("input_recipient").getValue() + "@rtsautomation.com";
+		var oSendMail;
+      		if (window.XMLHttpRequest) {
+     	     		oSendMail = new XMLHttpRequest();
+      		}
+		if (oSendMail != null) {
+			var timestamp = new Date().getTime();
+			var paramStr = "PlantID="+encodeURIComponent(plantE)+"&ProductRoute="+encodeURIComponent(routeE)+"&MailRecipient="+encodeURIComponent(recipient);
+			//	alert(paramStr);
+			var queryStr = "/XMII/Runner?Transaction=MESM/MATERIALS/TRANSACTIONS/mailProductList&OutputParameter=XML_RESULT&Content-Type=text/xml&"+paramStr+"&ts="+timestamp;
+			 // 	alert(queryStr);
+			oSendMail.open("GET", queryStr, true); 
+			oSendMail.onreadystatechange = function() {
+				if (oSendMail.readyState == 4) 
+					if (oSendMail.status == 200) {
+						// Successful -- rebuild the screen
+						var xmlDOC = oSendMail.responseXML;
+						if(xmlDOC.getElementsByTagName("TRXRESULT")[0] && xmlDOC.getElementsByTagName("TRXRESULT")[0].childNodes[0]) {
+							var trxMessage = xmlDOC.getElementsByTagName("TRXRESULT")[0].childNodes[0].nodeValue;
+							alert(trxMessage);
+							oOverlayContainerMail.close();
+						} else { 
+							alert("Please try again later .. ");
+						}
+					} else {
+						alert("Error: " + oSendMail.statusText);
+					}
+				}
+			oSendMail.send();
+       		} else {
+          			window.alert("Error creating XmlHttpRequest object.");
+       		}
+	}
+	// ******************************************************************************************************************************************************************
+	var oMatrixNM = new sap.ui.commons.layout.MatrixLayout({
+		id : 'MatrixNM',
+		layoutFixed : true,
+		width: '830px',
+		columns : 2,
+		widths : ['365px','435px']
+	});
+
+	var oTitleNM = new sap.ui.commons.Label({
+		id : 'L-NewMaterial',
+		text : 'NEW PRODUCT'
+	});
+
+	oCell_NMRow1 = new sap.ui.commons.layout.MatrixLayoutCell({colSpan : 2,hAlign:'Center',separation:'Large'});
+	oCell_NMRow1.addContent(oTitleNM);
+	oMatrixNM.createRow( oCell_NMRow1 );
+
+	var oLabelNMMaterialPlant = new sap.ui.commons.Label({
+		id : 'L-NMMaterialPlant',
+		visible : true,
+		text : 'PLANT ' });
+
+	var oDropdownBoxPlantsNM = new sap.ui.commons.DropdownBox({
+		id : "PlantListNM",
+		tooltip : 'Plants',
+		editable : true,
+		width : '200px',
+		change: function(oEvent){
+			 //alert(oEvent.oSource.getSelectedKey());
+		}
+	});
+	// ******************************************************************************************************************************************************************
+	function updatePlantsNM(idPlant) {
+		// alert(idPlant);
+		var timestamp = new Date().getTime();
+		getData("/XMII/Illuminator?QueryTemplate=MESM/PLANTS/TRANSACTIONS/getActivePlants_xAcute&Param.1="+idPlant+"&ts="+timestamp+"&Content-Type=text/xml", parseJsonPlantsList);
+		function parseJsonPlantsList(jsondata){
+			oDropdownBoxPlantsNM.destroyItems();
+			for (var i=0; i<jsondata.length; i++){
+				item_id = jsondata[i]['ID'];
+				item_key = jsondata[i]['PLANT'];
+				item_text = jsondata[i]['DESC'];
+				oItem = new sap.ui.core.ListItem("plantNM_"+item_id,{
+					key : item_key,
+					text : item_text });
+				oDropdownBoxPlantsNM.addItem(oItem);
+			}
+			oDropdownBoxPlantsNM.setSelectedKey(idPlant);
+		}
+	};
+	// ******************************************************************************************************************************************************************
+	oMatrixNM.createRow( oLabelNMMaterialPlant,oDropdownBoxPlantsNM);
+
+	var oLabelNMMaterialName = new sap.ui.commons.Label({
+		id : 'L-NMMaterialName',
+		visible : true,
+		text : 'PRODUCT NAME ' });
+
+  	var oTF_NMMaterialName = new sap.ui.commons.TextField({
+		id : 'TF-NMMaterialName',
+		tooltip : 'PRODUCT NAME',
+		editable : true,
+		maxLength : 25,
+		visible : true,
+		width : '200px' 
+	});
+
+	oMatrixNM.createRow( oLabelNMMaterialName, oTF_NMMaterialName);
+
+     	var oLabelNMMaterialDesc = new sap.ui.commons.Label({
+		id : 'L-NMMaterialDesc',
+		visible : true,
+		text : 'DESCRIPTION' });
+
+	 var oTF_NMMaterialDesc = new sap.ui.commons.TextField({
+		id : 'TF-NMMaterialDesc',
+		tooltip : 'PRODUCT DESCRIPTION',
+		editable : true,
+		maxLength : 50,
+		visible : true,
+		width : '440px' 
+	});
+
+	oMatrixNM.createRow( oLabelNMMaterialDesc,oTF_NMMaterialDesc);
+
+	var oMatrixNM1 = new sap.ui.commons.layout.MatrixLayout({
+		id : 'MatrixNM1',
+		layoutFixed : true,
+		width: '820px',
+		columns : 4,
+		widths : ['205px','245px','185px','245px']
+	});
+
+	var oLabelNMMaterialCode = new sap.ui.commons.Label({
+		id : 'L-NMMaterialCode',
+		visible : true,
+		text : 'SPECIAL REQUIREMENTS' });
+
+  	var oTF_NMMaterialCode = new sap.ui.commons.TextField({
+		id : 'TF-NMMaterialCode',
+		tooltip : 'SPECIAL REQUIREMENT CODE',
+		editable : true,
+		maxLength : 3,
+		visible : true,
+		width : '200px' 
+	});
+
+	var oLabelNMMaterialRev = new sap.ui.commons.Label({
+		id : 'L-NMMaterialRev',
+		visible : true,
+		text : 'REVISION' });
+
+  	var oTF_NMMaterialRev = new sap.ui.commons.TextField({
+		id : 'TF-NMMaterialRev',
+		tooltip : 'PRODUCT REVISION',
+		editable : true,
+		maxLength : 3,
+		visible : true,
+		width : '200px' 
+	});
+
+	oMatrixNM1.createRow( oLabelNMMaterialCode, oTF_NMMaterialCode, oLabelNMMaterialRev, oTF_NMMaterialRev);
+
+	var oLabelNMMaterialMaxQty = new sap.ui.commons.Label({
+		id : 'L-NMMaterialMaxQty',
+		visible : true,
+		text : 'MAX QUANTITY' });
+
+  	var oTF_NMMaterialMaxQty = new sap.ui.commons.TextField({
+		id : 'TF-NMMaterialMaxQty',
+		tooltip : 'MAX QTY',
+		editable : true,
+		maxLength : 8,
+		visible : true,
+		width : '200px' 
+	});
+
+	var oLabelNMMaterialCom = new sap.ui.commons.Label({
+		id : 'L-NMMaterialCom',
+		visible : true,
+		text : 'COMMODITY' });
+
+  	var oTF_NMMaterialCom = new sap.ui.commons.TextField({
+		id : 'TF-NMMaterialCom',
+		tooltip : 'COMMODITY',
+		editable : true,
+		maxLength : 10,
+		visible : true,
+		width : '200px' 
+	});
+
+	oMatrixNM1.createRow( oLabelNMMaterialMaxQty, oTF_NMMaterialMaxQty, oLabelNMMaterialCom, oTF_NMMaterialCom);
+
+	var oLabelNMMaterialModel = new sap.ui.commons.Label({
+		id : 'L-NMMaterialModel',
+		visible : true,
+		text : 'PRODUCT MODEL' });
+
+  	var oTF_NMMaterialModel = new sap.ui.commons.TextField({
+		id : 'TF-NMMaterialModel',
+		tooltip : 'PRODUCT MODEL',
+		editable : true,
+		maxLength : 4,
+		visible : true,
+		width : '200px' 
+	});
+
+	var oLabelNMMaterialType = new sap.ui.commons.Label({
+		id : 'L-NMMaterialType',
+		visible : true,
+		text : 'PRODUCT TYPE' });
+
+	var oTF_NMMaterialType = new sap.ui.commons.TextField({
+		id : 'TF-NMMaterialType',
+		tooltip : 'PRODUCT TYPE',
+		editable : true,
+		maxLength : 1,
+		visible : true,
+		width : '200px' 
+	});
+
+	oMatrixNM1.createRow( oLabelNMMaterialModel, oTF_NMMaterialModel, oLabelNMMaterialType, oTF_NMMaterialType);
+
+	var oLabelNMMaterialAcct = new sap.ui.commons.Label({
+		id : 'L-NMMaterialAcct',
+		visible : true,
+		text : 'ACCOUNT' });
+
+	var oTF_NMMaterialAcct = new sap.ui.commons.TextField({
+		id : 'TF-NMMaterialAcct',
+		tooltip : 'ACCOUNT',
+		editable : true,
+		maxLength : 10,
+		visible : true,
+		width : '200px' 
+	});
+
+	var oLabelNMMaterialRout = new sap.ui.commons.Label({
+		id : 'L-NMMaterialRout',
+		visible : true,
+		text : 'ROUTE' });
+
+	var oDropdownBoxNMRoutes = new sap.ui.commons.DropdownBox({
+		id : "NMRoutesList",
+		tooltip : 'Routes',
+		editable : true,
+		width : '200px',
+		change: function(oEvent){
+			 //alert(oEvent.oSource.getSelectedKey());
+		}
+	});
+
+	oMatrixNM1.createRow( oLabelNMMaterialAcct, oTF_NMMaterialAcct, oLabelNMMaterialRout, oDropdownBoxNMRoutes );
+
+	var oLabelNMMaterialUom = new sap.ui.commons.Label({
+		id : 'L-NMMaterialUom',
+		visible : true,
+		text : 'UNIT OF MEASURE' });
+
+	var oDropdownBoxNMUom = new sap.ui.commons.DropdownBox({
+		id : "NMUomList",
+		tooltip : 'Type',
+		editable : true,
+		width : '200px',
+		change: function(oEvent){
+			 //alert(oEvent.oSource.getSelectedKey());
+		}
+	});
+
+	var oLabelNMMaterialAct = new sap.ui.commons.Label({
+		id : 'L-NMMaterialAct',
+		visible : true,
+		text : 'ACTIVE' });
+
+
+	var oCheckboxAct = new sap.ui.commons.CheckBox('checkbox_active',{
+		checked : false
+	});
+
+	oMatrixNM1.createRow( oLabelNMMaterialUom, oDropdownBoxNMUom, oLabelNMMaterialAct , oCheckboxAct );
+
+	var oMatrixNM2 = new sap.ui.commons.layout.MatrixLayout({
+		id : 'MatrixNM2',
+		layoutFixed : true,
+		width: '820px',
+		columns : 4,
+		widths : ['205px','245px','185px','245px']
+	});
+
+	var oLabelNMMaterialDerivativeNo = new sap.ui.commons.Label({
+		id : 'L-NMMaterialDerivativeNo',
+		visible : true,
+		text : 'MATERIAL DERIVATIVE NO' });
+
+  	var oTF_NMMaterialDerivativeNo = new sap.ui.commons.TextField({
+		id : 'TF-NMMaterialDerivativeNo',
+		tooltip : 'MATERIAL DERIVATIVE NO',
+		editable : true,
+		maxLength : 5,
+		visible : true,
+		width : '200px' 
+	});
+
+	var oLabelNMMaterialFinalPartDesc = new sap.ui.commons.Label({
+		id : 'L-NMMaterialFinalPartDesc',
+		visible : true,
+		text : 'FINAL PART DESCRIPTION' });
+
+  	var oTF_NMMaterialFinalPartDesc = new sap.ui.commons.TextField({
+		id : 'TF-NMMaterialFinalPartDesc',
+		tooltip : 'FINAL PART DESCRIPTION',
+		editable : true,
+		maxLength : 50,
+		visible : true,
+		width : '200px' 
+	});
+
+	oMatrixNM2.createRow( oLabelNMMaterialDerivativeNo, oTF_NMMaterialDerivativeNo, oLabelNMMaterialFinalPartDesc, oTF_NMMaterialFinalPartDesc );
+
+	var oLabelNMMaterialFinalPartNo = new sap.ui.commons.Label({
+		id : 'L-NMMaterialFinalPartNo',
+		visible : true,
+		text : 'FINAL PART NO' });
+
+  	var oTF_NMMaterialFinalPartNo = new sap.ui.commons.TextField({
+		id : 'TF-NMMaterialFinalPartNo',
+		tooltip : 'FINAL PART NO',
+		editable : true,
+		maxLength : 25,
+		visible : true,
+		width : '200px' 
+	});
+
+	var oLabelNMMaterialFinalPartRatio = new sap.ui.commons.Label({
+		id : 'L-NMMaterialFinalPartRatio',
+		visible : true,
+		text : 'FINAL PART GEAR RATIO' });
+
+  	var oTF_NMMaterialFinalPartRatio = new sap.ui.commons.TextField({
+		id : 'TF-NMMaterialFinalPartRatio',
+		tooltip : 'FINAL PART GEAR RATIO',
+		editable : true,
+		maxLength : 50,
+		visible : true,
+		width : '200px' 
+	});
+
+	oMatrixNM2.createRow( oLabelNMMaterialFinalPartNo, oTF_NMMaterialFinalPartNo, oLabelNMMaterialFinalPartRatio, oTF_NMMaterialFinalPartRatio);
+
+	var oLabelNMMaterialCustPartNo = new sap.ui.commons.Label({
+		id : 'L-NMMaterialCustPartNo',
+		visible : true,
+		text : 'CUSTOMER PART NO' });
+
+  	var oTF_NMMaterialCustPartNo = new sap.ui.commons.TextField({
+		id : 'TF-NMMaterialCustPartNo',
+		tooltip : 'CUSTOMER PART NO',
+		editable : true,
+		maxLength : 25,
+		visible : true,
+		width : '200px' 
+	});
+
+	oMatrixNM2.createRow( oLabelNMMaterialCustPartNo, oTF_NMMaterialCustPartNo, "", "");
+
+	var oLabelNMRow10Space1 = new sap.ui.commons.Label({
+		id : 'L-NMRow10Space1',
+		height : '150px',
+		width : '50px', 
+		text : '  ' });
+
+	oMatrixNM2.createRow(oLabelNMRow10Space1);
+
+	var oButtonNMSave = new sap.ui.commons.Button({
+		id : 'B-NMSave',
+		tooltip : "Submit",
+		text : 'Submit',
+		enabled: true
+	});
+	oButtonNMSave.attachPress(doAddMaterial);
+
+	oCell_NCRow7 = new sap.ui.commons.layout.MatrixLayoutCell({colSpan : 4,hAlign:'Center',separation:'Large'});
+	oCell_NCRow7.addContent(oButtonNMSave);
+	oMatrixNM2.createRow(oCell_NCRow7);
+
+	var oOverlayContainerNew = new sap.ui.ux3.OverlayDialog({openButtonVisible: false});
+	oOverlayContainerNew.setHeight('570px');
+	oOverlayContainerNew.setWidth('890px');
+	oOverlayContainerNew.addContent(oMatrixNM);
+	oOverlayContainerNew.addContent(oMatrixNM1);
+	oOverlayContainerNew.addContent(oMatrixNM2);
+	// ******************************************************************************************************************************************************************
+	function doNew() {
+		if(!oOverlayContainerNew.isOpen()){
+			resetAddMaterial();
+			updatePlantsNM(plant2Access);
+			updateNMMaterialUomList();
+			updateNMRoutesList();
+			oOverlayContainerNew.open();
+		}
+	}
+	// ******************************************************************************************************************************************************************
+	function resetAddMaterial(){
+		oCore.byId('TF-NMMaterialName').setValue("");
+		oCore.byId('TF-NMMaterialDesc').setValue("");
+		oCore.byId('TF-NMMaterialCode').setValue("");
+		oCore.byId('TF-NMMaterialRev').setValue("");
+		 oCore.byId('TF-NMMaterialMaxQty').setValue("");
+		oCore.byId('TF-NMMaterialCom').setValue("");
+		oCore.byId('TF-NMMaterialModel').setValue("");
+		oCore.byId('TF-NMMaterialType').setValue("");
+		oCore.byId('TF-NMMaterialAcct').setValue("");
+		oCore.byId("checkbox_active").setChecked(false);
+		oCore.byId('TF-NMMaterialDerivativeNo').setValue("");
+		oCore.byId('TF-NMMaterialFinalPartNo').setValue("");
+		oCore.byId('TF-NMMaterialCustPartNo').setValue("");
+		oCore.byId('TF-NMMaterialFinalPartDesc').setValue("");
+		oCore.byId('TF-NMMaterialFinalPartRatio').setValue("");
+	}
+	// ******************************************************************************************************************************************************************
+	function updateNMMaterialUomList() {
+		var timestamp = new Date().getTime();
+		getData("/XMII/Illuminator?QueryTemplate=MESM/MATERIALS/QUERIES/get_UOMList&ts="+timestamp+"&Content-Type=text/xml", parseJsonUomList);
+		function parseJsonUomList(jsondata){
+			oDropdownBoxNMUom.destroyItems();
+			for (var i=0; i<jsondata.length; i++){
+				item_id = jsondata[i]['idUOM'];
+				item_key = jsondata[i]['idUOM'];
+				item_text = jsondata[i]['UOMName'];
+				oItem = new sap.ui.core.ListItem("uomNM_"+item_id,{
+					key : item_key,
+					text : item_text });
+				oDropdownBoxNMUom.addItem(oItem);
+			}
+			oDropdownBoxNMUom.setSelectedKey(1);
+		}
+	}
+	// ******************************************************************************************************************************************************************
+	function updateNMRoutesList() {
+		var timestamp = new Date().getTime();
+		getData("/XMII/Illuminator?QueryTemplate=MESM/MATERIALS/QUERIES/get_RoutesList&ts="+timestamp+"&Content-Type=text/xml", parseJsonRoutesList);
+		function parseJsonRoutesList(jsondata){
+			oDropdownBoxNMRoutes.destroyItems();
+			for (var i=0; i<jsondata.length; i++){
+				item_id = jsondata[i]['routeName'];
+				item_key = jsondata[i]['routeName'];
+				item_text = jsondata[i]['routeDesc'];
+				oItem = new sap.ui.core.ListItem("routesNM_"+item_id,{
+					key : item_key,
+					text : item_text });
+				oDropdownBoxNMRoutes.addItem(oItem);
+			}
+			oDropdownBoxNMRoutes.setSelectedKey(1);
+		}
+	}
+	// ******************************************************************************************************************************************************************
+	function doAddMaterial() {
+		// retrieve values
+		var material_name = oCore.byId('TF-NMMaterialName').getValue();
+		var material_description = oCore.byId('TF-NMMaterialDesc').getValue();
+		var material_code = oCore.byId('TF-NMMaterialCode').getValue();
+		var material_rev = oCore.byId('TF-NMMaterialRev').getValue();
+		var material_maxqty = oCore.byId('TF-NMMaterialMaxQty').getValue();
+		var material_com = oCore.byId('TF-NMMaterialCom').getValue();
+		var material_model = oCore.byId('TF-NMMaterialModel').getValue();
+		var material_type = oCore.byId('TF-NMMaterialType').getValue();
+		var material_acct = oCore.byId('TF-NMMaterialAcct').getValue();
+		var material_rout = oDropdownBoxNMRoutes.getSelectedKey();
+		var material_uom = oDropdownBoxNMUom.getSelectedKey();
+		var material_bom = 0;
+		var plant_sapid = oDropdownBoxPlantsNM.getSelectedKey();
+		var material_active = 0;
+		var materialDerivativeNo = oCore.byId('TF-NMMaterialDerivativeNo').getValue();
+		var materialFinalPartNo = oCore.byId('TF-NMMaterialFinalPartNo').getValue();
+		var materialCustPartNo = oCore.byId('TF-NMMaterialCustPartNo').getValue();
+		var materialFinalPartDesc = oCore.byId('TF-NMMaterialFinalPartDesc').getValue();
+		var materialFinalPartRatio = oCore.byId('TF-NMMaterialFinalPartRatio').getValue();
+		if (oCore.byId("checkbox_active").getChecked() ) {
+			material_active = 1;
+		}
+		if(plant_sapid=="0000") {
+			alert("Please Select plant ..");
+			oCore.byId("PlantListNM").focus();
+			return;
+		}
+		if(material_name=="") {
+			alert("Please Input Material Name ..");
+			oCore.byId("TF-NMMaterialName").focus();
+			return;
+		}
+		if(material_description=="") {
+			alert("Please Input Material Description ..");
+			oCore.byId("TF-NMMaterialDesc").focus();
+			return;
+		}
+		if((isNaN(material_maxqty)) || (material_maxqty =="")){
+			alert("Please Enter Numeric Value ..");
+			oCore.byId("TF-NMMaterialMaxQty").focus();
+			return;
+		}
+		if(material_type=="") {
+			alert("Please Input Material Type ..");
+			oCore.byId("TF-NMMaterialType").focus();
+			return;
+		}
+		if(materialDerivativeNo=="") {
+			alert("Please Input Material Derivatives No ..");
+			oCore.byId("TF-NMMaterialDerivativeNo").focus();
+			return;
+		}
+		if(materialFinalPartNo=="") {
+			alert("Please Input Material Final Part No ..");
+			oCore.byId("TF-NMMaterialFinalPartNo").focus();
+			return;
+		}
+		if(materialCustPartNo=="") {
+			alert("Please Input Material Cust Part No ..");
+			oCore.byId("TF-NMMaterialCustPartNo").focus();
+			return;
+		}
+		if(materialFinalPartDesc=="") {
+			alert("Please Input Material Final Part Desc ..");
+			oCore.byId("TF-NMMaterialFinalPartDesc").focus();
+			return;
+		}
+		if(materialFinalPartRatio=="") {
+			alert("Please Input Material Final Part Ratio ..");
+			oCore.byId("TF-NMMaterialFinalPartRatio").focus();
+			return;
+		}
+
+		var Param1 = escapeSQLString(material_name);
+		var Param2 = escapeSQLString(material_description);
+		var Param3 = escapeSQLString(material_code);
+		var Param4 = escapeSQLString(material_rev);
+		var Param5 = escapeSQLString(material_maxqty);
+		var Param6 = escapeSQLString(material_com);
+		var Param7 = escapeSQLString(material_model);
+		var Param8 = escapeSQLString(material_type);
+		var Param9 = escapeSQLString(material_acct);
+		var Param10 = escapeSQLString(material_rout);
+		var Param11 = escapeSQLString(material_uom);
+		var Param12 = escapeSQLString(material_bom);
+		var Param13 = escapeSQLString(plant_sapid);
+		var Param14 = escapeSQLString(material_active);
+		var Param15 = escapeSQLString(user_name);
+		var Param16 = escapeSQLString(materialDerivativeNo);
+		var Param17 = escapeSQLString(materialFinalPartNo);
+		var Param18 = escapeSQLString(materialCustPartNo);
+		var Param19 = escapeSQLString(materialFinalPartDesc);
+		var Param20 = escapeSQLString(materialFinalPartRatio);
+					
+       		var oReqData;
+      		if (window.XMLHttpRequest) {
+     	     		oReqData = new XMLHttpRequest();
+      		}
+		if (oReqData != null) {
+			var timestamp = new Date().getTime();
+			var paramStr = "Param.1="+encodeURIComponent(Param1)+"&Param.2="+encodeURIComponent(Param2)+"&Param.3="+encodeURIComponent(Param3)+"&Param.4="+encodeURIComponent(Param4)+"&Param.5="+encodeURIComponent(Param5)+"&Param.6="+encodeURIComponent(Param6)+"&Param.7="+encodeURIComponent(Param7)+"&Param.8="+encodeURIComponent(Param8)+"&Param.9="+encodeURIComponent(Param9)+"&Param.10="+encodeURIComponent(Param10)+"&Param.11="+encodeURIComponent(Param11)+"&Param.12="+encodeURIComponent(Param12)+"&Param.13="+encodeURIComponent(Param13)+"&Param.14="+encodeURIComponent(Param14)+"&Param.15="+encodeURIComponent(Param15)+"&Param.16="+encodeURIComponent(Param16)+"&Param.17="+encodeURIComponent(Param17)+"&Param.18="+encodeURIComponent(Param18)+"&Param.19="+encodeURIComponent(Param19)+"&Param.20="+encodeURIComponent(Param20);
+			//alert(paramStr);
+			var queryStr = "/XMII/Illuminator?QueryTemplate=MESM/MATERIALS/QUERIES/add_Material&"+paramStr+"&ts="+timestamp+"&Content-Type=text/xml";
+			// alert(queryStr);
+			oReqData.open("GET", queryStr, true); 
+			oReqData.onreadystatechange = function() {
+				if (oReqData.readyState == 4) 
+					if (oReqData.status == 200) {
+						// Successful -- rebuild the screen
+						updateTableMaterials();	
+						oOverlayContainerNew.close();
+					} else {
+						// Not Successful -- alert the user
+						alert("Error: " + oReqData.statusText);
+					}
+			}
+			oReqData.send();
+       		} else {
+          			window.alert("Error creating XmlHttpRequest object.");
+       		}
+	}
+
+	// ******************************************************************************************************************************************************************
+	// Create EDIT Order Overlay
+	var oMatrixEM = new sap.ui.commons.layout.MatrixLayout({
+		id : 'MatrixEM',
+		layoutFixed : true,
+		width: '820px',
+		columns : 2,
+		widths : ['365px','435px']
+	});
+
+	var oTitleEM = new sap.ui.commons.Label({
+		id : 'L-EditMaterial',
+		text : 'EDIT PRODUCT'
+	});
+
+	oCell_EMRow1 = new sap.ui.commons.layout.MatrixLayoutCell({colSpan : 2,hAlign:'Center',separation:'Large'});
+	oCell_EMRow1 .addContent(oTitleEM);
+
+	oMatrixEM.createRow( oCell_EMRow1 );
+
+	var oLabelEMMaterialPlant = new sap.ui.commons.Label({
+		id : 'L-EMMaterialPlant',
+		visible : true,
+		text : 'PLANT ' });
+
+	var oDropdownBoxPlantsEM = new sap.ui.commons.DropdownBox({
+		id : "PlantListEM",
+		tooltip : 'Plants',
+		editable : true,
+		width : '200px',
+		change: function(oEvent){
+			 //alert(oEvent.oSource.getSelectedKey());
+		}
+	});
+
+	// ******************************************************************************************************************************************************************
+	function updatePlantsEM(idPlant) {
+		// alert(idPlant);
+		var timestamp = new Date().getTime();
+		getData("/XMII/Illuminator?QueryTemplate=MESM/PLANTS/TRANSACTIONS/getActivePlants_xAcute&Param.1="+idPlant+"&ts="+timestamp+"&Content-Type=text/xml", parseJsonPlantsList);
+		function parseJsonPlantsList(jsondata){
+			oDropdownBoxPlantsEM.destroyItems();
+			for (var i=0; i<jsondata.length; i++){
+				item_id = jsondata[i]['ID'];
+				item_key = jsondata[i]['PLANT'];
+				item_text = jsondata[i]['DESC'];
+				oItem = new sap.ui.core.ListItem("plantEM_"+item_id,{
+					key : item_key,
+					text : item_text });
+				oDropdownBoxPlantsEM.addItem(oItem);
+			}
+			oDropdownBoxPlantsEM.setSelectedKey(materialSAPID);
+		}
+	};
+	// ******************************************************************************************************************************************************************
+	oMatrixEM.createRow( oLabelEMMaterialPlant,oDropdownBoxPlantsEM);
+
+	var oLabelEMMaterialName = new sap.ui.commons.Label({
+		id : 'L-EMMaterialName',
+		visible : true,
+		text : 'PRODUCT NAME ' });
+
+  	var oTF_EMMaterialName = new sap.ui.commons.TextField({
+		id : 'TF-EMMaterialName',
+		tooltip : 'PRODUCT NAME',
+		editable : true,
+		maxLength : 25,
+		visible : true,
+		width : '200px' 
+	});
+
+	oMatrixEM.createRow( oLabelEMMaterialName, oTF_EMMaterialName);
+
+     	var oLabelEMMaterialDesc = new sap.ui.commons.Label({
+		id : 'L-EMMaterialDesc',
+		visible : true,
+		text : 'DESCRIPTION' });
+
+	 var oTF_EMMaterialDesc = new sap.ui.commons.TextField({
+		id : 'TF-EMMaterialDesc',
+		tooltip : 'PRODUCT DESCRIPTION',
+		editable : true,
+		maxLength : 50,
+		visible : true,
+		width : '350px' 
+	});
+
+	oMatrixEM.createRow( oLabelEMMaterialDesc,oTF_EMMaterialDesc);
+
+	var oMatrixEM1 = new sap.ui.commons.layout.MatrixLayout({
+		id : 'MatrixEM1',
+		layoutFixed : true,
+		width: '820px',
+		columns : 4,
+		widths : ['205px','245px','185px','245px']
+	});
+
+	var oLabelEMMaterialCode = new sap.ui.commons.Label({
+		id : 'L-EMMaterialCode',
+		visible : true,
+		text : 'SPECIAL REQUIREMENTS' });
+
+  	var oTF_EMMaterialCode = new sap.ui.commons.TextField({
+		id : 'TF-EMMaterialCode',
+		tooltip : 'SPECIAL REQUIREMENT CODE',
+		editable : true,
+		maxLength : 3,
+		visible : true,
+		width : '200px' 
+	});
+
+	var oLabelEMMaterialRev = new sap.ui.commons.Label({
+		id : 'L-EMMaterialRev',
+		visible : true,
+		text : 'REVISION' });
+
+  	var oTF_EMMaterialRev = new sap.ui.commons.TextField({
+		id : 'TF-EMMaterialRev',
+		tooltip : 'PRODUCT REVISION',
+		editable : true,
+		maxLength : 3,
+		visible : true,
+		width : '200px' 
+	});
+
+	oMatrixEM1.createRow( oLabelEMMaterialCode, oTF_EMMaterialCode, oLabelEMMaterialRev, oTF_EMMaterialRev);
+
+	var oLabelEMMaterialMaxQty = new sap.ui.commons.Label({
+		id : 'L-EMMaterialMaxQty',
+		visible : true,
+		text : 'MAX QUANTITY' });
+
+  	var oTF_EMMaterialMaxQty = new sap.ui.commons.TextField({
+		id : 'TF-EMMaterialMaxQty',
+		tooltip : 'MAX QUANTITY',
+		editable : true,
+		maxLength : 8,
+		visible : true,
+		width : '200px' 
+	});
+
+	var oLabelEMMaterialCom = new sap.ui.commons.Label({
+		id : 'L-EMMaterialCom',
+		visible : true,
+		text : 'COMMODITY' });
+
+  	var oTF_EMMaterialCom = new sap.ui.commons.TextField({
+		id : 'TF-EMMaterialCom',
+		tooltip : 'COMMODITY',
+		editable : true,
+		maxLength : 10,
+		visible : true,
+		width : '200px' 
+	});
+
+	oMatrixEM1.createRow( oLabelEMMaterialMaxQty, oTF_EMMaterialMaxQty, oLabelEMMaterialCom, oTF_EMMaterialCom);
+
+	var oLabelEMMaterialModel = new sap.ui.commons.Label({
+		id : 'L-EMMaterialModel',
+		visible : true,
+		text : 'PRODUCT MODEL' });
+
+  	var oTF_EMMaterialModel = new sap.ui.commons.TextField({
+		id : 'TF-EMMaterialModel',
+		tooltip : 'PRODUCT MODEL',
+		editable : true,
+		maxLength : 4,
+		visible : true,
+		width : '200px' 
+	});
+
+	var oLabelEMMaterialType = new sap.ui.commons.Label({
+		id : 'L-EMMaterialType',
+		visible : true,
+		text : 'PRODUCT TYPE' });
+
+	var oTF_EMMaterialType = new sap.ui.commons.TextField({
+		id : 'TF-EMMaterialType',
+		tooltip : 'PRODUCT TYPE',
+		editable : true,
+		maxLength : 1,
+		visible : true,
+		width : '200px' 
+	});
+
+	oMatrixEM1.createRow( oLabelEMMaterialModel, oTF_EMMaterialModel, oLabelEMMaterialType, oTF_EMMaterialType);
+
+	var oLabelEMMaterialAcct = new sap.ui.commons.Label({
+		id : 'L-EMMaterialAcct',
+		visible : true,
+		text : 'ACCOUNT' });
+
+	var oTF_EMMaterialAcct = new sap.ui.commons.TextField({
+		id : 'TF-EMMaterialAcct',
+		tooltip : 'ACCOUNT',
+		editable : true,
+		maxLength : 10,
+		visible : true,
+		width : '200px' 
+	});
+
+	var oLabelEMMaterialRout = new sap.ui.commons.Label({
+		id : 'L-EMMaterialRout',
+		visible : true,
+		text : 'ROUTE' });
+
+	var oDropdownBoxEMRoutes = new sap.ui.commons.DropdownBox({
+		id : "EMRoutesList",
+		tooltip : 'Routes',
+		editable : true,
+		width : '200px',
+		change: function(oEvent){
+			 //alert(oEvent.oSource.getSelectedKey());
+		}
+	});
+
+	oMatrixEM1.createRow( oLabelEMMaterialAcct, oTF_EMMaterialAcct, oLabelEMMaterialRout, oDropdownBoxEMRoutes );
+
+	var oLabelEMMaterialUom = new sap.ui.commons.Label({
+		id : 'L-EMMaterialUom',
+		visible : true,
+		text : 'UNIT OF MEASURE' });
+
+	var oDropdownBoxEMUom = new sap.ui.commons.DropdownBox({
+		id : "EMUomList",
+		tooltip : 'Type',
+		editable : true,
+		width : '200px',
+		change: function(oEvent){
+			 //alert(oEvent.oSource.getSelectedKey());
+		}
+	});
+
+	var oLabelEMMaterialAct = new sap.ui.commons.Label({
+		id : 'L-EMMaterialAct',
+		visible : true,
+		text : 'ACTIVE' });
+
+
+	var oCheckboxActEM = new sap.ui.commons.CheckBox('checkbox_activeEM',{
+		checked : false
+	});
+
+	oMatrixEM1.createRow( oLabelEMMaterialUom, oDropdownBoxEMUom, oLabelEMMaterialAct , oCheckboxActEM);
+
+	var oMatrixEM2 = new sap.ui.commons.layout.MatrixLayout({
+		id : 'MatrixEM2',
+		layoutFixed : true,
+		width: '820px',
+		columns : 4,
+		widths : ['205px','245px','185px','245px']
+	});
+
+	var oLabelEMMaterialDerivativeNo = new sap.ui.commons.Label({
+		id : 'L-EMMaterialDerivativeNo',
+		visible : true,
+		text : 'MATERIAL DERIVATIVE NO' });
+
+  	var oTF_EMMaterialDerivativeNo = new sap.ui.commons.TextField({
+		id : 'TF-EMMaterialDerivativeNo',
+		tooltip : 'MATERIAL DERIVATIVE NO',
+		editable : true,
+		maxLength : 5,
+		visible : true,
+		width : '200px' 
+	});
+
+	var oLabelEMMaterialFinalPartDesc = new sap.ui.commons.Label({
+		id : 'L-EMMaterialFinalPartDesc',
+		visible : true,
+		text : 'FINAL PART DESCRIPTION' });
+
+  	var oTF_EMMaterialFinalPartDesc = new sap.ui.commons.TextField({
+		id : 'TF-EMMaterialFinalPartDesc',
+		tooltip : 'FINAL PART DESCRIPTION',
+		editable : true,
+		maxLength : 50,
+		visible : true,
+		width : '200px' 
+	});
+
+	oMatrixEM2.createRow( oLabelEMMaterialDerivativeNo, oTF_EMMaterialDerivativeNo, oLabelEMMaterialFinalPartDesc, oTF_EMMaterialFinalPartDesc );
+
+	var oLabelEMMaterialFinalPartNo = new sap.ui.commons.Label({
+		id : 'L-EMMaterialFinalPartNo',
+		visible : true,
+		text : 'FINAL PART NO' });
+
+  	var oTF_EMMaterialFinalPartNo = new sap.ui.commons.TextField({
+		id : 'TF-EMMaterialFinalPartNo',
+		tooltip : 'FINAL PART NO',
+		editable : true,
+		maxLength : 25,
+		visible : true,
+		width : '200px' 
+	});
+
+	var oLabelEMMaterialFinalPartRatio = new sap.ui.commons.Label({
+		id : 'L-EMMaterialFinalPartRatio',
+		visible : true,
+		text : 'FINAL PART GEAR RATIO' });
+
+  	var oTF_EMMaterialFinalPartRatio = new sap.ui.commons.TextField({
+		id : 'TF-EMMaterialFinalPartRatio',
+		tooltip : 'FINAL PART GEAR RATIO',
+		editable : true,
+		maxLength : 50,
+		visible : true,
+		width : '200px' 
+	});
+
+	oMatrixEM2.createRow( oLabelEMMaterialFinalPartNo, oTF_EMMaterialFinalPartNo, oLabelEMMaterialFinalPartRatio, oTF_EMMaterialFinalPartRatio);
+
+	var oLabelEMMaterialCustPartNo = new sap.ui.commons.Label({
+		id : 'L-EMMaterialCustPartNo',
+		visible : true,
+		text : 'CUSTOMER PART NO' });
+
+  	var oTF_EMMaterialCustPartNo = new sap.ui.commons.TextField({
+		id : 'TF-EMMaterialCustPartNo',
+		tooltip : 'CUSTOMER PART NO',
+		editable : true,
+		maxLength : 25,
+		visible : true,
+		width : '200px' 
+	});
+
+	oMatrixEM2.createRow( oLabelEMMaterialCustPartNo, oTF_EMMaterialCustPartNo, "", "");
+
+	var oLabelEMRow10Space1 = new sap.ui.commons.Label({
+		id : 'L-EMRow10Space1',
+		height : '150px',
+		width : '50px', 
+		text : '  ' })
+
+	oMatrixEM2.createRow(oLabelEMRow10Space1 );
+
+	var oButtonEMSave = new sap.ui.commons.Button({
+		id : 'B-EMSave',
+		tooltip : "Submit",
+		text : 'Submit',
+		enabled: true
+	});
+	oButtonEMSave.attachPress(doEditMaterial);
+
+	oCell_ECRow7 = new sap.ui.commons.layout.MatrixLayoutCell({colSpan : 4,hAlign:'Center',separation:'Large'});
+	oCell_ECRow7.addContent(oButtonEMSave);
+	oMatrixEM2.createRow(oCell_ECRow7);
+
+	var oOverlayContainerEdit = new sap.ui.ux3.OverlayDialog({openButtonVisible: false});
+	oOverlayContainerEdit.setHeight('570px');
+	oOverlayContainerEdit.setWidth('890px');
+	oOverlayContainerEdit.addContent(oMatrixEM);
+	oOverlayContainerEdit.addContent(oMatrixEM1);
+	oOverlayContainerEdit.addContent(oMatrixEM2);
+	// ******************************************************************************************************************************************************************
+	function doEdit() {
+		if(!oOverlayContainerEdit.isOpen()){
+			setEditMaterial();
+			oOverlayContainerEdit.open();
+		}
+	};
+	// ******************************************************************************************************************************************************************
+	function setEditMaterial() {
+		//alert(orders_SelectedOrder_id);
+		oCore.byId('TF-EMMaterialName').setValue(materialName);
+		oCore.byId('TF-EMMaterialDesc').setValue(materialDescription);
+		oCore.byId('TF-EMMaterialCode').setValue(specialRequirementCode);
+		oCore.byId('TF-EMMaterialRev').setValue(materialRevision);
+		oCore.byId('TF-EMMaterialMaxQty').setValue(maxQuantity);
+		oCore.byId('TF-EMMaterialCom').setValue(materialCommodity);
+		oCore.byId('TF-EMMaterialModel').setValue(materialModel);
+		oCore.byId('TF-EMMaterialType').setValue(materialType);
+		oCore.byId('TF-EMMaterialAcct').setValue(materialAccount);
+		updateEMMaterialUomList();
+		updateEMRoutesList();
+		var material_active = 0;
+		if (Active==1) {
+			oCore.byId("checkbox_activeEM").setChecked(true);
+		}
+		oCore.byId('TF-EMMaterialDerivativeNo').setValue(materialDerivativeNo);
+		oCore.byId('TF-EMMaterialFinalPartNo').setValue(materialFinalPartNo);
+		oCore.byId('TF-EMMaterialCustPartNo').setValue(materialCustPartNo);
+		oCore.byId('TF-EMMaterialFinalPartDesc').setValue(materialFinalPartDesc);
+		oCore.byId('TF-EMMaterialFinalPartRatio').setValue(materialFinalPartRatio);
+		updatePlantsEM(plant2Access);
+	};
+	// ******************************************************************************************************************************************************************
+	function resetEditMaterial() {
+		oCore.byId('TF-EMMaterialName').setValue('');
+		oCore.byId('TF-EMMaterialDesc').setValue('');
+		oCore.byId('TF-EMMaterialCode').setValue("");
+		oCore.byId('TF-EMMaterialRev').setValue("");
+		 oCore.byId('TF-EMMaterialMaxQty').setValue("");
+		oCore.byId('TF-EMMaterialCom').setValue("");
+		oCore.byId('TF-EMMaterialModel').setValue("");
+		oCore.byId('TF-EMMaterialType').setValue("");
+		oCore.byId('TF-EMMaterialAcct').setValue("");
+		oCore.byId("checkbox_activeEM").setChecked(false);
+		oCore.byId('TF-EMMaterialDerivativeNo').setValue("");
+		oCore.byId('TF-EMMaterialFinalPartNo').setValue("");
+		oCore.byId('TF-EMMaterialCustPartNo').setValue("");
+		oCore.byId('TF-EMMaterialFinalPartDesc').setValue("");
+		oCore.byId('TF-EMMaterialFinalPartRatio').setValue("");
+	};
+	// ******************************************************************************************************************************************************************
+	function updateEMMaterialUomList() {
+		var timestamp = new Date().getTime();
+		getData("/XMII/Illuminator?QueryTemplate=MESM/MATERIALS/QUERIES/get_UOMList&ts="+timestamp+"&Content-Type=text/xml", parseJsonUomList);
+		function parseJsonUomList(jsondata){
+			oDropdownBoxEMUom.destroyItems();
+			for (var i=0; i<jsondata.length; i++){
+				item_id = jsondata[i]['idUOM'];
+				item_key = jsondata[i]['idUOM'];
+				item_text = jsondata[i]['UOMName'];
+				oItem = new sap.ui.core.ListItem("uomEM_"+item_id,{
+					key : item_key,
+					text : item_text });
+				oDropdownBoxEMUom.addItem(oItem);
+			}
+			oDropdownBoxEMUom.setSelectedKey(materialUOM);
+		}
+	};
+	// ******************************************************************************************************************************************************************
+	function updateEMRoutesList() {
+		var timestamp = new Date().getTime();
+		getData("/XMII/Illuminator?QueryTemplate=MESM/MATERIALS/QUERIES/get_RoutesList&ts="+timestamp+"&Content-Type=text/xml", parseJsonRoutesList);
+		function parseJsonRoutesList(jsondata){
+			oDropdownBoxEMRoutes.destroyItems();
+			for (var i=0; i<jsondata.length; i++){
+				item_id = jsondata[i]['routeName'];
+				item_key = jsondata[i]['routeName'];
+				item_text = jsondata[i]['routeDesc'];
+				oItem = new sap.ui.core.ListItem("routesEM_"+item_id,{
+					key : item_key,
+					text : item_text });
+				oDropdownBoxEMRoutes.addItem(oItem);
+			}
+			oDropdownBoxEMRoutes.setSelectedKey(materialRouteName);
+		}
+	}
+	// ******************************************************************************************************************************************************************
+	function doEditMaterial() {
+		// retrieve values
+		var material_name = oCore.byId('TF-EMMaterialName').getValue();
+		var material_description = oCore.byId('TF-EMMaterialDesc').getValue();
+		var material_code = oCore.byId('TF-EMMaterialCode').getValue();
+		var material_rev = oCore.byId('TF-EMMaterialRev').getValue();
+		var material_maxqty = oCore.byId('TF-EMMaterialMaxQty').getValue();
+		var material_com = oCore.byId('TF-EMMaterialCom').getValue();
+		var material_model = oCore.byId('TF-EMMaterialModel').getValue();
+		var material_type = oCore.byId('TF-EMMaterialType').getValue();
+		var material_acct = oCore.byId('TF-EMMaterialAcct').getValue();
+		var material_rout = oDropdownBoxEMRoutes.getSelectedKey();
+		var material_uom = oDropdownBoxEMUom.getSelectedKey();
+		var plant_sapid = oDropdownBoxPlantsEM.getSelectedKey();
+		var material_active = 0;
+		var materialDerivativeNo = oCore.byId('TF-EMMaterialDerivativeNo').getValue();
+		var materialFinalPartNo = oCore.byId('TF-EMMaterialFinalPartNo').getValue();
+		var materialCustPartNo = oCore.byId('TF-EMMaterialCustPartNo').getValue();
+		var materialFinalPartDesc = oCore.byId('TF-EMMaterialFinalPartDesc').getValue();
+		var materialFinalPartRatio = oCore.byId('TF-EMMaterialFinalPartRatio').getValue();
+		if (oCore.byId("checkbox_activeEM").getChecked() ) {
+			material_active = 1;
+		}
+		if(plant_sapid=="0000") {
+			alert("Please Select plant ..");
+			oCore.byId("PlantListEM").focus();
+			return;
+		}
+		if(material_name=="") {
+			alert("Please Input Material Name ..");
+			oCore.byId("TF-EMMaterialName").focus();
+			return;
+		}
+		if(material_description=="") {
+			alert("Please Input Material Description ..");
+			oCore.byId("TF-EMMaterialDesc").focus();
+			return;
+		}
+		if((isNaN(material_maxqty)) || (material_maxqty =="")){
+			alert("Please Enter Numeric Value ..");
+			oCore.byId("TF-EMMaterialMaxQty").focus();
+			return;
+		}
+		if(material_type=="") {
+			alert("Please Input Material Type ..");
+			oCore.byId("TF-EMMaterialType").focus();
+			return;
+		}/*
+		if(materialDerivativeNo=="") {
+			alert("Please Input Material Derivatives No ..");
+			oCore.byId("TF-EMMaterialDerivativeNo").focus();
+			return;
+		}
+		if(materialFinalPartNo=="") {
+			alert("Please Input Material Final Part No ..");
+			oCore.byId("TF-EMMaterialFinalPartNo").focus();
+			return;
+		}
+		if(materialCustPartNo=="") {
+			alert("Please Input Material Cust Part No ..");
+			oCore.byId("TF-EMMaterialCustPartNo").focus();
+			return;
+		}
+		if(materialFinalPartDesc=="") {
+			alert("Please Input Material Final Part Desc ..");
+			oCore.byId("TF-EMMaterialFinalPartDesc").focus();
+			return;
+		}
+		if(materialFinalPartRatio=="") {
+			alert("Please Input Material Final Part Ratio ..");
+			oCore.byId("TF-EMMaterialFinalPartRatio").focus();
+			return;
+		}
+*/
+		var Param1 = escapeSQLString(materialID);
+		var Param2 = escapeSQLString(material_name);
+		var Param3 = escapeSQLString(material_description);
+		var Param4 = escapeSQLString(material_code);
+		var Param5 = escapeSQLString(material_rev);
+		var Param6 = escapeSQLString(material_maxqty);
+		var Param7 = escapeSQLString(material_com);
+		var Param8 = escapeSQLString(material_model);
+		var Param9 = escapeSQLString(material_type);
+		var Param10 = escapeSQLString(material_acct);
+		var Param11 = escapeSQLString(material_rout);
+		var Param12 = escapeSQLString(material_uom);
+		var Param13 = escapeSQLString(plant_sapid);
+		var Param14 = escapeSQLString(material_active);
+		var Param15 = escapeSQLString(user_name);
+		var Param16 = escapeSQLString(materialDerivativeNo);
+		var Param17 = escapeSQLString(materialFinalPartNo);
+		var Param18 = escapeSQLString(materialCustPartNo);
+		var Param19 = escapeSQLString(materialFinalPartDesc);
+		var Param20 = escapeSQLString(materialFinalPartRatio);
+					
+       		var oReqData;
+      		if (window.XMLHttpRequest) {
+     	     		oReqData = new XMLHttpRequest();
+      		}
+		if (oReqData != null) {
+			var timestamp = new Date().getTime();
+			var paramStr = "Param.1="+encodeURIComponent(Param1)+"&Param.2="+encodeURIComponent(Param2)+"&Param.3="+encodeURIComponent(Param3)+"&Param.4="+encodeURIComponent(Param4)+"&Param.5="+encodeURIComponent(Param5)+"&Param.6="+encodeURIComponent(Param6)+"&Param.7="+encodeURIComponent(Param7)+"&Param.8="+encodeURIComponent(Param8)+"&Param.9="+encodeURIComponent(Param9)+"&Param.10="+encodeURIComponent(Param10)+"&Param.11="+encodeURIComponent(Param11)+"&Param.12="+encodeURIComponent(Param12)+"&Param.13="+encodeURIComponent(Param13)+"&Param.14="+encodeURIComponent(Param14)+"&Param.15="+encodeURIComponent(Param15)+"&Param.16="+encodeURIComponent(Param16)+"&Param.17="+encodeURIComponent(Param17)+"&Param.18="+encodeURIComponent(Param18)+"&Param.19="+encodeURIComponent(Param19)+"&Param.20="+encodeURIComponent(Param20);
+			//alert(paramStr);
+			var queryStr = "/XMII/Illuminator?QueryTemplate=MESM/MATERIALS/QUERIES/edit_Material&"+paramStr+"&ts="+timestamp+"&Content-Type=text/xml";
+			// alert(queryStr);
+			oReqData.open("GET", queryStr, true); 
+			oReqData.onreadystatechange = function() {
+				if (oReqData.readyState == 4) 
+					if (oReqData.status == 200) {
+						// Successful -- rebuild the screen
+						updateTableMaterials();	
+						oOverlayContainerEdit.close();
+					} else {
+						// Not Successful -- alert the user
+						alert("Error: " + oReqData.statusText);
+					}
+			}
+			oReqData.send();
+       		} else {
+          			window.alert("Error creating XmlHttpRequest object.");
+       		}
+	};
+	// ******************************************************************************************************************************************************************
+	</script>
+</head>
+
+<body onLoad="roleSecurity()">
+
+<input id="user_roles" type="hidden" value="{IllumLoginRoles}" style="display:block;width:1000px;" readonly />
+<input id="user_role" type="hidden" value="{ROLE}" style="display:block;width:1000px;" readonly />
+<input id="user_email" type="hidden" value="{email}" style="display:block;width:800px;" readonly />
+<input id="user_firstname" type="hidden" value="{firstname}" style="display:block;width:800px;" readonly />
+<input id="user_lastname" type="hidden" value="{lastname}" style="display:block;width:800px;" readonly />
+<input id="user_name" type="hidden" value="{IllumLoginName}" style="display: block;width:1000px;" readonly />
+<input id="user_height" type="hidden" value="{HEIGHT}" style="display: block;width:100px;" readonly />
+<input id="user_address" type="hidden" value="{Machine}" style="display:block;width:1000px;" readonly />
+<div id="app_header" >
+<div id="app_title">PRODUCTS MGMT</div>
+<div id="app_menu"></div>
+<div id="page_title">DEFAULT SCREEN</div>
+</div>
+<div id="mesm_content" ></div>
+
+</body>
+</html>

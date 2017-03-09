@@ -1,0 +1,1512 @@
+<!DOCTYPE html >
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>CT MODULE</title>
+	<style>
+	body{
+		background-image: url("Common/img/logo.png");
+		background-size: 180px;
+		background-repeat: no-repeat;
+    		background-attachment: fixed;
+    		background-position: right 40px top 30px;
+		font-family: Arial;
+	}
+	#app_header {
+ 		padding: 10px;
+ 		padding-left: 40px;
+ 		padding-top: 15px;
+ 		padding-bottom: 0px;
+		height:80px;
+		width:400px;
+		text-align: center;
+	}
+	#app_title {
+		width:400px;
+		text-align: center;
+		font-family: "Arial Black",Arial,Helvetica,sans-serif;
+		font-size:32px;
+		color: #007dc0;
+		margin-bottom; 20px;
+	}
+	#app_menu {
+		width:400px;
+		text-align: center;
+		font-family: Arial,Helvetica,sans-serif;
+	}
+	#page_title {
+		width:400px;
+		text-align: center;
+		font-family: "Arial Black",Arial,Helvetica,sans-serif;
+		font-size:28px;
+		color: #cfcfcf;
+	}
+	#mesm_content {
+ 		padding: 30px;
+ 		padding-top: 40px;
+	}
+	#__button0, #__button1, #__button2 {
+		margin-top:10px;
+		margin-left:5px;
+		margin-right:5px;
+	}
+	#MatrixT, #MatrixB, #MatrixP {
+		margin:10px auto;
+	}
+	#MatrixMail, #MatrixMailF, #MatrixSN {
+		margin:10px auto;
+	}
+ 	#__cell4 {
+		padding-left:35px;
+	}
+ 	#__cell9 {
+		text-align:right;
+	}
+	#__cell12, #__cell13, #__cell14, #__cell15 {
+		text-align:center;
+	}
+	#__cell16,#__cell17, #__cell18, #__cell19, #__cell21, #__cell24, #__cell25 {
+		text-align:center;
+	}
+	#__cell20 {
+		text-align:right;
+	}
+	#__cell22 {
+		text-align:left;
+	}
+	#__cell27 {
+		text-align:center;
+	}
+	#B-PrintList, #B-Email, #B-ShowSN, #B-Link {
+		width:100px;
+		height:35px;
+		font-size:14px;
+	}
+	#L-MailInfo, #L-SN {
+		margin-top:15px;
+		padding:5px;
+		font-family: "Arial Black",Arial,Helvetica,sans-serif;
+		font-size:27px;
+		height:35px;
+		color: #007dc0;
+	}
+	#B-SendMail {
+		margin-top:10px;
+		width:100px;
+		height:35px;
+		font-size:14px;
+	}
+	.green {
+		background-color:  #66FF33;
+	}
+	.red {
+		background-color:  #FF6666;
+	}
+	.grey {
+		background-color:  #E0E0E0;
+	}
+	.thick {
+     		font: bold 20px "Times New Roman", Georgia, Serif;
+	} 
+	#tbl_snlist {
+		margin:2px auto;
+		margin-bottom: 15px;
+	}
+	</style>
+	<link rel="stylesheet" type="text/css" href="Common/js/jquerydatetimepicker/jquery.datetimepicker.css"/>
+	<link rel="stylesheet" type="text/css" media="print" href="Common/css/print.css" />
+	<script id="sap-ui-bootstrap"
+		src="/sapui5/resources/sap-ui-core.js"
+		data-sap-ui-theme="sap_goldreflection"
+		data-sap-ui-libs="sap.ui.core,sap.ui.commons,sap.ui.table,sap.ui.ux3,sap.m"
+		data-sap-ui-language="en" >
+	</script>
+	<script type="text/javascript" src="Common/js/default.js"></script>
+	<script src="Common/js/jquerydatetimepicker/build/jquery.datetimepicker.full.js"></script>
+
+	<script type="text/javascript" id="app-init">
+	// ******************************************************************************************************************************************************************
+	// Get Core SAP UI5
+	var oCore = sap.ui.getCore();
+	// Initialize screen
+	var nrRows = 7;
+	var selectedIndex =  -1;
+	var selectedIndexS =  -1;
+	// ******************************************************************************************************************************************************************
+	// initialize access
+	var level2Access = "";
+	var plant2Access = "";
+	// Initialize screen
+	var selectedPlant = 0;
+	var user_name = "";
+
+	// FILTERS
+ 	var selectedLine = 0;
+	var selectedLineRecID = 0;
+	var selectedOrderNumber = ''
+	var selectedOperation = '';
+ 	var selectedFrom = '';
+ 	var selectedTo = '';
+	var selectedLineRecName = '';
+
+	var tableCreated = 0;
+	var tableCreatedShifts = 0;
+
+	var showWhat = "";
+	var serialNumber = "";
+	// ****************************************************************************************************************************************************
+	function roleSecurity() {
+		var myRoles = document.getElementById("user_roles").value;
+		var role2Access = "MESM_" + document.getElementById("user_role").value;
+		user_name = document.getElementById("user_name").value;
+		if(myRoles.indexOf(role2Access)<0) {
+			 window.location.assign("security.irpt");
+		  } else {
+			var roleString = document.getElementById("user_role").value;
+			var roleArray = roleString.split("_");
+			level2Access = roleArray[0]; 
+				// alert("level : " + level2Access);
+			plant2Access =  roleArray[1];
+				// alert("plant : " + plant2Access);
+			updatePlants(plant2Access);
+			document.getElementById("page_title").innerHTML=role2Access;
+			// enable homepage
+			oCore.byId("item3-0-3").setEnabled(true);
+			// show menus
+			oMenuButton1.placeAt("app_menu");
+			oMenuButton2.placeAt("app_menu");
+			oMenuButton3.placeAt("app_menu");
+			var role_ADM = "MESM_ADM_"+plant2Access;
+			var role_ENG = "MESM_ENG_"+plant2Access;
+			var role_SUP = "MESM_SUP_"+plant2Access;
+			var role_OPS = "MESM_OPS_"+plant2Access;
+
+			switch(role2Access) {
+			case "MESM_ADM_ALL":
+
+				// enable Cfg Hierarchy
+					oCore.byId("item1-0-1").setEnabled(true);
+				// enable Cfg Memory Maps
+					oCore.byId("item1-0-3").setEnabled(true);
+				// enable Cfg Connectivity
+					oCore.byId("item1-0-4").setEnabled(true);
+				// enable Master Data
+					oCore.byId("item1-0-5").setEnabled(true);
+
+				// SPC
+				// enable SPC home page
+					oCore.byId("item1-0-6").setEnabled(true);
+				// enable Plants submenu
+					oCore.byId("item1-0-7").setEnabled(true);
+				// enable  Stations submenu
+					oCore.byId("item1-0-8").setEnabled(true);
+				// enable Part submenu
+					oCore.byId("item1-0-9").setEnabled(true);
+				// enable Datapoints submenu
+					oCore.byId("item1-0-10").setEnabled(true);
+				// enable Operators submenu
+					oCore.byId("item1-0-11").setEnabled(true);
+				// enable Subscriptions submenu
+					oCore.byId("item1-0-12").setEnabled(true);
+
+				// enable WO Management
+					oCore.byId("item2-0-1").setEnabled(true);
+				// enable Carrier Station Dashboard
+					oCore.byId("item2-0-2").setEnabled(true);
+				// enable Assembly Station Dashboard
+					oCore.byId("item2-0-3").setEnabled(true);
+
+				// SPC
+				// enable SPC Dashboard
+					oCore.byId("item2-0-4").setEnabled(true);
+				// enable Saved File Charts
+					//	oCore.byId("item2-0-5").setEnabled(true);
+				// enable  PC History Logs
+					//	oCore.byId("item2-0-6").setEnabled(true);
+
+				// enable Production Status Shifts Report
+					oCore.byId("item3-0-1").setEnabled(true);
+				// enable Item Traceability Report
+					oCore.byId("item3-0-2").setEnabled(true);
+				// enable Connector Diagnostics
+					oCore.byId("item3-0-3").setEnabled(true);
+
+				// SPC
+				// enable Daily Activity
+					oCore.byId("item3-0-4").setEnabled(true);
+				// enable Weekly Activity
+					oCore.byId("item3-0-5").setEnabled(true);
+				// enable onthly Activity
+					oCore.byId("item3-0-6").setEnabled(true);
+
+				// enable Equipment Hierarchy
+					oCore.byId("item1-4-1").setEnabled(true);
+				// enable Cfg Hierarchy Levels
+					oCore.byId("item1-4-2").setEnabled(true);
+
+				// enable Cfg Memory Maps
+					oCore.byId("item1-5-1").setEnabled(true);
+				// enable Cfg Tag Types
+					oCore.byId("item1-5-2").setEnabled(true);
+				// enable Cfg Tag Functions
+					oCore.byId("item1-5-3").setEnabled(true);
+				// enable Cfg Tag Groups
+					oCore.byId("item1-5-4").setEnabled(true);
+				// enable Cfg Memory Map Transactions
+					oCore.byId("item1-5-5").setEnabled(true);
+
+				// enable Cfg Shop Floor Computers
+					oCore.byId("item1-6-1").setEnabled(true);
+				// enable Cfg Shop Floor Printers
+					oCore.byId("item1-6-2").setEnabled(true);
+				// enable Cfg PCo Servers
+					oCore.byId("item1-6-3").setEnabled(true);
+				// enable Cfg PCo Agents
+					oCore.byId("item1-6-4").setEnabled(true);
+				// enable Cfg Sql Servers
+					oCore.byId("item1-6-5").setEnabled(true);
+				// enable Cfg Operators
+					oCore.byId("item1-6-6").setEnabled(true);
+				// enable Cfg File Servers
+					oCore.byId("item1-6-7").setEnabled(true);
+				// enable Cfg File Agents
+					oCore.byId("item1-6-8").setEnabled(true);
+
+				// Enable UOM Maintenance
+					oCore.byId("item1-7-1").setEnabled(true);
+				// Enable Product Maintenance
+					oCore.byId("item1-7-2").setEnabled(true);
+				// Enable BOM Maintenance
+					oCore.byId("item1-7-3").setEnabled(true);
+				// Enable Routing Maintenance
+					oCore.byId("item1-7-4").setEnabled(true);
+
+				// SPC
+				// enable Plants  Maintenance
+					oCore.byId("item1-8-1").setEnabled(true);
+				// enable Import Plants
+					oCore.byId("item1-8-2").setEnabled(true);
+				// enable Export Plants
+					oCore.byId("item1-8-3").setEnabled(true);
+
+				// enable Stations   Maintenance
+					oCore.byId("item1-9-1").setEnabled(true);
+				// enable Import Stations
+					oCore.byId("item1-9-2").setEnabled(true);
+				// enable Export Stations
+					oCore.byId("item1-9-3").setEnabled(true);
+
+				// enable Parts Maintenance
+					oCore.byId("item1-10-1").setEnabled(true);
+				// enable Import Parts
+					oCore.byId("item1-10-2").setEnabled(true);
+				// enable Export Parts
+					oCore.byId("item1-10-3").setEnabled(true);
+
+				// enable Datapoints HDR
+					oCore.byId("item1-11-1").setEnabled(true);
+				// enable Datapoints SPC
+					oCore.byId("item1-11-2").setEnabled(true);
+				// enable Import Datapoints
+					oCore.byId("item1-11-3").setEnabled(true);
+				// enable Export Datapoints
+					oCore.byId("item1-11-4").setEnabled(true);
+
+				// enable Operatord Maintenance
+					oCore.byId("item1-12-1").setEnabled(true);
+				// enable Import Operators
+					oCore.byId("item1-12-2").setEnabled(true);
+				// enable  Export Operators
+					oCore.byId("item1-12-3").setEnabled(true);
+										
+				// enable Subscriptions Maintenance 
+					oCore.byId("item1-13-1").setEnabled(true);
+				// enable Import Subscriptions
+					oCore.byId("item1-13-2").setEnabled(true);
+				// enable Export Subscriptions
+					oCore.byId("item1-13-3").setEnabled(true);
+	
+				// update screen
+				document.getElementById("page_title").innerHTML="ADM ALL PLANTS";
+				oMatrixP.placeAt('mesm_content');
+				oMatrixT.placeAt('mesm_content');
+				oMatrixB.placeAt('mesm_content');
+				break;
+			case role_ADM:
+				// enable Cfg Hierarchy
+					oCore.byId("item1-0-1").setEnabled(true);
+				// enable Cfg Memory Maps
+					oCore.byId("item1-0-3").setEnabled(true);
+				// enable Cfg Connectivity
+					oCore.byId("item1-0-4").setEnabled(true);
+				// enable Master Data
+					oCore.byId("item1-0-5").setEnabled(true);
+
+				// SPC
+				// enable SPC home page
+					oCore.byId("item1-0-6").setEnabled(true);
+				// enable Plants submenu
+					oCore.byId("item1-0-7").setEnabled(true);
+				// enable  Stations submenu
+					oCore.byId("item1-0-8").setEnabled(true);
+				// enable Part submenu
+					oCore.byId("item1-0-9").setEnabled(true);
+				// enable   Datapoints submenu
+					oCore.byId("item1-0-10").setEnabled(true);
+				// enable Operators submenu
+					oCore.byId("item1-0-11").setEnabled(true);
+				// enable Subscriptions submenu
+					oCore.byId("item1-0-12").setEnabled(true);
+
+				// enable WO Management
+					oCore.byId("item2-0-1").setEnabled(true);
+				// enable Carrier Station Dashboard
+					oCore.byId("item2-0-2").setEnabled(true);
+				// enable Assembly Station Dashboard
+					oCore.byId("item2-0-3").setEnabled(true);
+
+				// SPC
+				// enable SPC Dashboard
+					oCore.byId("item2-0-4").setEnabled(true);
+				// enable Saved File Charts
+					//	oCore.byId("item2-0-5").setEnabled(true);
+				// enable  PC History Logs
+					//	oCore.byId("item2-0-6").setEnabled(true);
+
+				// enable Production Status Report
+					oCore.byId("item3-0-1").setEnabled(true);
+				// enable Item Traceability Report
+					oCore.byId("item3-0-2").setEnabled(true);
+				// enable Connector Diagnostics
+					oCore.byId("item3-0-3").setEnabled(true);
+
+				// SPC
+				// enable Daily Activity
+					oCore.byId("item3-0-4").setEnabled(true);
+				// enable Weekly Activity
+					oCore.byId("item3-0-5").setEnabled(true);
+				// enable onthly Activity
+					oCore.byId("item3-0-6").setEnabled(true);
+
+				// enable Equipment Hierarchy
+					oCore.byId("item1-4-1").setEnabled(true);
+				// enable Cfg Hierarchy Levels
+					oCore.byId("item1-4-2").setEnabled(true);
+
+				// enable Cfg Memory Maps
+					oCore.byId("item1-5-1").setEnabled(true);
+				// enable Cfg Tag Types
+					oCore.byId("item1-5-2").setEnabled(true);
+				// enable Cfg Tag Functions
+					oCore.byId("item1-5-3").setEnabled(true);
+				// enable Cfg Tag Groups
+					oCore.byId("item1-5-4").setEnabled(true);
+				// enable Cfg Memory Map Transactions
+					oCore.byId("item1-5-5").setEnabled(true);
+
+				// enable Cfg Shop Floor Computers
+					oCore.byId("item1-6-1").setEnabled(true);
+				// enable Cfg Shop Floor Printers
+					oCore.byId("item1-6-2").setEnabled(true);
+				// enable Cfg PCo Servers
+					oCore.byId("item1-6-3").setEnabled(true);
+				// enable Cfg PCo Agents
+					oCore.byId("item1-6-4").setEnabled(true);
+				// enable Cfg Sql Servers
+					oCore.byId("item1-6-5").setEnabled(true);
+				// enable Cfg Operators
+					oCore.byId("item1-6-6").setEnabled(true);
+				// enable Cfg File Servers
+					oCore.byId("item1-6-7").setEnabled(true);
+				// enable Cfg File Agents
+					oCore.byId("item1-6-8").setEnabled(true);
+
+				// Enable UOM Maintenance
+					oCore.byId("item1-7-1").setEnabled(true);
+				// Enable Product Maintenance
+					oCore.byId("item1-7-2").setEnabled(true);
+				// Enable BOM Maintenance
+					oCore.byId("item1-7-3").setEnabled(true);
+				// Enable Routing Maintenance
+					oCore.byId("item1-7-4").setEnabled(true);
+
+				// SPC
+				// enable Plants  Maintenance
+					oCore.byId("item1-8-1").setEnabled(true);
+				// enable Import Plants
+					oCore.byId("item1-8-2").setEnabled(true);
+				// enable Export Plants
+					oCore.byId("item1-8-3").setEnabled(true);
+
+				// enable Stations   Maintenance
+					oCore.byId("item1-9-1").setEnabled(true);
+				// enable Import Stations
+					oCore.byId("item1-9-2").setEnabled(true);
+				// enable Export Stations
+					oCore.byId("item1-9-3").setEnabled(true);
+
+				// enable Parts Maintenance
+					oCore.byId("item1-10-1").setEnabled(true);
+				// enable Import Parts
+					oCore.byId("item1-10-2").setEnabled(true);
+				// enable Export Parts
+					oCore.byId("item1-10-3").setEnabled(true);
+
+				// enable Datapoints HDR
+					oCore.byId("item1-11-1").setEnabled(true);
+				// enable Datapoints SPC
+					oCore.byId("item1-11-2").setEnabled(true);
+				// enable Import Datapoints
+					oCore.byId("item1-11-3").setEnabled(true);
+				// enable Export Datapoints
+					oCore.byId("item1-11-4").setEnabled(true);
+
+				// enable Operatord Maintenance
+					oCore.byId("item1-12-1").setEnabled(true);
+				// enable Import Operators
+					oCore.byId("item1-12-2").setEnabled(true);
+				// enable  Export Operators
+					oCore.byId("item1-12-3").setEnabled(true);
+										
+				// enable Subscriptions Maintenance 
+					oCore.byId("item1-13-1").setEnabled(true);
+				// enable Import Subscriptions
+					oCore.byId("item1-13-2").setEnabled(true);
+				// enable Export Subscriptions
+					oCore.byId("item1-13-3").setEnabled(true);
+	
+				// update screen
+				document.getElementById("page_title").innerHTML="ADM PLANT "+plant2Access;
+				oMatrixP.placeAt('mesm_content');
+				oMatrixT.placeAt('mesm_content');
+				oMatrixB.placeAt('mesm_content');
+				break;
+			case "MESM_OPS_ALL":
+				// enable WO Management
+					oCore.byId("item2-0-1").setEnabled(true);
+				// enable Carrier Station Dashboard
+					oCore.byId("item2-0-2").setEnabled(true);
+				// enable Assembly Station Dashboard
+					oCore.byId("item2-0-3").setEnabled(true);
+
+				// SPC
+				// enable SPC Dashboard
+					oCore.byId("item2-0-4").setEnabled(true);
+				// enable Saved File Charts
+					//	oCore.byId("item2-0-5").setEnabled(true);
+				// enable  PC History Logs
+					//	oCore.byId("item2-0-6").setEnabled(true);
+
+				// enable Production Status Report
+					oCore.byId("item3-0-1").setEnabled(true);
+				// enable Item Traceability Report
+					oCore.byId("item3-0-2").setEnabled(true);
+				// enable Connector Diagnostics
+					oCore.byId("item3-0-3").setEnabled(true);
+
+				// SPC
+				// enable Daily Activity
+					oCore.byId("item3-0-4").setEnabled(true);
+				// enable Weekly Activity
+					oCore.byId("item3-0-5").setEnabled(true);
+				// enable onthly Activity
+					oCore.byId("item3-0-6").setEnabled(true);
+
+				document.getElementById("page_title").innerHTML="OPS ALL PLANTS";
+				oMatrixP.placeAt('mesm_content');
+				oMatrixT.placeAt('mesm_content');
+				oMatrixB.placeAt('mesm_content');
+				break;
+			case role_OPS:
+		// enable WO Management
+					oCore.byId("item2-0-1").setEnabled(true);
+				// enable Carrier Station Dashboard
+					oCore.byId("item2-0-2").setEnabled(true);
+				// enable Assembly Station Dashboard
+					oCore.byId("item2-0-3").setEnabled(true);
+
+				// SPC
+				// enable SPC Dashboard
+					oCore.byId("item2-0-4").setEnabled(true);
+				// enable Saved File Charts
+					//	oCore.byId("item2-0-5").setEnabled(true);
+				// enable  PC History Logs
+					//	oCore.byId("item2-0-6").setEnabled(true);
+
+				// enable Production Status Report
+					oCore.byId("item3-0-1").setEnabled(true);
+				// enable Item Traceability Report
+					oCore.byId("item3-0-2").setEnabled(true);
+				// enable Connector Diagnostics
+					oCore.byId("item3-0-3").setEnabled(true);
+
+				// SPC
+				// enable Daily Activity
+					oCore.byId("item3-0-4").setEnabled(true);
+				// enable Weekly Activity
+					oCore.byId("item3-0-5").setEnabled(true);
+				// enable onthly Activity
+					oCore.byId("item3-0-6").setEnabled(true);
+
+				document.getElementById("page_title").innerHTML="OPS PLANT "+plant2Access;
+				oMatrixP.placeAt('mesm_content');
+				oMatrixT.placeAt('mesm_content');
+				oMatrixB.placeAt('mesm_content');
+				break;
+			default:
+				alert("MES Module Role Unknown: " + role2Access);
+				break;
+			}
+		  }
+	}
+
+	// ************************************	MENU		******************************************************************************************************************************
+
+	var timestamp = new Date().getTime();
+
+	var jsFile=document.createElement('script');
+	jsFile.setAttribute("type","text/javascript");
+	jsFile.setAttribute("src", "Common/js/menu.js?ts="+timestamp);
+	document.getElementsByTagName("head")[0].appendChild(jsFile);
+
+	// ****************************************************************************************************************************************************	// ****************************************************************************************************************************************************
+	function getCurrentDateTime() {
+		var srvDate = new Date();
+
+		var day = srvDate.getDate();
+		if(String(day).length ==1) day = "0" +day;
+		var month = srvDate.getMonth();
+		month = (month +1);
+		if(String(month).length ==1) month = "0" +month;
+		var year = srvDate.getFullYear();
+
+		var tomorrow = new Date();
+		tomorrow.setDate(tomorrow.getDate() + 1);
+
+		var dayTomorrow = tomorrow.getDate();
+		if(String(dayTomorrow).length ==1) dayTomorrow = "0" +dayTomorrow;
+		var monthTomorrow = tomorrow.getMonth();
+		monthTomorrow = (monthTomorrow +1);
+		if(String(monthTomorrow).length ==1) monthTomorrow = "0" +monthTomorrow;
+		var yearTomorrow = tomorrow.getFullYear();
+
+		var fromDate =  month + "-" + day + "-" + year + " 07:00";
+		var toDate =  monthTomorrow + "-" + dayTomorrow + "-" + yearTomorrow + " 07:00";
+		// alert(fromDate + "  -- " + toDate);
+		oCore.byId('TF-FromDateTime').setValue(fromDate);
+		oCore.byId('TF-ToDateTime').setValue(toDate);
+	};
+	// ****************************************************************************************************************************************************
+	var oMatrixP = new sap.ui.commons.layout.MatrixLayout({
+		id : 'MatrixP',
+		layoutFixed : true,
+		width: '1200px',
+		columns : 5,
+		widths : ['240px', '240px', '240px', '240px', '240px'] 
+	});
+
+	var oLabelPlants = new sap.ui.commons.Label({
+		id : 'L-Plants',
+		visible : true,
+		text : 'SELECTED PLANT ' });
+
+	var oLabelLines = new sap.ui.commons.Label({
+		id : 'L-Lines',
+		visible : true,
+		text : 'PRODUCTION LINE ' });
+
+	var oLabelFrom = new sap.ui.commons.Label({
+		id : 'L-From',
+		visible : true,
+		text : 'FROM ' });
+
+	var oLabelTo = new sap.ui.commons.Label({
+		id : 'L-To',
+		visible : true,
+		text : 'TO ' });
+
+	oMatrixP.createRow(oLabelLines,oLabelFrom,oLabelTo,"",oLabelPlants);
+
+	var oDropdownBoxLines = new sap.ui.commons.DropdownBox({
+		id : "LinesList",
+		tooltip : 'Lines',
+		editable : true,
+		width : '200px',
+		change: function(oEvent){
+			selectedLine = oDropdownBoxLines.getSelectedKey();
+			updateTableProductionStatus();
+		}
+	});
+
+	var oTF_FromDateTime = new sap.ui.commons.TextField({
+		id : 'TF-FromDateTime',
+		tooltip : 'From Time Stamp',
+		editable : true,
+		visible : true,
+		width : '160px' 
+	});
+
+	var oBtn_FromDateTime = new sap.ui.commons.Button({
+		id : 'B-DateTimeFrom',
+		tooltip : 'From Time Stamp',
+		text : ''
+	});
+	oBtn_FromDateTime.setIcon("Common/img/asr_calendar.png");
+	oBtn_FromDateTime.attachPress(doOpenPickerFrom);
+
+	var oLayoutOrdersFrom = new sap.ui.layout.HorizontalLayout("OrdersFrom", {
+		content: [oTF_FromDateTime, oBtn_FromDateTime]
+	});
+
+	// ****************************************************************************************************************************************************
+	function doOpenPickerFrom(oControlEvent){
+         		// find the input fields and apply the time select to them.
+		$('#TF-FromDateTime').datetimepicker('show');
+      	};
+	// ****************************************************************************************************************************************************		
+	oBtn_FromDateTime.attachBrowserEvent("mouseover", function() {
+		$('#TF-FromDateTime').datetimepicker({
+			format:'m-d-Y H:i',
+			step: 5,
+			onChangeDateTime:function(){
+				var d = $('#TF-FromDateTime').val();
+				oCore.byId('TF-FromDateTime').setValue(d);
+				selectedFrom = d;
+				updateTableProductionStatus();
+			}
+		});
+	});
+
+	var oTF_ToDateTime = new sap.ui.commons.TextField({
+		id : 'TF-ToDateTime',
+		tooltip : 'To Time Stamp',
+		editable : true,
+		visible : true,
+		width : '160px' 
+	});
+	var oBtn_ToDateTime = new sap.ui.commons.Button({
+		id : 'B-DateTimeTo',
+		tooltip : 'To Time Stamp',
+		text : ''
+	});
+
+	oBtn_ToDateTime.setIcon("Common/img/asr_calendar.png");
+	oBtn_ToDateTime.attachPress(doOpenPickerTo);
+
+	var oLayoutOrdersTo = new sap.ui.layout.HorizontalLayout("OrdersTo", {
+		content: [oTF_ToDateTime, oBtn_ToDateTime]
+	});
+
+	// ****************************************************************************************************************************************************
+	function doOpenPickerTo(oControlEvent){
+         		// find the input fields and apply the time select to them.
+		$('#TF-ToDateTime').datetimepicker('show');
+      	};
+	// ****************************************************************************************************************************************************		
+	oBtn_ToDateTime.attachBrowserEvent("mouseover", function() {
+		$('#TF-ToDateTime').datetimepicker({
+			format:'m-d-Y H:i',
+			step: 5,		          
+			onChangeDateTime:function(){
+				var d = $('#TF-ToDateTime').val();
+				oCore.byId('TF-ToDateTime').setValue(d);
+				selectedTo = d;
+				updateTableProductionStatus();
+			}
+		});
+	});
+
+	var oDropdownBoxPlants = new sap.ui.commons.DropdownBox({
+		id : "PlantList",
+		tooltip : 'Plants',
+		editable : true,
+		width : '200px',
+		change: function(oEvent){
+			// alert(oEvent.oSource.getSelectedKey());
+			var endplant = oDropdownBoxPlants.getSelectedItemId();
+			var result = endplant.substring(6,endplant.length);
+			selectedPlant = result;
+			displayProductionLineList(selectedPlant);
+		}
+	})
+
+	oMatrixP.createRow( oDropdownBoxLines,oLayoutOrdersFrom,oLayoutOrdersTo,"",oDropdownBoxPlants );
+
+	// ****************************************************************************************************************************************************
+	function updatePlants(idPlant) {
+		var timestamp = new Date().getTime();
+		getData("/XMII/Illuminator?QueryTemplate=MESM/PLANTS/TRANSACTIONS/getActivePlants_xAcute&Param.1="+idPlant+"&ts="+timestamp+"&Content-Type=text/xml", parseJsonPlantsList);
+		function parseJsonPlantsList(jsondata){
+			oDropdownBoxPlants.destroyItems();
+			for (var i=0; i<jsondata.length; i++){
+				item_id = jsondata[i]['ID'];
+				item_key = jsondata[i]['PLANT'];
+				item_text = jsondata[i]['DESC'];
+				oItem = new sap.ui.core.ListItem("plant_"+item_id,{
+					key : item_key,
+					text : item_text });
+				oDropdownBoxPlants.addItem(oItem);
+			}
+			oDropdownBoxPlants.setSelectedKey(idPlant);
+			var endplant = oDropdownBoxPlants.getSelectedItemId();
+			var result = endplant.substring(6,endplant.length);
+			selectedPlant = result;
+			displayProductionLineList(selectedPlant);
+		}
+	};
+
+	// ****************************************************************************************************************************************************
+	function displayProductionLineList(selPlant) {
+		var timestamp = new Date().getTime();
+		getData("/XMII/Illuminator?QueryTemplate=MESM/ORDERS/QUERIES/get_ProductionLineListALL&Param.1="+selPlant+"&ts="+timestamp+"&Content-Type=text/xml", parseJsonProductionLineList);
+		function parseJsonProductionLineList(jsondata){
+			oDropdownBoxLines.destroyItems();
+			for (var i=0; i<jsondata.length; i++){
+				item_id = jsondata[i]['recordID'];
+				item_key = jsondata[i]['recordID'];
+				item_text = jsondata[i]['unitName'];
+				oItem = new sap.ui.core.ListItem("line_"+item_id,{
+					key : item_key,
+					text : item_text });
+				oDropdownBoxLines.addItem(oItem);
+			}
+			selectedLine = oDropdownBoxLines.getSelectedKey();
+			if(tableCreated == 0) {
+				getCurrentDateTime();
+				createTableProductionStatus();
+				//oTable.setSelectedIndex(0);
+				tableCreated = 1;
+			}else {
+				updateTableProductionStatus();
+			}
+		}
+	};
+
+	// ****************************************************************************************************************************************************
+	function createTableProductionShifts() {
+		var timestamp = new Date().getTime();
+		// alert(selectedPlant); 
+	         	var Param1 = escapeSQLString(selectedPlant);
+		var Param2 = escapeSQLString(selectedLineRecID);
+		var Param3 = escapeSQLString(oCore.byId('TF-FromDateTime').getValue());
+		var Param4 = escapeSQLString(oCore.byId('TF-ToDateTime').getValue());
+		var Param5 = escapeSQLString(selectedOrderNumber);
+		var Param6 = escapeSQLString(selectedOperation);
+		var Param7 = escapeSQLString("ALL");
+		var paramStr = "Param.1="+encodeURIComponent(Param1)+"&Param.2="+encodeURIComponent(Param2)+"&Param.3="+encodeURIComponent(Param3)+"&Param.4="+encodeURIComponent(Param4)+"&Param.5="+encodeURIComponent(Param5)+"&Param.6="+encodeURIComponent(Param6)+"&Param.7="+encodeURIComponent(Param7);
+		// alert(paramStr);		
+ 		oModelS.loadData("/XMII/Illuminator?QueryTemplate=MESM/REPORTS/QUERIES/getProductionStatusByHours&"+paramStr+"&ts="+timestamp+"&Content-Type=text/xml","",false);
+		// alert(oModelS.getXML());
+		createColumnsProductionShifts();
+		oTableS.setModel(oModelS);
+		// Bind the table rows to this model
+		oTableS.bindRows("/Rowset/Row");
+		//setTimeout(colorRows(), 1000);
+	};
+	// ****************************************************************************************************************************
+	function updateTableProductionShifts() { 
+		oTableS.clearSelection();
+		var timestamp = new Date().getTime();
+		// alert(selectedPlant); 
+ 	  	var Param1 = escapeSQLString(selectedPlant);
+		var Param2 = escapeSQLString(selectedLineRecID);
+		var Param3 = escapeSQLString(oCore.byId('TF-FromDateTime').getValue());
+		var Param4 = escapeSQLString(oCore.byId('TF-ToDateTime').getValue());
+		var Param5 = escapeSQLString(selectedOrderNumber);
+		var Param6 = escapeSQLString(selectedOperation);
+		var Param7 = escapeSQLString("ALL");
+		var paramStr = "Param.1="+encodeURIComponent(Param1)+"&Param.2="+encodeURIComponent(Param2)+"&Param.3="+encodeURIComponent(Param3)+"&Param.4="+encodeURIComponent(Param4)+"&Param.5="+encodeURIComponent(Param5)+"&Param.6="+encodeURIComponent(Param6)+"&Param.7="+encodeURIComponent(Param7);
+		// alert(paramStr);		
+ 		oModelS.loadData("/XMII/Illuminator?QueryTemplate=MESM/REPORTS/QUERIES/getProductionStatusByHours&"+paramStr+"&ts="+timestamp+"&Content-Type=text/xml","",false);
+		// alert(oModelS.getXML());
+		oTableS.getModel().refresh(true);
+		//setTimeout(colorRows(), 1000);
+	};
+
+	// ****************************************************************************************************************************************************
+	function createTableProductionStatus() {
+		var timestamp = new Date().getTime();
+		// alert(selectedPlant); 
+	         	var Param1 = escapeSQLString(selectedPlant);
+		var Param2 = escapeSQLString(selectedLine);
+		var Param3 = escapeSQLString(oCore.byId('TF-FromDateTime').getValue());
+		var Param4 = escapeSQLString(oCore.byId('TF-ToDateTime').getValue());
+		var paramStr = "Param.1="+encodeURIComponent(Param1)+"&Param.2="+encodeURIComponent(Param2)+"&Param.3="+encodeURIComponent(Param3)+"&Param.4="+encodeURIComponent(Param4);
+		// alert(paramStr);		
+ 		oModel.loadData("/XMII/Illuminator?QueryTemplate=MESM/REPORTS/QUERIES/getProductionStatus&"+paramStr+"&ts="+timestamp+"&Content-Type=text/xml","",false);
+		// alert(oModel.getXML());
+		createColumnsProductionStatus();
+		oTable.setModel(oModel);
+		// Bind the table rows to this model
+		oTable.bindRows("/Rowset/Row");
+	};
+	// ****************************************************************************************************************************
+	function updateTableProductionStatus() { 		
+		oTable.clearSelection();
+		var timestamp = new Date().getTime();
+		// alert(selectedPlant); 
+ 	  	var Param1 = escapeSQLString(selectedPlant);
+		var Param2 = escapeSQLString(selectedLine);
+		var Param3 = escapeSQLString(oCore.byId('TF-FromDateTime').getValue());
+		var Param4 = escapeSQLString(oCore.byId('TF-ToDateTime').getValue());
+		var paramStr = "Param.1="+encodeURIComponent(Param1)+"&Param.2="+encodeURIComponent(Param2)+"&Param.3="+encodeURIComponent(Param3)+"&Param.4="+encodeURIComponent(Param4);
+		//alert(paramStr);		
+ 		oModel.loadData("/XMII/Illuminator?QueryTemplate=MESM/REPORTS/QUERIES/getProductionStatus&"+paramStr+"&ts="+timestamp+"&Content-Type=text/xml","",false);
+		oTable.getModel().refresh(true);
+	};
+	// ****************************************************************************************************************************
+	function refreshTableProductionStatus() {
+		if(selectedIndex > -1) return;
+		updateTableProductionStatus();
+	}
+	// ****************************************************************************************************************************
+	function createColumnsProductionStatus() {
+		//Define the columns and the control templates to be used
+		oTable.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: "PLANT"}),
+			template: new sap.ui.commons.TextView().bindProperty("text", "plantName"),
+			sortProperty: "plantName",
+			filterProperty: "plantName",
+			width: "100px"
+		}));
+		oTable.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: "LINE"}),
+			template: new sap.ui.commons.TextView().bindProperty("text", "lineName"),
+			sortProperty: "lineName",
+			filterProperty: "lineName",
+			width: "100px"
+		}));
+		oTable.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: "ORDER NO"}),
+			template: new sap.ui.commons.TextView().bindProperty("text", "workOrder"),
+			sortProperty: "workOrder",
+			filterProperty: "workOrder",
+			width: "100px"
+		}));
+		oTable.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: "PART NO"}),
+			template: new sap.ui.commons.TextView().bindProperty("text", "partNo"),
+			sortProperty: "partNo",
+			filterProperty: "partNo",
+			width: "100px"
+		}));
+		oTable.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: "TOTAL"}),
+			template: new sap.ui.commons.TextView().bindProperty("text", "maxQty"),
+			sortProperty: "maxQty",
+			filterProperty: "maxQty",
+			width: "80px"
+		}));
+		oTable.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: "CONFIRMED"}),
+			template: new sap.ui.commons.TextView().bindProperty("text", "totalCnf"),
+			sortProperty: "totalCnf",
+			filterProperty: "totalCnf",
+			width: "80px"
+		}));
+		oTable.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: "GOOD"}),
+			template: new sap.ui.commons.TextView().bindProperty("text", "goodCnf"),
+			sortProperty: "goodCnf",
+			filterProperty: "goodCnf",
+			width: "80px"
+		}));
+		oTable.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: "FAILED"}),
+			template: new sap.ui.commons.TextView().bindProperty("text", "failCnf"),
+			sortProperty: "failCnf",
+			filterProperty: "failCnf",
+			width: "80px"
+		}));
+		oTable.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: "LAST UPDATED"}),
+			template: new sap.ui.commons.TextView().bindProperty("text", "lastTS"),
+			sortProperty: "lastTS",
+			filterProperty: "lastTS",
+			width: "100px"
+		}));
+	};
+	// ****************************************************************************************************************************
+	function createColumnsProductionShifts() {
+		//Define the columns and the control templates to be used
+		oTableS.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: "HOUR", wrapping: true, textAlign: sap.ui.core.TextAlign.Center}),
+			//template: new sap.ui.commons.TextView().bindProperty("text", "HOURINT"),
+			template: new sap.ui.commons.TextView().bindProperty("text", {
+				path: "HOURINT",
+				formatter: function(HOURINT){
+				this.addStyleClass("thick");
+				return HOURINT;
+				}
+        			}),
+			sortProperty: "HOURINT",
+			filterProperty: "HOURINT",
+			width: "180px"
+		}));
+		oTableS.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: "GOOD PARTS", wrapping: true, textAlign: sap.ui.core.TextAlign.Center}),
+			//template: new sap.ui.commons.TextView().bindProperty("text", "GoodParts"),
+			template: new sap.ui.commons.TextView().bindProperty("text", {
+				path: "GoodParts",
+				formatter: function(GoodParts){
+				this.addStyleClass("green");
+				return GoodParts;
+				}
+        			}),
+			sortProperty: "GoodParts",
+			filterProperty: "GoodParts",
+			width: "140px"
+		}));
+		oTableS.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: "FAILED PARTS", wrapping: true, textAlign: sap.ui.core.TextAlign.Center}),
+			//template: new sap.ui.commons.TextView().bindProperty("text", "FailedParts"),
+			template: new sap.ui.commons.TextView().bindProperty("text", {
+				path: "FailedParts",
+				formatter: function(FailedParts){
+				this.addStyleClass("red");
+				return FailedParts;
+				}
+        			}),			
+			sortProperty: "FailedParts",
+			filterProperty: "FailedParts",
+			width: "140px"
+		}));
+		oTableS.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: "UNKNOWN PARTS", wrapping: true, textAlign: sap.ui.core.TextAlign.Center}),
+			//template: new sap.ui.commons.TextView().bindProperty("text", "UnknownParts"),
+			template: new sap.ui.commons.TextView().bindProperty("text", {
+				path: "UnknownParts",
+				formatter: function(UnknownParts){   
+				this.addStyleClass("grey");
+				return UnknownParts;
+				}
+        			}),			
+			sortProperty: "UnknownParts",
+			filterProperty: "UnknownParts",
+			width: "140px"
+		}));
+		oTableS.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: "TOTAL \r\n PARTS", wrapping: true, textAlign: sap.ui.core.TextAlign.Center}),
+			//template: new sap.ui.commons.TextView().bindProperty("text", "TOTALPARTS"),
+			template: new sap.ui.commons.TextView().bindProperty("text", {
+				path: "TOTALPARTS",
+				formatter: function(TOTALPARTS){
+				this.addStyleClass("thick");
+				return TOTALPARTS;
+				}
+        			}),
+			sortProperty: "TOTALPARTS",
+			filterProperty: "TOTALPARTS",
+			width: "140px"
+		}));
+	}
+
+	// ****************************************************************************************************************************************************
+	var oMatrixT = new sap.ui.commons.layout.MatrixLayout({
+		id : 'MatrixT',
+		layoutFixed : true,
+		width: '1200px',
+		columns : 1,
+		widths : ['1200px'] 
+	});
+
+	//Create an instance of the table control
+	var oTable = new sap.ui.table.Table({
+		visibleRowCount: nrRows,
+		visibleRowCountMode: sap.ui.table.VisibleRowCountMode.Interactive,
+		firstVisibleRow: 0,
+		width: "1200px",
+		selectionBehavior: sap.ui.table.SelectionBehavior.Row,
+		selectionMode: sap.ui.table.SelectionMode.Single
+	});
+	// ****************************************************************************************************************************************************
+	oTable.attachRowSelectionChange(function(oEvent) {
+		var selIndex = oTable.getSelectedIndex();
+		selectedIndex = selIndex;
+		if (selIndex  >= 0) {
+			// Retrieve the selected row
+			var selectedRow = oTable.getRows()[selIndex];
+			var selectedRowContext = oEvent.getParameter("rowContext");
+			selectedLineRecID = oModel.getProperty("lineRecID", selectedRowContext);
+			selectedLineRecName = oModel.getProperty("lineName", selectedRowContext);
+			selectedOrderNumber = oModel.getProperty("workOrder", selectedRowContext);
+			selectedOperation = oModel.getProperty("opFinal", selectedRowContext);
+		} else {
+			selectedIndex =  -1;
+			// alert ("No Selection ..");
+			selectedLineRecID = -1;
+			selectedLineRecName = "";
+			selectedOrderNumber = "";
+			selectedOperation = "";
+		}
+
+		if(tableCreatedShifts == 0) {
+			createTableProductionShifts();
+			tableCreatedShifts = 1;
+		}else {
+			updateTableProductionShifts();
+		}
+		//colorRows();
+	});
+
+	var oModel =  new sap.ui.model.xml.XMLModel();
+
+	//Bring the table onto the UI 
+	oMatrixT.createRow(oTable);
+
+	// ****************************************************************************************************************************************************
+	//Create an instance of the table control
+	var oTableS = new sap.ui.table.Table({
+		visibleRowCount: 10,
+		visibleRowCountMode: sap.ui.table.VisibleRowCountMode.Interactive,
+		firstVisibleRow: 0,
+		width: "1200px",
+		selectionBehavior: sap.ui.table.SelectionBehavior.Row,
+		selectionMode: sap.ui.table.SelectionMode.Single
+	});
+	// ****************************************************************************************************************************************************
+	oTableS.attachRowSelectionChange(function(oEvent) {
+		var selIndex = oTableS.getSelectedIndex();
+		selectedIndex = selIndex;
+		if (selIndex  >= 0) {
+			// Retrieve the selected row
+			var selectedRow = oTableS.getRows()[selIndex];
+			var selectedRowContext = oEvent.getParameter("rowContext");
+			showWhat = oModelS.getProperty("shiftType", selectedRowContext);
+			showWhat = showWhat.toUpperCase();
+			oButtonShowSN.setEnabled(showWhat!="");
+		} else {
+			selectedIndex =  -1;
+			showWhat = "";
+			oButtonShowSN.setEnabled(false);
+			// alert ("No Selection ..");
+		}
+	});
+
+	var oModelS =  new sap.ui.model.xml.XMLModel();
+
+	//Bring the table onto the UI 
+	oMatrixT.createRow(oTableS);
+
+	// ****************************************************************************************************************************************************
+	var oMatrixB = new sap.ui.commons.layout.MatrixLayout({
+		id : 'MatrixB',
+		layoutFixed : true,
+		width: '1200px',
+		columns : 5,
+		widths : ['150px','200px','200px','200px','150px'] 
+	});
+	
+	var oButtonPrintList = new sap.ui.commons.Button({
+		id : 'B-PrintList',
+		tooltip : "Print",
+		text : 'Print',
+		enabled: true
+	});
+	oButtonPrintList.attachPress(doOnPrintPage);
+
+	var oButtonEmail = new sap.ui.commons.Button({
+		id : 'B-Email',
+		tooltip : "Email",
+		text : 'Email',
+		enabled: true
+	});
+	oButtonEmail.attachPress(doEmail);
+
+	var oButtonShowSN = new sap.ui.commons.Button({
+		id : 'B-ShowSN',
+		tooltip : "Show Serial Numbers",
+		text : 'Show SN',
+		enabled: false
+	});
+	oButtonShowSN.attachPress(doShowSN);
+
+	oMatrixB.createRow('', oButtonPrintList, oButtonEmail, oButtonShowSN, '');
+
+	// ****************************************************************************************************************************************************
+	function doOnPrintPage() {
+		// retrieve parameters
+		var Param1 = escapeSQLString(selectedPlant);
+		var Param2 = escapeSQLString(selectedLine);
+		var Param3 = escapeSQLString(oCore.byId('TF-FromDateTime').getValue());
+		var Param4 = escapeSQLString(oCore.byId('TF-ToDateTime').getValue());
+		var Param5 = escapeSQLString(selectedOrderNumber);
+		var Param6 = escapeSQLString(oDropdownBoxLines.getValue());
+		var Param7 = escapeSQLString(selectedLineRecID);
+		var Param8 = escapeSQLString((selectedLineRecName == "" ? "ALL LINES" : selectedLineRecName));
+		var Param9 = escapeSQLString(selectedOperation);
+		var Param10 = escapeSQLString("Hourly");
+
+		var paramStr = "Param.1="+encodeURIComponent(Param1)+"&Param.2="+encodeURIComponent(Param2)+"&Param.3="+encodeURIComponent(Param3)+"&Param.4="+encodeURIComponent(Param4)+"&Param.5="+encodeURIComponent(Param5)+"&Param.6="+encodeURIComponent(Param6)+"&Param.7="+encodeURIComponent(Param7)+"&Param.8="+encodeURIComponent(Param8)+"&Param.9="+encodeURIComponent(Param9)+"&Param.10="+encodeURIComponent(Param10);
+		// alert(paramStr);	
+		var w = window.innerWidth
+			|| document.documentElement.clientWidth
+			|| document.body.clientWidth;
+		w = w-40;
+		var h = window.innerHeight
+			|| document.documentElement.clientHeight
+			|| document.body.clientHeight;
+		h=h-20;
+		var WindowObject = window.open("PrintProductionStatus.irpt?"+paramStr, "PrintWindow","width="+w+",height="+h+",top=10,left=10,toolbars=no,scrollbars=yes,status=no,resizable=yes");
+		WindowObject.focus();
+	};
+	// ****************************************************************************************************************************************************
+	var oMatrixMail = new sap.ui.commons.layout.MatrixLayout({
+		id : 'MatrixMail',
+		layoutFixed : true,
+		width: '490px',
+		columns : 1,
+		widths : ['500px'] 
+	});
+
+	var oMatrixMailF = new sap.ui.commons.layout.MatrixLayout({
+		id : 'MatrixMailF',
+		layoutFixed : true,
+		width: '490px',
+		columns : 3,
+		widths : ['180px','140px','170px'] 
+	});
+
+	var oTitleMail = new sap.ui.commons.Label({
+		id : 'L-MailInfo',
+		text : 'EMAIL INFORMATION'
+	});
+	oMatrixMail.createRow( oTitleMail );
+
+	var oLabelSystemMail = new sap.ui.commons.Label({
+		id : 'L-SysMail',
+		text : ' System Mail : '
+	});
+	oMatrixMail.createRow( oLabelSystemMail );
+
+	var oLabelSystemNote = new sap.ui.commons.Label({
+		id : 'L-SysNote',
+		text : ' Messages can be relayed to xxxxxxxxxxx@dana.com addresses only! '
+	});
+	oMatrixMail.createRow( oLabelSystemNote );
+
+	var oLabelRecipient = new sap.ui.commons.Label({
+		id : 'L-Recipient',
+		text : ' Send eMail To  '
+	});
+
+	var oInputRecipient = new sap.ui.commons.TextField('input_recipient');
+	oInputRecipient.setTextAlign(sap.ui.core.TextAlign.Right);
+
+	var oLabelDomain = new sap.ui.commons.Label({
+		id : 'L-Domain',
+		text : ' @dana.com '
+	});
+
+	oMatrixMailF.createRow( oLabelRecipient, oInputRecipient, oLabelDomain );
+	oMatrixMail.createRow( oMatrixMailF );
+
+	var oButtonMail = new sap.ui.commons.Button({
+		id : 'B-SendMail',
+		tooltip : "Send report data via eMail",
+		text : 'SUBMIT',
+		enabled: true
+	});
+	oButtonMail.attachPress(doSendEmail);
+	oMatrixMail.createRow( oButtonMail );
+
+	var oOverlayContainerMail = new sap.ui.ux3.OverlayDialog({openButtonVisible: false});
+	oOverlayContainerMail.setHeight('240px');
+	oOverlayContainerMail.setWidth('700px');
+	oOverlayContainerMail.addContent(oMatrixMail);	
+
+	// ******************************************************************************************************************************************************************
+	function doEmail() {
+		 // collect email data
+		var recipient = document.getElementById("user_email").value;
+
+	// hardcoded to test 
+		recipient = "paul.radulescu.dana.com";
+
+		recipient = recipient.toLowerCase();
+		var firstname = document.getElementById("user_firstname").value;
+		var lastname = document.getElementById("user_lastname").value;
+		
+	// hardcoded to test 
+		firstname = "paul";
+		lastname= "radulescu";
+
+		var allname = firstname+"."+lastname;
+		// show email overlay
+		if(!oOverlayContainerMail.isOpen()){
+          			oCore.byId("L-SysMail").setText("System configured eMail address : " + recipient);
+			if (recipient.indexOf("@dana.com")>0 ) {
+          			    oCore.byId("input_recipient").setValue(recipient.substr(0, recipient.indexOf("@dana.com")));
+			} else {
+          			    oCore.byId("input_recipient").setValue(allname.toLowerCase());
+			}
+			oOverlayContainerMail.open();
+		}
+	};
+	// ******************************************************************************************************************************************************************
+	function doSendEmail() {
+		var Param1 = escapeSQLString(selectedPlant);
+		var Param2 = escapeSQLString(selectedLine);
+		var Param3 = escapeSQLString(oCore.byId('TF-FromDateTime').getValue());
+		var Param4 = escapeSQLString(oCore.byId('TF-ToDateTime').getValue());
+		var Param5 = escapeSQLString(selectedOrderNumber);
+		var Param6 = escapeSQLString(oDropdownBoxLines.getValue());
+		var Param7 = escapeSQLString(selectedLineRecID);
+		var Param8 = escapeSQLString((selectedLineRecName == "" ? "ALL LINES" : selectedLineRecName));
+		var Param9 = escapeSQLString(selectedOperation);
+		var Param10 = escapeSQLString("Hourly");
+		var recipient = oCore.byId("input_recipient").getValue() + "@dana.com";
+		//var recipient = oCore.byId("input_recipient").getValue() + "@rtsautomation.com";
+       		var oSendMail;
+      		if (window.XMLHttpRequest) {
+     	     		oSendMail = new XMLHttpRequest();
+      		}
+		if (oSendMail != null) {
+			var timestamp = new Date().getTime();
+			var paramStr = "PlantID="+encodeURIComponent(Param1)+"&LineID="+encodeURIComponent(Param2)+"&ShowFrom="+encodeURIComponent(Param3)+"&ShowTo="+encodeURIComponent(Param4)+"&OrderNumber="+encodeURIComponent(Param5)+"&MailRecipient="+encodeURIComponent(recipient)+"&LineName="+encodeURIComponent(Param5)+"&LineRecID="+encodeURIComponent(Param7)+"&LineRecName="+encodeURIComponent(Param8)+"&Operation="+encodeURIComponent(Param9)+"&TypePR="+encodeURIComponent(Param10);
+			// alert(paramStr);
+			var queryStr = "/XMII/Runner?Transaction=MESM/REPORTS/TRANSACTIONS/mailProductionStatusList&OutputParameter=XML_RESULT&Content-Type=text/xml&"+paramStr+"&ts="+timestamp;
+			// alert(queryStr);
+			oSendMail.open("GET", queryStr, true); 
+			oSendMail.onreadystatechange = function() {
+				if (oSendMail.readyState == 4) 
+					if (oSendMail.status == 200) {
+						// Successful -- rebuild the screen
+						var xmlDOC = oSendMail.responseXML;
+						if(xmlDOC.getElementsByTagName("TRXRESULT")[0] && xmlDOC.getElementsByTagName("TRXRESULT")[0].childNodes[0]) {
+							var trxMessage = xmlDOC.getElementsByTagName("TRXRESULT")[0].childNodes[0].nodeValue;
+							alert(trxMessage);
+							oOverlayContainerMail.close();
+						} else { 
+							alert("Please do try again later .. ");
+						}
+					} else {
+						alert("Error: " + oSendMail.statusText);
+					}
+				}
+			oSendMail.send();
+       		} else {
+          			window.alert("Error creating XmlHttpRequest object.");
+       		}
+	};
+	// ****************************************************************************************************************************************************
+	// Refresh screen data if no selection present
+	setTimeout(refreshTableProductionStatus, 30*1000);
+	// ****************************************************************************************************************************************************
+	if (oTableS._oVSb)
+            oTableS._oVSb.attachScroll(function() {
+		//colorRows();
+            });
+	oTableS.attachColumnResize(function(oEvent) {
+		setTimeout(function() {colorRows();}, 50);
+	});
+	// ****************************************************************************************************************************************************
+	var colorRows = function() {
+		var rowCount = oTableS.getVisibleRowCount();
+		var rowStart = oTableS.getFirstVisibleRow();
+		var currentRowContext;
+		for (var i = 0; i < rowCount; i++) {
+			currentRowContext = oTableS.getContextByIndex(rowStart + i);
+			oTableS.getRows()[i].$().removeClass("green");
+			oTableS.getRows()[i].$().removeClass("red");
+			oTableS.getRows()[i].$().removeClass("grey");
+			oTableS.getRows()[i].$().removeClass("thick");
+			var hourInt = oModelS.getProperty("HOURINT", currentRowContext);
+			var goodParts = oModelS.getProperty("GoodParts", currentRowContext);
+			var failedParts = oModelS.getProperty("FailedParts", currentRowContext);
+			var unknownParts = oModelS.getProperty("UnknownParts", currentRowContext);
+			var totalParts = oModelS.getProperty("TOTALPARTS", currentRowContext);
+				oTableS.getRows()[i].getCells()[0].$().addClass("thick");
+			//if (goodParts > 0) {
+				oTableS.getRows()[i].getCells()[1].$().addClass("green");
+			//} else if (failedParts > 0) {
+				oTableS.getRows()[i].getCells()[2].$().addClass("red");
+			//} else if (unknownParts > 0) {
+				oTableS.getRows()[i].getCells()[3].$().addClass("grey");
+			//} else if (totalParts > 0) {
+				oTableS.getRows()[i].getCells()[4].$().addClass("thick");
+			//}
+		}
+	}
+	// ******************************************************************************************************************************************************************
+	// Create SN Overlay
+	var oMatrixSN = new sap.ui.commons.layout.MatrixLayout({
+		id : 'MatrixSN',
+		layoutFixed : true,
+		width: '950px',
+		columns : 1,
+		widths : ['960px'] 
+	});
+
+	var oTitleSN = new sap.ui.commons.Label({
+		id : 'L-SN',
+		text : 'SERIAL NUMBERS'
+	});
+	oMatrixSN.createRow( oTitleSN );
+
+	//Create an instance of the table control
+	var oTableSN = new sap.ui.table.Table({
+		id : "tbl_snlist",
+		visibleRowCount: 12,
+		firstVisibleRow: 0,
+		width: "950px",
+		selectionBehavior: sap.ui.table.SelectionBehavior.Row
+	});
+	oMatrixSN.createRow( oTableSN );
+
+	// ******************************************************************************************************************************************************************
+	oTableSN.attachRowSelectionChange(function(oEvent) {
+		var selIndex = oTableSN.getSelectedIndex();
+		selectedIndex = selIndex;
+		if (selIndex  >= 0) {
+			// Retrieve the selected row
+			var selectedRow = oTableSN.getRows()[selIndex];
+			var selectedRowContext = oEvent.getParameter("rowContext");
+			serialNo = oModelSN.getProperty("HOURINT", selectedRowContext);
+			serialNumber = serialNo.replace('Serial Number', '').trim();
+			oButtonLink.setEnabled(serialNo.indexOf('Serial Number') !== -1);
+		} else {
+			selectedIndex =  -1;
+			oButtonLink.setEnabled(false);
+			// alert ("No Selection ..");
+		}
+	});
+
+	var oButtonLink = new sap.ui.commons.Button({
+		id : 'B-Link',
+		tooltip : "Item Traceability Report",
+		text : 'SN Report',
+		enabled:false
+	});
+	oButtonLink.attachPress(doOpenLink);
+
+	oMatrixSN.createRow( oButtonLink );
+
+	var oModelSN =  new sap.ui.model.xml.XMLModel();
+
+	// ******************************************************************************************************************************************************************
+	function createColumnsSNList() {
+		//Define the columns and the control templates to be used
+		oTableSN.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({id: "label1", text: "SERIAL NUMBER", wrapping: true, textAlign: sap.ui.core.TextAlign.Center}),
+			template: new sap.ui.commons.TextView().bindProperty("text", "HOURINT"),
+			sortProperty: "HOUTINT",
+			filterProperty: "HOURINT",
+			width: "180px"
+		}));
+		oTableSN.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: "Good Parts", wrapping: true, textAlign: sap.ui.core.TextAlign.Center}),
+			template: new sap.ui.commons.TextView().bindProperty("text", "GoodParts"),
+			sortProperty: "GoodParts",
+			filterProperty: "GoodParts",
+			width: "150px"
+		}));
+		oTableSN.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: "Failed Parts", wrapping: true, textAlign: sap.ui.core.TextAlign.Center}),
+			template: new sap.ui.commons.TextView().bindProperty("text", "FailedParts"),
+			sortProperty: "FailedParts",
+			filterProperty: "FailedParts",
+			width: "150px"
+		}));
+		oTableSN.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: "Unknown Parts", wrapping: true, textAlign: sap.ui.core.TextAlign.Center}),
+			template: new sap.ui.commons.TextView().bindProperty("text", "UnknownParts"),
+			sortProperty: "UnknownParts",
+			filterProperty: "UnknownParts",
+			width: "150px"
+		}));
+		oTableSN.addColumn(new sap.ui.table.Column({
+			label: new sap.ui.commons.Label({text: "TOTAL PARTS", wrapping: true, textAlign: sap.ui.core.TextAlign.Center}),
+			template: new sap.ui.commons.TextView().bindProperty("text", "TOTALPARTS"),
+			sortProperty: "TOTALPARTS",
+			filterProperty: "TOTALPARTS",
+			width: "100px"
+		}));
+	}
+
+	// ******************************************************************************************************************************************************************
+	function createTableSNList() {
+		var timestamp = new Date().getTime();
+		// alert(selectedPlant);
+	         	var Param1 = escapeSQLString(selectedPlant);
+		var Param2 = escapeSQLString(selectedLineRecID);
+		var Param3 = escapeSQLString(oCore.byId('TF-FromDateTime').getValue());
+		var Param4 = escapeSQLString(oCore.byId('TF-ToDateTime').getValue());
+		var Param5 = escapeSQLString(selectedOrderNumber);
+		var Param6 = escapeSQLString(selectedOperation);
+		var Param7 = escapeSQLString(showWhat);
+		var paramStr = "Param.1="+encodeURIComponent(Param1)+"&Param.2="+encodeURIComponent(Param2)+"&Param.3="+encodeURIComponent(Param3)+"&Param.4="+encodeURIComponent(Param4)+"&Param.5="+encodeURIComponent(Param5)+"&Param.6="+encodeURIComponent(Param6)+"&Param.7="+encodeURIComponent(Param7);
+		// alert(paramStr);
+ 		oModelSN.loadData("/XMII/Illuminator?QueryTemplate=MESM/REPORTS/QUERIES/getProductionStatusByHours&"+paramStr+"&ts="+timestamp+"&Content-Type=text/xml","",false);
+		// alert(oModelSN.getXML());
+		createColumnsSNList();
+		oTableSN.setModel(oModelSN);
+		// Bind the table rows to this model
+		oTableSN.bindRows("/Rowset/Row");
+	}
+	setTimeout(createTableSNList(), 1000);
+
+	// ******************************************************************************************************************************************************************
+	function updateTableSNList() {
+		oTableSN.clearSelection();
+		var timestamp = new Date().getTime();
+		// alert(selectedPlant);
+	         	var Param1 = escapeSQLString(selectedPlant);
+		var Param2 = escapeSQLString(selectedLineRecID);
+		var Param3 = escapeSQLString(oCore.byId('TF-FromDateTime').getValue());
+		var Param4 = escapeSQLString(oCore.byId('TF-ToDateTime').getValue());
+		var Param5 = escapeSQLString(selectedOrderNumber);
+		var Param6 = escapeSQLString(selectedOperation);
+		var Param7 = escapeSQLString(showWhat);
+		var paramStr = "Param.1="+encodeURIComponent(Param1)+"&Param.2="+encodeURIComponent(Param2)+"&Param.3="+encodeURIComponent(Param3)+"&Param.4="+encodeURIComponent(Param4)+"&Param.5="+encodeURIComponent(Param5)+"&Param.6="+encodeURIComponent(Param6)+"&Param.7="+encodeURIComponent(Param7);
+		// alert(paramStr);
+ 		oModelSN.loadData("/XMII/Illuminator?QueryTemplate=MESM/REPORTS/QUERIES/getProductionStatusByHours&"+paramStr+"&ts="+timestamp+"&Content-Type=text/xml","",false);
+		oTableSN.getModel().refresh(true);
+	}
+
+	var oOverlayContainerSN = new sap.ui.ux3.OverlayDialog({openButtonVisible: false});
+	oOverlayContainerSN.setHeight('530px');
+	oOverlayContainerSN.setWidth('1005px');
+	oOverlayContainerSN.addContent(oMatrixSN);
+	// ******************************************************************************************************************************************************************
+	function doShowSN() {
+		if(!oOverlayContainerSN.isOpen()){
+			updateTableSNList();
+			if ((selectedLineRecName=="D541-4 C2") || (selectedLineRecName=="D541-4 C3")) {
+				oTitleSN.setText("MACHINES");
+				oCore.byId('label1').setText("MACHINE");
+			}
+			else {
+				oTitleSN.setText("SERIAL NUMBERS");
+				oCore.byId('label1').setText("SERIAL NUMBER");
+			}
+			oOverlayContainerSN.open();
+		}
+	}
+	// ******************************************************************************************************************************************************************
+	function doOpenLink() {
+		setTimeout("location.href = '" + "ItemTraceability.irpt?ROLE=" + document.getElementById("user_role").value + "&SN=" + serialNumber + "'",0);
+	}
+	// ******************************************************************************************************************************************************************
+	</script>
+</head>
+
+<body onLoad="roleSecurity()">
+
+<input id="user_roles" type="hidden" value="{IllumLoginRoles}" style="display:block;width:1000px;" readonly />
+<input id="user_role" type="hidden" value="{ROLE}" style="display:block;width:1000px;" readonly />
+<input id="user_name" type="hidden" value="{IllumLoginName}" style="display: block;width:1000px;" readonly />
+<input id="user_height" type="hidden" value="{HEIGHT}" style="display: block;width:100px;" readonly />
+<input id="user_address" type="hidden" value="{Machine}" style="display:block;width:1000px;" readonly />
+<input id="user_email" type="hidden" value="{email}" style="display:block;width:800px;" readonly />
+<input id="user_firstname" type="hidden" value="{firstname}" style="display:block;width:800px;" readonly />
+<input id="user_lastname" type="hidden" value="{lastname}" style="display:block;width:800px;" readonly />
+<div id="app_header" >
+<div id="app_title">PRODUCTION STATUS</div>
+<div id="app_menu"></div>
+<div id="page_title">DEFAULT SCREEN</div>
+</div>
+<div id="mesm_content" ></div>
+</body>
+</html>

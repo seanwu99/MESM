@@ -1,0 +1,778 @@
+<!DOCTYPE html >
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>CT MODULE</title>
+	<style>
+	body {
+		background-image: url("Common/img/logo.png");
+		background-size: 180px;
+		background-repeat: no-repeat;
+    		background-attachment: fixed;
+    		background-position: right 40px top 30px;
+		font-family: Arial;
+	}
+	#app_header {
+ 		padding: 10px;
+ 		padding-left: 40px;
+ 		padding-top: 15px;
+ 		padding-bottom: 0px;
+		height:80px;
+		width:400px;
+		text-align: center;
+	}
+	#app_title {
+		width:400px;
+		text-align: center;
+		text-align: left;
+		font-family: "Arial Black",Arial,Helvetica,sans-serif;
+		font-size:32px;
+		color: #007dc0;
+		margin-bottom; 20px;
+	}
+	#app_menu {
+		width:200px;
+		text-align: right;
+		font-family: Arial,Helvetica,sans-serif;
+	}
+	#page_title {
+		width:400px;
+		text-align: center;
+		font-family: "Arial Black",Arial,Helvetica,sans-serif;
+		font-size:28px;
+		color: #cfcfcf;
+	}
+	#mesm_content {
+ 		padding: 30px;
+ 		padding-top: 40px;
+	}
+	#__button0, #__button1, #__button2 {
+		margin-top:10px;
+		margin-left:5px;
+		margin-right:5px;
+	}
+	#__cell0 {
+		text-align: center;
+	}
+	#matrixT, #matrixF, #matrixB {
+		margin:10px auto;
+		text-align: center;
+     		//border: 2px solid red;
+	}
+
+	#B-Submit {
+		width:100px;
+		height:35px;
+		font-size:14px;
+	}
+	#L-Qty {
+ 		margin-left: 10px;
+	}
+	#L-ClockID{
+		font-family: "Arial Black",Arial,Helvetica,sans-serif;
+		font-size:14px;
+		color: #007dc0;
+		text-align:right;
+	}
+	</style>
+
+	<script id="sap-ui-bootstrap"
+		src="/sapui5/resources/sap-ui-core.js"
+		data-sap-ui-theme="sap_goldreflection"
+		data-sap-ui-libs="sap.ui.core,sap.ui.commons,sap.ui.table,sap.ui.ux3"
+		data-sap-ui-language="en" >
+	</script>
+	<script type="text/javascript" src="Common/js/default.js"></script>
+
+	<link rel="stylesheet" type="text/css" href="Common/css/keyboard.css">
+	<script type="text/javascript" src="Common/js/jquery.keyboard.js"></script>
+
+	<script type="text/javascript" id="app-init">
+	// ******************************************************************************************************************************************************************
+	// Get Core SAP UI5
+	var oCore = sap.ui.getCore();
+	// Initialize screen
+	// ******************************************************************************************************************************************************************
+	// initialize access
+	var level2Access = "";
+	var plant2Access = "";
+	// Initialize screen
+	var matTxt = "";
+	var trgQty = 0;
+	var oCellTF, oCellDB;
+	// ******************************************************************************************************************************************************************
+	function roleSecurity() {
+		var myRoles = document.getElementById("user_roles").value;
+		var role2Access = "MESM_" + document.getElementById("user_role").value;
+		// alert(role2Access);
+ 		if(myRoles.indexOf(role2Access)<0) {
+			window.location.assign("security.irpt");
+		 } else {
+			var roleString = document.getElementById("user_role").value;
+			var roleArray = roleString.split("_");
+			level2Access = roleArray[0]; 
+				// alert("level : " + level2Access);
+			plant2Access =  roleArray[1];
+				// alert("plant : " + plant2Access);
+			//document.getElementById("page_title").innerHTML=role2Access;
+			//alert(plant2Access);
+			selectedPlant = plant2Access; 
+
+			updateProducts();
+
+			var role_ADM = "MESM_ADM_"+plant2Access;
+			var role_OPS = "MESM_OPS_"+plant2Access;
+			switch(role2Access) {
+			case "MESM_ADM_ALL":
+				// update screen
+				oMatrixC.placeAt('app_menu');
+				oMatrixT.placeAt('mesm_content');
+				oMatrixF.placeAt('mesm_content');
+				oMatrixB.placeAt('mesm_content');
+				break;
+			case role_ADM:
+				// update screen
+				oMatrixC.placeAt('app_menu');
+				oMatrixT.placeAt('mesm_content');
+				oMatrixF.placeAt('mesm_content');
+				oMatrixB.placeAt('mesm_content');
+				break;
+			case "MESM_OPS_ALL":
+				oMatrixC.placeAt('app_menu');
+				oMatrixT.placeAt('mesm_content');
+				oMatrixF.placeAt('mesm_content');
+				oMatrixB.placeAt('mesm_content');
+				break;
+			case role_OPS:
+				oMatrixC.placeAt('app_menu');
+				oMatrixT.placeAt('mesm_content');
+				oMatrixF.placeAt('mesm_content');
+				oMatrixB.placeAt('mesm_content');
+				break;
+			default:
+				alert("MES Module Role Unknown: " + role2Access);
+				break;
+			}
+		  }
+	}
+	// ******************************************************************************************************************************************************************
+	var oMatrixC = new sap.ui.commons.layout.MatrixLayout({
+		id : 'MatrixC',
+		layoutFixed : true,
+		width: '290px',
+		columns : 2,
+		widths : ['180px', '100px'] 
+	});
+
+	var oLabelClockID = new sap.ui.commons.Label({
+		id : 'L-ClockID',
+		visible : true,
+		text : ' OPERATOR CLOCK ID',
+		width : '180px'
+	});
+
+	var oTF_ClockID = new sap.ui.commons.TextField({
+		id : 'TF-ClockID',
+		tooltip : 'Clock ID',
+		editable : true,
+		maxLength : 5,
+		visible : true,
+		width : '100px' 
+	});
+
+	oTF_ClockID.addEventDelegate({
+   		 onAfterRendering:function() {
+  		      // do something
+			$('#TF-ClockID').keyboard({ 
+				layout : 'num',
+				restrictInput : true, // Prevent keys not in the displayed keyboard from being typed in
+				preventPaste : true,  // prevent ctrl-v and right click
+				autoAccept : true
+			 });
+	  	  }
+	});
+
+	oMatrixC.createRow(oLabelClockID, oTF_ClockID);
+
+	// ******************************************************************************************************************************************************************
+ 	 // define main matrix
+	var oMatrixT = new sap.ui.commons.layout.MatrixLayout({
+		id : 'matrixT',
+		layoutFixed : true,
+		columns : 3,
+		widths : ['225px','225px','450px'], 
+		width : '900px' 
+	});
+	var oMatrixF = new sap.ui.commons.layout.MatrixLayout({
+		id : 'matrixF',
+		layoutFixed : true,
+		columns : 4,
+		widths : ['225px','225px','225px','225px'], 
+		width : '900px' 
+	});
+	var oMatrixB = new sap.ui.commons.layout.MatrixLayout({
+		id : 'matrixB',
+		layoutFixed : true,
+		columns : 1,
+		width : '900px' 
+	});
+
+	var oLabelProducts = new sap.ui.commons.Label({
+		id : 'L-Products',
+		visible : true,
+		text : 'MATERIALS'
+	});
+
+	var oLabelType = new sap.ui.commons.Label({
+		id : 'L-Type',
+		visible : true,
+		text : 'TYPE'
+	});
+
+	var oLabelDescr = new sap.ui.commons.Label({
+		id : 'L-Descr',
+		visible : true,
+		text : 'DESCRIPTION'
+	});
+
+	oMatrixT.createRow(oLabelProducts, oLabelType, oLabelDescr);
+
+	var oDropdownBoxProducts = new sap.ui.commons.DropdownBox({
+		id : 'dbProducts',
+		editable : true,
+		width : '150px',
+		change: function(oEvent){
+			destroyRowItems();
+			//alert(oEvent.oSource.getSelectedKey());
+			if ($('#TF-ClockID').val() == ""){
+				alert("Please enter the Clock ID ..");
+				oCore.byId("TF-ClockID").focus();
+				oDropdownBoxProducts.setSelectedKey(0);
+				return;
+			}
+			updateKSCHL();
+		}
+	});
+
+	// ******************************************************************************************************************************************************************
+	function destroyRowItems() {
+		//alert(trgQty);
+		for (var i=0; i<trgQty; i++){
+			objs[i][0].destroy();
+			objs[i][1].destroy();
+			objs[i][2].destroy();
+			objs[i][3].destroy();
+
+			oMatrixF.removeRow(i);
+		}
+		oMatrixF.removeAllRows();
+
+		matTxt = "";
+		trgQty = 0;
+
+		oMatrixF.destroyRows();
+
+		oLabelName.setText("");
+		oLabelQty.setText("");
+	}
+
+	// ******************************************************************************************************************************************************************
+	function updateProducts() {
+		var timestamp = new Date().getTime();
+		getData("/XMII/Illuminator?QueryTemplate=MESM/PACKING/QUERIES/get_MaterialList&ts="+timestamp+"&Content-Type=text/xml", parseJsonProducts);
+		function parseJsonProducts(jsondata){
+			oDropdownBoxProducts.destroyItems();
+			for (var i=0; i<jsondata.length; i++){
+				//alert(jsondata[i]['materialID'] + '   ' + jsondata[i]['materialName']);
+				item_key = jsondata[i]['materialID'];
+				item_text = jsondata[i]['materialName'];
+				oItem = new sap.ui.core.ListItem({
+					key : item_key,
+					text : item_text 
+				});
+				oDropdownBoxProducts.addItem(oItem);
+			}
+			oDropdownBoxProducts.setSelectedKey(0);
+		}	
+	}
+
+	// ******************************************************************************************************************************************************************
+	function updateKSCHL() {
+		var timestamp = new Date().getTime();
+		var Param1 = escapeSQLString(oDropdownBoxProducts.getValue());
+		getData("/XMII/Illuminator?QueryTemplate=MESM/PACKING/QUERIES/get_KSCHL&Param.1="+Param1+"&ts="+timestamp+"&Content-Type=text/xml", parseJsonKSCHL);
+		function parseJsonKSCHL(jsondata){
+			oDropdownBoxKSCHL.destroyItems();
+			for (var i=0; i<jsondata.length; i++){
+				//alert(jsondata[i]['KSCHLID'] + '   ' + jsondata[i]['KSCHL']);
+				item_key = jsondata[i]['KSCHLID'];
+				item_text = jsondata[i]['KSCHL'];
+				oItem = new sap.ui.core.ListItem({
+					key : item_key,
+					text : item_text 
+				});
+				oDropdownBoxKSCHL.addItem(oItem);
+			}
+			oDropdownBoxKSCHL.setSelectedKey(0);
+		}	
+	}
+
+	// ******************************************************************************************************************************************************************
+	function getPackingInstr() {
+		oLabelName.setText('');
+		oLabelQty.setText('');
+       		var oReqData;
+      		if (window.XMLHttpRequest) {
+     	     		oReqData = new XMLHttpRequest();
+      		}
+
+		if (oReqData != null) {
+			var Param1 = escapeSQLString(oDropdownBoxProducts.getValue());
+			var Param2 = escapeSQLString(oDropdownBoxKSCHL.getValue());
+			var timestamp = new Date().getTime();
+			// alert(Param1);
+			var sUrl = "/XMII/Illuminator?QueryTemplate=MESM/PACKING/QUERIES/get_PackingInstrByMatName&Param.1="+encodeURIComponent(Param1)+"&Param.2="+encodeURIComponent(Param2)+"&ts="+timestamp+"&Content-Type=text/xml";
+
+			oReqData.open("GET", sUrl, false);
+			oReqData.send();
+
+			if (oReqData.status == 200) {
+				var xmlDoc = oReqData.responseXML;
+				//alert(oReqData.responseText);
+				if(xmlDoc.getElementsByTagName("MATTXT")[0] && xmlDoc.getElementsByTagName("MATTXT")[0].childNodes[0]) {
+					matTxt = xmlDoc.getElementsByTagName("MATTXT")[0].childNodes[0].nodeValue;
+					oLabelName.setText(matTxt);
+				}
+				if(xmlDoc.getElementsByTagName("TRGQTY")[0] && xmlDoc.getElementsByTagName("TRGQTY")[0].childNodes[0]) {
+					trgQty = xmlDoc.getElementsByTagName("TRGQTY")[0].childNodes[0].nodeValue;
+					oLabelQty.setText('Qty: ' + trgQty);
+				}
+				createMatrixFields();
+			}
+		}
+		else {
+			window.alert("Error creating XmlHttpRequest object.");
+		}
+	}
+
+	// ******************************************************************************************************************************************************************
+	var oLabelName = new sap.ui.commons.Label({
+		id : 'L-Name',
+		visible : true,
+		text : ''
+	});
+
+	var oLabelQty = new sap.ui.commons.Label({
+		id : 'L-Qty',
+		visible : true,
+		text : ''
+	});
+
+	var oLayoutNameQty = new sap.ui.layout.HorizontalLayout("LayoutNameQty", {
+		content: [oLabelName, oLabelQty]
+	});
+
+	var oDropdownBoxKSCHL = new sap.ui.commons.DropdownBox({
+		id : 'dbKSCHL',
+		editable : true,
+		width : '150px',
+		change: function(oEvent){
+			destroyRowItems();
+			//alert(oEvent.oSource.getSelectedKey());
+			if ($('#TF-ClockID').val() == ""){
+				alert("Please enter the Clock ID ..");
+				oCore.byId("TF-ClockID").focus();
+				oDropdownBoxKSCHL.setSelectedKey(0);
+				return;
+			}
+			getPackingInstr();
+		}
+	});
+
+	oMatrixT.createRow(oDropdownBoxProducts, oDropdownBoxKSCHL, oLayoutNameQty);
+
+	var oLabelSerNum = new sap.ui.commons.Label({
+		id : 'L-SerNum',
+		visible : true,
+		text : 'SERIAL #'
+	});
+
+	var oLabelOrderNum = new sap.ui.commons.Label({
+		id : 'L-OrderNum',
+		visible : true,
+		text : 'ORDER #'
+	});
+
+	var oLabelChk = new sap.ui.commons.Label({
+		id : 'L-Chk',
+		visible : true,
+		text : 'VALIDATION & CHECKS'
+	});
+
+	oMatrixT.createRow(oLabelSerNum, oLabelOrderNum, oLabelChk);
+	var objs = new Array();
+
+	// ******************************************************************************************************************************************************************
+	function createMatrixFields() {
+		// alert(trgQty);
+		for (var i=0; i<trgQty; i++){
+
+			objs[i] = new Array();
+
+			objs[i][0] = new sap.ui.commons.TextField({
+				id : 'TF-'+i,
+				editable : true,
+				visible : true,
+				width : '150px'
+			});
+
+			objs[i][2] = new sap.ui.commons.Label({
+				id : 'LSN-'+i,
+				text : '',
+				width : '150px' 
+			});
+
+			objs[i][1] = new sap.ui.commons.DropdownBox({
+				id : 'DB-'+i,
+				editable : true,
+				visible : true,
+				width : '150px' 
+			});
+
+			objs[i][3] = new sap.ui.commons.Label({
+				id : 'LTotal-'+i,
+				text : '',
+				width : '150px' 
+			});
+		}
+
+		for (var i=0; i<trgQty; i++){
+			objs[i][0].attachChange(doOnChangeTF(i,1));
+		}
+
+		for (var i=0; i<trgQty; i++){
+			objs[i][1].attachChange(doOnChangeDB(i,3));
+		}
+
+		for (var i=0; i<trgQty; i++){
+			if (isRealValue(objs[i][0]) && isRealValue(objs[i][1])) {
+				oMatrixF.createRow(objs[i][0],objs[i][1], objs[i][3],objs[i][2]);
+			}
+		}
+	}
+
+	// ******************************************************************************************************************************************************************
+	function isRealValue(obj) {
+		return obj && obj !== 'null' && obj !== 'undefined';
+	}
+	// ******************************************************************************************************************************************************************
+	function doOnChangeTF(i,j) {
+		return function() { 
+			if (objs[i][0].getValue()=="") objs[i][2].setText("");
+			if (objs[i][0].getValue()=="") objs[i][3].setText("");
+			if (objs[i][0].getValue()=="") objs[i][1].setSelectedKey(0);
+			//alert(objs[i][j].getId() + "  > " + objs[i][j].getValue());
+			updateOrd(objs[i][j], objs[i][0].getValue()=="" ? 0 : oDropdownBoxProducts.getSelectedKey());
+		};
+	}
+	// ******************************************************************************************************************************************************************
+	function doOnChangeDB(i,j) {
+		return function() {
+			//alert(objs[i][j].getId() + " > " + objs[i][j].getValue());
+			var qty = getSelectedQty(objs[i][1]);
+			var cfn = getConfirmStatus(objs[i][0],objs[i][1]);
+			updateTotal(objs[i][j],qty);
+			updateConfirmStatus(objs[i][2],cfn);
+			if (qty==0) objs[i][3].setText("");
+		};
+	}
+	// ******************************************************************************************************************************************************************
+	function updateOrd(oDB, TKEY) {
+		var timestamp = new Date().getTime();
+		getData("/XMII/Illuminator?QueryTemplate=MESM/PACKING/QUERIES/get_OrderListByMaterialID&Param.1="+TKEY+"&ts="+timestamp+"&Content-Type=text/xml", parseJsonOrd);
+		function parseJsonOrd(jsondata){
+			oDB.destroyItems();
+			for (var i=0; i<jsondata.length; i++){
+				//alert(jsondata[i]['orderRecordID'] + '   ' + jsondata[i]['orderLastID']);
+				item_key = jsondata[i]['orderRecordID'];
+				item_text = jsondata[i]['orderFirstID'] + jsondata[i]['orderLastID'];
+				oItem = new sap.ui.core.ListItem({
+					key : item_key,
+					text : item_text 
+				});
+				oItem.setAdditionalText(jsondata[i]['scheduledQty']);
+				oDB.addItem(oItem);
+			}
+			oDB.setSelectedKey(0);
+		}	
+	}
+	// ******************************************************************************************************************************************************************
+	function getConfirmStatus(oTF, oDB) {
+		var yieldConfirmed = -1;
+		var scrapConfirmed = -1;
+		var oReqData;
+		if (window.XMLHttpRequest) {
+			oReqData = new XMLHttpRequest();
+		}
+
+		if (oReqData != null) {
+			var Param1 = escapeSQLString(oTF.getValue());
+			var Param2 = escapeSQLString(oDB.getValue());
+			var timestamp = new Date().getTime();
+			//alert(Param1 + " >> " + Param2);
+			var sUrl = "/XMII/Illuminator?QueryTemplate=MESM/PACKING/QUERIES/get_ConfirmStatusBySN&Param.1="+encodeURIComponent(Param1)+"&Param.2="+encodeURIComponent(Param2)+"&ts="+timestamp+"&Content-Type=text/xml";
+
+			oReqData.open("GET", sUrl, false);
+			oReqData.send();
+
+			if (oReqData.status == 200) {
+				var xmlDoc = oReqData.responseXML;
+				//alert(oReqData.responseText);
+				if(xmlDoc.getElementsByTagName("yieldConfirmed")[0] && xmlDoc.getElementsByTagName("yieldConfirmed")[0].childNodes[0]) {
+					yieldConfirmed = xmlDoc.getElementsByTagName("yieldConfirmed")[0].childNodes[0].nodeValue;
+				}
+				if(xmlDoc.getElementsByTagName("scrapConfirmed")[0] && xmlDoc.getElementsByTagName("scrapConfirmed")[0].childNodes[0]) {
+					scrapConfirmed = xmlDoc.getElementsByTagName("scrapConfirmed")[0].childNodes[0].nodeValue;
+				}
+				return [yieldConfirmed, scrapConfirmed];
+			}
+		}
+		else {
+			window.alert("Error creating XmlHttpRequest object.");
+		}
+	}
+	// ******************************************************************************************************************************************************************
+	function getSelectedQty(oDB) {
+		var aItems = oDB.getItems();
+		for (var i = 0; i < aItems.length; i++){ 
+ 			if(aItems[i].getText() === oDB.getValue()) { 
+				return oDB.getItems()[i].getAdditionalText();
+ 			} 
+ 		} 
+	}
+	// ******************************************************************************************************************************************************************
+	function updateTotal(oLbl,qty) {
+		oLbl.setText("Total QTY: " + qty);
+	}
+	// ******************************************************************************************************************************************************************
+	function updateConfirmStatus(oLbl,Cfn) {
+		if ((Cfn[0] == -1) && (Cfn[1] == -1))
+			oLbl.setText("No Confirmation Found");
+		else
+		if ((Cfn[0] == 1) && (Cfn[1] == 0))
+			oLbl.setText(" Part Confirmed: PASS");
+		else
+		if ((Cfn[1] == 1) && (Cfn[0] == 0))
+			oLbl.setText("Part Confirmed: FAILED");
+		else
+			oLbl.setText("UNKNOWN PART");
+	}
+	// ******************************************************************************************************************************************************************
+
+	var oButtonSubmit = new sap.ui.commons.Button({
+		id : 'B-Submit',
+		tooltip : 'Submit',
+		text : 'Submit',
+		width : '100px'
+	});
+
+	var oCellButton = new sap.ui.commons.layout.MatrixLayoutCell({
+		id : 'Cell-B',
+		hAlign: sap.ui.commons.layout.HAlign.Center
+	});
+	oCellButton.addContent(oButtonSubmit);
+	oButtonSubmit.attachPress(doOnSubmit);
+
+	oMatrixB.createRow(oCellButton);
+
+	// ******************************************************************************************************************************************************************
+	function doOnSubmit(){
+		if(oDropdownBoxProducts.getSelectedKey()==0) {
+			alert("Please select a material ..");
+			oDropdownBoxProducts.focus();
+			return;
+		}
+
+		if(oDropdownBoxKSCHL.getSelectedKey()==0) {
+			alert("Please select a type ..");
+			oDropdownBoxKSCHL.focus();
+			return;
+		}
+
+		var strconfirm;
+		var doReturn;
+		var cntSN;
+		var idx;
+		for (var i=0; i<trgQty; i++){
+			if (objs[i][0].getValue() == "") {
+				strconfirm = confirm("Packing less items than required.\nAre you sure?");
+				break;
+			}
+		}
+		if (strconfirm == false) return;
+
+		for (var i=0; i<trgQty; i++){
+			if (objs[i][2].getText() == "No Confirmation Found" || objs[i][2].getText() == "Part Confirmed: FAILED") {
+				strconfirm = confirm("Packing Rejects or Unconfirmed.\nAre you sure?");
+				break;
+			}
+		}
+		if (strconfirm == false) return;
+
+		for (var i=0; i<trgQty; i++){
+			var strQty = objs[i][3].getText();
+			if (Number(strQty.substr(strQty.indexOf(":") + 1).trim()) < trgQty) {
+				strconfirm = confirm("Qty packing more than Qty on order.\nAre you sure?");
+				break;
+			}
+		}
+		if (strconfirm == false) return;
+
+		var oReqData;
+		if (window.XMLHttpRequest) {
+			oReqData = new XMLHttpRequest();
+		}
+		if (oReqData != null) {
+
+			for (var i=0; i<trgQty; i++){
+				var strSN = objs[i][0].getValue();
+
+				var Param1 = escapeSQLString(strSN);
+				var timestamp = new Date().getTime();
+				//alert(Param1);
+				var sUrl = "/XMII/Illuminator?QueryTemplate=MESM/PACKING/QUERIES/qry_SNExists&Param.1="+encodeURIComponent(Param1)+"&ts="+timestamp+"&Content-Type=text/xml";
+
+				oReqData.open("GET", sUrl, false);
+				oReqData.send();
+
+				if (oReqData.status == 200) {
+					var xmlDoc = oReqData.responseXML;
+					//alert(oReqData.responseText);
+					if(xmlDoc.getElementsByTagName("SNCnt")[0] && xmlDoc.getElementsByTagName("SNCnt")[0].childNodes[0]) {
+						cntSN = xmlDoc.getElementsByTagName("SNCnt")[0].childNodes[0].nodeValue;
+					}
+				}
+
+				if (Number(cntSN) >= 1) {
+					alert("SN previously packed !\nPlease change?");
+					doReturn = true;
+					idx = i;
+					break;
+				}
+			}
+		}
+		else {
+			window.alert("Error creating XmlHttpRequest object.");
+		}
+		if (doReturn) { objs[idx][0].focus(); return };
+
+		var xml = "<packings>";
+		for (var i=0; i<trgQty; i++){
+			if (objs[i][0].getValue() != "")
+			var xml = xml + "<packing><idSN>" + objs[i][0].getId().substring(3,objs[i][0].getId().length) + "</idSN><valSN>" + objs[i][0].getValue() + "</valSN><idOrd>" + objs[i][1].getId().substring(3,objs[i][1].getId().length) + "</idOrd><valOrd>" + objs[i][1].getValue() + "</valOrd></packing>";
+		}
+		var xml = xml + "</packings>";
+
+		// retrieve values
+		var input_partNumber = oDropdownBoxProducts.getValue();
+		var input_packType = oDropdownBoxKSCHL.getValue();
+		var input_XML = xml;
+		var input_ClockID = oTF_ClockID.getValue();
+		// all good. Try to write them ..
+		var Param1 = escapeSQLString(input_partNumber);
+		var Param2 = escapeSQLString(input_packType);
+		var Param3 = escapeSQLString(input_XML);
+		var Param4 = escapeSQLString(input_ClockID);
+		var oReqData;
+		if (window.XMLHttpRequest) {
+     	     		oReqData = new XMLHttpRequest();
+      		}
+		if (oReqData != null) {
+			var timestamp = new Date().getTime();
+			var paramStr = "PARTNO="+encodeURIComponent(Param1)+"&PACKTYPE="+encodeURIComponent(Param2)+"&PACKINGLIST="+encodeURIComponent(Param3)+"&CREATEDBY="+encodeURIComponent(Param4);
+			// alert(paramStr);
+			var queryStr = "/XMII/Runner?Transaction=MESM/PACKING/TRANSACTIONS/POST_SAP_FTP&OutputParameter=*&Content-Type=text/xml&"+paramStr+"&ts="+timestamp;
+			// alert(queryStr);
+			oReqData.open("GET", queryStr, true); 
+			oReqData.onreadystatechange = function() {
+				if (oReqData.readyState == 4) 
+				if (oReqData.status == 200) {
+					// Successful -- rebuild the screen
+					alert("Records added successfully");
+					clearFields();
+				} else {
+					// Not Successful -- alert the user
+					alert("Error: " + oReqData.statusText);
+				}
+			}
+			oReqData.send();
+       		} else {
+          			window.alert("Error creating XmlHttpRequest object.");
+       		}
+	}
+	// ******************************************************************************************************************************************************************
+	function clearFields() {
+		oDropdownBoxProducts.setSelectedKey(0);
+		oDropdownBoxKSCHL.setSelectedKey(0);
+		oLabelName.setText("");
+		oLabelQty.setText("");
+		destroyRowItems();
+	}
+	// ******************************************************************************************************************************************************************
+
+	// ----------------------------------------Soft KB-------------------------------
+		
+		function refreshKeypad(){
+			$('#TF-ClockID').keyboard({
+  				layout : 'num',
+				restrictInput : true, // Prevent keys not in the displayed keyboard from being typed in
+				preventPaste : true,  // prevent ctrl-v and right click
+				autoAccept : true
+			});
+		}
+
+		function refreshNOKeypad(){
+			$('#TF-NOMaterialQty').keyboard({
+  				layout : 'num',
+				restrictInput : true, // Prevent keys not in the displayed keyboard from being typed in
+				preventPaste : true,  // prevent ctrl-v and right click
+				autoAccept : true
+			});
+		}
+
+		function refreshEOKeypad(){
+			$('#TF-EOMaterialQty').keyboard({
+  				layout : 'num',
+				restrictInput : true, // Prevent keys not in the displayed keyboard from being typed in
+				preventPaste : true,  // prevent ctrl-v and right click
+				autoAccept : true
+			});
+		}
+
+		function refreshEmailKeypad(){
+			$('#input_recipient').keyboard({
+				restrictInput : true, // Prevent keys not in the displayed keyboard from being typed in
+				preventPaste : true,  // prevent ctrl-v and right click
+				autoAccept : true
+			});
+		}
+
+	</script>
+</head>
+
+<body onLoad="roleSecurity()">
+
+<input id="user_roles" type="hidden" value="{IllumLoginRoles}" style="display:block;width:1000px;" readonly />
+<input id="user_role" type="hidden" value="{ROLE}" style="display:block;width:1000px;" readonly />
+<input id="user_name" type="hidden" value="{IllumLoginName}" style="display: block;width:1000px;" readonly />
+<input id="user_height" type="hidden" value="{HEIGHT}" style="display: block;width:100px;" readonly />
+<input id="user_address" type="hidden" value="{Machine}" style="display:block;width:1000px;" readonly />
+<div id="app_header" >
+<div id="app_title">PACKING</div>
+<div id="app_menu"></div>
+<!--<div id="page_title">DEFAULT SCREEN</div>-->
+</div>
+<div id="mesm_content" ></div>
+</body>
+</html>

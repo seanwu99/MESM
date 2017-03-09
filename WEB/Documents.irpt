@@ -1,0 +1,316 @@
+<!DOCTYPE html >
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>MES MODULE</title>
+	<style>
+	body {
+		background-image: url("Common/img/logo.png");
+		background-size: 180px;
+		background-repeat: no-repeat;
+    		background-attachment: fixed;
+    		background-position: right 40px top 30px;
+		font-family: Arial;
+	}
+	#app_header {
+ 		padding: 10px;
+ 		padding-left: 40px;
+ 		padding-top: 15px;
+ 		padding-bottom: 0px;
+		height:80px;
+		width:400px;
+		text-align: center;
+	}
+	#app_title {
+		width:400px;
+		text-align: center;
+		font-family: "Arial Black",Arial,Helvetica,sans-serif;
+		font-size:32px;
+		color: #007dc0;
+		margin-bottom; 20px;
+	}
+	#mov_title, #doc_title {
+		width:470px;
+		text-align: center;
+		font-family: "Arial Black", Arial, Helvetica, sans-serif;
+		font-size:22px;
+		color: #007dc0;
+		margin-bottom; 30px;
+	}
+	#app_menu {
+		width:400px;
+		text-align: center;
+		font-family: Arial,Helvetica,sans-serif;
+	}
+	#page_title {
+		width:400px;
+		text-align: center;
+		font-family: "Arial Black",Arial,Helvetica,sans-serif;
+		font-size:28px;
+		color: #cfcfcf;
+	}
+	#mesm_content {
+ 		padding: 30px;
+ 		padding-top: 40px;
+	}
+	#B-Stats {
+		width:200px;
+		margin-top:10px;
+		margin-left:5px;
+		margin-right:5px;
+	}
+	input[type=button] {
+  		color:#08233e;
+    		display:inline-block;
+  		font:2.4em Futura, ‘Century Gothic’, AppleGothic, sans-serif;
+  		font-size:70%;
+ 		padding:14px;
+  		//background:url(overlay.png) repeat-x center #ffcc00;
+  		background-color:rgba(255,204,0,1);
+  		border:1px solid #ffcc00;
+  		-moz-border-radius:10px;
+  		-webkit-border-radius:10px;
+  		border-radius:10px;
+  		border-bottom:1px solid #9f9f9f;
+  		-moz-box-shadow:inset 0 1px 0 rgba(255,255,255,0.5);
+  		-webkit-box-shadow:inset 0 1px 0 rgba(255,255,255,0.5);
+  		box-shadow:inset 0 1px 0 rgba(255,255,255,0.5);
+  		cursor:pointer;
+ 	}
+
+	input[type=button]:hover {
+  		background-color:rgba(255,204,0,0.8);
+ 	}
+	</style>
+	<script id="sap-ui-bootstrap"
+		src="/sapui5/resources/sap-ui-core.js"
+		data-sap-ui-theme="sap_goldreflection"
+		data-sap-ui-libs="sap.ui.core,sap.ui.commons,sap.ui.table,sap.ui.ux3,sap.m"
+		data-sap-ui-language="en" >
+	</script>
+	<script type="text/javascript" src="Common/js/default.js"></script>
+
+	<script type="text/javascript" id="app-init">
+	// ******************************************************************************************************************************************************************
+	// Get Core SAP UI5
+	var oCore = sap.ui.getCore();
+	// Initialize screen
+	var nrRows = 13;
+	var selectedIndex =  -1;
+	var selectedSTATION = "";
+	// ******************************************************************************************************************************************************************
+	// initialize access
+	var level2Access = "";
+	var plant2Access = "";
+	// Initialize screen
+	var user_name = "";
+	var selectedDIR = 0;
+	var selectedSTATION_TXT = "";
+
+	// ****************************************************************************************************************************************************
+	function roleSecurity() {
+		var myRoles = document.getElementById("user_roles").value;
+		var role2Access = "MESM_" + document.getElementById("user_role").value;
+		user_name = document.getElementById("user_name").value;
+
+		if(myRoles.indexOf(role2Access)<0) {
+			 window.location.assign("security.irpt");
+		  } else {
+
+			var roleString = document.getElementById("user_role").value;
+			var roleArray = roleString.split("_");
+			level2Access = roleArray[0]; 
+				// alert("level : " + level2Access);
+			plant2Access =  roleArray[1];
+				// alert("plant : " + plant2Access);
+
+			var role_ADM = "MESM_ADM_"+plant2Access;
+			var role_ENG = "MESM_ENG_"+plant2Access;
+			var role_OPS = "MESM_OPS_"+plant2Access;
+
+			selectedSTATION = document.getElementById("user_dir").value;
+
+			var tabID = selectedSTATION.split("_");
+			if(typeof tabID[2] === "undefined" || tabID[2] === null ) tabID[2] = "OP010";
+			selectedSTATION_TXT = tabID[1] + " " + tabID[2];
+			// show documents
+			doList() ;
+
+			switch(role2Access) {
+			case "MESM_ADM_ALL":
+
+				// update screen
+				document.getElementById("page_title").innerHTML=selectedSTATION_TXT;
+				break;
+			case role_ADM:
+
+				// update screen
+				document.getElementById("page_title").innerHTML=selectedSTATION_TXT;
+				break;
+			case role_ENG:
+
+				// update screen
+				document.getElementById("page_title").innerHTML=selectedSTATION_TXT;
+				break;
+			case "MESM_OPS_ALL":
+
+				// update screen
+				document.getElementById("page_title").innerHTML=selectedSTATION_TXT;
+
+				break;
+			case role_OPS:
+
+				// update screen
+				document.getElementById("page_title").innerHTML=selectedSTATION_TXT;
+
+				break;
+			default:
+				alert("MES Module Role Unknown: " + role2Access);
+				break;
+			}
+		  }
+	}
+	// ******************************************************************************************************************************************************************
+	// Create Video Overlay
+	var oMatrixVideo = new sap.ui.commons.layout.MatrixLayout({
+		id : 'MatrixVideo',
+		layoutFixed : true,
+		width: '800px',
+		columns : 1,
+		widths : ['920px'] 
+	});
+	var oVHTML = new sap.ui.core.HTML();
+	var oVContent = "";
+	oVHTML.setContent(oVContent);
+	oMatrixVideo.createRow(oVHTML);
+
+	var oOverlayContainerVideo = new sap.ui.ux3.OverlayDialog({openButtonVisible: false, closeButtonVisible: false});
+	oOverlayContainerVideo.setHeight('630px');
+	oOverlayContainerVideo.setWidth('920px');
+	oOverlayContainerVideo.addContent(oMatrixVideo);	
+
+	// ******************************************************************************************************************************************************************
+	function doVideo(file) {
+		if(!oOverlayContainerVideo.isOpen()){
+			file= file.substr(0,file.length-4);
+          			// set content
+			var timestamp = new Date().getTime();  // <source src="movie.mp4" type='video/mp4; codecs="avc1.4D401E, mp4a.40.2"'>
+			var oVContent = "<div style=\"padding: 0px; margin:0 auto;height:625px;width:925px;background:#565656;\"><center><video id=\"sampleMovie\" width=\"840\" height=\"545\" preload controls><source src=\""+file+".mp4\" type='video/mp4; codecs=\"avc1.4D401E, avc1.42E01E, mp4a.40.2\"' /><source src=\""+file+".ogv\" type='video/ogg; codecs=\"theora, vorbis\"' /><source src=\""+file+".webm\" type='video/webm; codecs=\"vp8, vorbis\"' /></video><br /><input type=\"button\" style=\"width:100px;height:45px;font-size:18px;margin:10px;\" value=\"CLOSE\" onClick=\"closeVideo()\"></div>";
+			oVHTML.setContent(oVContent);
+			// open overlay
+			oOverlayContainerVideo.open();
+		}
+	};
+	// ******************************************************************************************************************************************************************
+	function closeVideo() {
+		if(oOverlayContainerVideo.isOpen()){
+			oOverlayContainerVideo.close();
+			var oVContent ="";
+			oVHTML.setContent(oVContent);
+		}
+	};
+	// ******************************************************************************************************************************************************************
+	// Create Drawing Overlay
+	var oMatrixDrawing = new sap.ui.commons.layout.MatrixLayout({
+		id : 'MatrixDrawing',
+		layoutFixed : true,
+		width: '1280px',
+		columns : 1,
+		widths : ['1280px'] 
+	});
+
+	var oDHTML = new sap.ui.core.HTML();
+	var oDContent = "";
+	oDHTML.setContent(oDContent);
+	oMatrixDrawing.createRow(oDHTML);
+
+	var oOverlayContainerDrawing = new sap.ui.ux3.OverlayDialog({openButtonVisible: false, closeButtonVisible: false});
+	oOverlayContainerDrawing.setHeight('725px');
+	oOverlayContainerDrawing.setWidth('1280px');
+	oOverlayContainerDrawing.addContent(oDHTML);	
+
+	// ******************************************************************************************************************************************************************
+	function doDrawing(file) {
+		if(!oOverlayContainerDrawing.isOpen()){
+          			// set content
+			var timestamp = new Date().getTime();
+			var oDContent ="<div style=\"padding: 0px; margin:0 auto;height:100%;background:#565656;\"><center><object width=\"1278\" height=\"650\" type=\"application/pdf\" data=\""+file+"?#zoom=70&scrollbar=0&toolbar=0&navpanes=0&ts="+timestamp+"\" id=\"pdf_content\" style=\"margin:0;padding:0;\"><p>No PDF Option!</p></object><br /><input type=\"button\" style=\"width:100px;height:45px;font-size:18px;margin:10px;\" value=\"CLOSE\" onClick=\"closeDrawing()\"></div>";
+			oDHTML.setContent(oDContent);
+			// open overlay
+			oOverlayContainerDrawing.open();
+		}
+	};
+	// ******************************************************************************************************************************************************************
+	function closeDrawing() {
+		if(oOverlayContainerDrawing.isOpen()){
+			oOverlayContainerDrawing.close();
+			// var oDContent ="<div style=\"padding: 0px; margin:0 auto;width:1278px;height:100%;background:#565656;\"></div>";
+			var oDContent ="";
+			oDHTML.setContent(oDContent);
+		}
+	};
+	// ******************************************************************************************************************************************************************
+	function doList() {
+		document.getElementById("mesm_content").innerHTML = "<center><img src='Common/img/pls_wait.gif' alt='wait ..' /></center>";
+
+       		var oReqData;
+      		if (window.XMLHttpRequest) {
+     	     		oReqData = new XMLHttpRequest();
+      		}
+		if (oReqData != null) {
+			var timestamp = new Date().getTime();
+			var paramStr = "DIR_NAME="+encodeURIComponent(document.getElementById("user_dir").value);
+			var queryStr = "/XMII/Runner?Transaction=MESM/TRAINING/TRANSACTIONS/buildList&OutputParameter=*&Content-Type=text/html&"+paramStr+"&ts="+timestamp;
+			oReqData.open("GET", queryStr, true); 
+			oReqData.onreadystatechange = function() {
+				if (oReqData.readyState == 4) 
+					if (oReqData.status == 200) {
+						document.getElementById("mesm_content").innerHTML = " XML Header Received. Processing ...";
+					// Successful -- rebuild the screen
+						 stringHTML = oReqData.responseText;
+						document.getElementById("mesm_content").innerHTML = stringHTML;
+					} else {
+						alert("Error: " + oReqData.statusText);
+					}
+				}
+			oReqData.send();
+       		} else {
+          			window.alert("Error creating XmlHttpRequest object.");
+       		}
+
+	};
+	// ******************************************************************************************************************************************************************
+	var oButtonStats = new sap.ui.commons.Button({
+		id : 'B-Stats',
+		text : 'Station Status',
+		enabled: true
+	});
+	oButtonStats.attachPress(loadStationStatus);
+	oButtonStats.placeAt('app_menu');
+	// ******************************************************************************************************************************************************************
+	function loadStationStatus() {
+		setTimeout("location.href = '" + "StationStatus.irpt?ROLE=" + document.getElementById("user_role").value + "&STATION="+document.getElementById("user_dir").value+"'",0);
+	return;
+	}
+	// ******************************************************************************************************************************************************************
+	</script>
+</head>
+
+<body onLoad="roleSecurity()">
+
+<input id="user_roles" type="hidden" value="{IllumLoginRoles}" style="display:block;width:1000px;" readonly />
+<input id="user_role" type="hidden" value="{ROLE}" style="display:block;width:1000px;" readonly />
+<input id="user_name" type="hidden" value="{IllumLoginName}" style="display: block;width:1000px;" readonly />
+<input id="user_dir" type="hidden" value="{DIR}" style="display: block;width:100px;" readonly />
+<input id="user_address" type="hidden" value="{Machine}" style="display:block;width:1000px;" readonly />
+<input id="user_firstname" type="hidden" value="{firstname}" style="display:block;width:800px;" readonly />
+<input id="user_lastname" type="hidden" value="{lastname}" style="display:block;width:800px;" readonly />
+<div id="app_header" >
+<div id="app_title">DOCUMENTATION</div>
+<div id="app_menu"></div>
+<div id="page_title">DEFAULT ROLE</div>
+</div>
+<div id="mesm_content" style="width:1000px;margin:auto;"></div>
+</body>
+</html>

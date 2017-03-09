@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?><NotificationMessage>
+    <Header>
+        <Name>TransCtr</Name>
+        <Description><![CDATA[P558_MACHC2_OP030]]></Description>
+        <Destination>MII15</Destination>
+        <CreatedDate>2016-12-09T17:53:26</CreatedDate>
+        <ID>03580017-a652-4b9b-88d1-3a11b51caf1d</ID>
+        <Status>Delivered</Status>
+    </Header>
+    <Body>
+        <Values>
+            <TransCtr quality="Good" timeStamp="2016-12-09T17:53:26.2405339Z" type="xsd:integer"><![CDATA[5381]]></TransCtr>
+        </Values>
+    </Body>
+    <Faults/>
+</NotificationMessage>
