@@ -23,7 +23,7 @@
 
         #loginButton {
             position: fixed;
-            top: 550px;
+            top: 520px;
             left: 390px;
             width: 100px;
             height: 36px;
@@ -55,7 +55,7 @@
 
         #colorButton {
             position: fixed;
-            top: 550px;
+            top: 520px;
             left: 1270px;
             width: 100px;
             height: 36px;
@@ -296,8 +296,15 @@
     </script>
     <script type="text/javascript" src="Common/js/default.js"></script>
 
-    <link rel="stylesheet" type="text/css" href="Common/css/keyboard.css">
-    <script type="text/javascript" src="Common/js/jquery.keyboard.js"></script>
+    <!--<link rel="stylesheet" type="text/css" href="Common/css/keyboard.css">-->
+    <!--<script type="text/javascript" src="Common/js/jquery.keyboard.js"></script>-->
+
+
+    <link href="mottie/keyboard.css" rel="stylesheet">
+    <script src="mottie/jquery.keyboard.js"></script>
+
+    <!--<script src="mottie/js/jquery.keyboard.extension-caret.js"></script>-->
+
 
     <script type="text/javascript" id="app-init">
         // ******************************************************************************************************************************************************************
@@ -387,7 +394,8 @@
         // ******************************************************************************************************************************************************************
         function getStatus() {
             // document.getElementById("mesm_content").innerHTML = "<center><img src='Common/img/pls_wait.gif' alt='wait ..' /></center>";
-
+            cc(oTF_ClockID.getValue());
+            oTF_ClockID.setValue('');
             var oReqData;
             if (window.XMLHttpRequest) {
                 oReqData = new XMLHttpRequest();
@@ -396,7 +404,7 @@
                 var timestamp = new Date().getTime();
                 var paramStr = "STATION=" + encodeURIComponent(selectedSTATION);
                 var queryStr = "/XMII/Runner?Transaction=MESM/STATIONS_HMI/TRANSACTIONS/buildData&OutputParameter=HTML_OUT&Content-Type=text/html&" + paramStr + "&ts=" + timestamp;
-                cc(queryStr);
+//                cc(queryStr);
                 oReqData.open("GET", queryStr, true);
                 oReqData.onreadystatechange = function () {
                     if (oReqData.readyState == 4)
@@ -443,11 +451,12 @@
             editable: true,
             maxLength: 5,
             visible: true,
-            width: '100px'
+            width: '200px'
         });
 
         oTF_ClockID.addEventDelegate({
             onAfterRendering: function () {
+                cc('onAfterRendering');
                 // do something
                 $('#TF-ClockID').keyboard({
                     layout: 'num',
@@ -455,6 +464,7 @@
                     preventPaste: true,  // prevent ctrl-v and right click
                     autoAccept: true
                 });
+
             }
         });
 
@@ -627,6 +637,71 @@
             '#8d4653',
             '#91e8e1'
         ]
+
+        $(function ($) {
+            $('.hiddenInput').click(function () {
+                $('#hidden').data('keyboard').reveal();
+                return false;
+            });
+//            $('#hidden').keyboard({
+//                layout: 'num',
+//                position: {
+//                    of: $('.hiddenInput'),
+//                    my: 'center top',
+//                    at: 'center top'
+//                }
+//            });
+            $('#hidden').keyboard({
+                layout: 'custom',
+                customLayout: {
+                    'normal': [
+                        '9 8 7 6 5',
+                        '4 3 2 1 0',
+                        'A B C {bksp}',
+                        '{accept} {a}'
+                    ]
+                },
+                position: {
+                    of: $('.hiddenInput'),
+                    my: 'center top',
+                    at: 'center top'
+                },
+                maxLength: 5,
+                validate: function (keyboard, value, isClosing) {
+                    // only make valid if input is 6 characters in length
+                    return value.length === 5;
+                },
+//                restrictInput: true, // Prevent keys not in the displayed keyboard from being typed in
+//                preventPaste: true,  // prevent ctrl-v and right click
+//                autoAccept: true
+            });
+
+        });
+
+        //        $('#IDpad').keyboard({
+        //            layout: 'custom',
+        //            customLayout: {
+        //                'normal': [
+        //                    '9 8 7 6 5',
+        //                    '4 3 2 1 0',
+        //                    'A B C {bksp}',
+        //                    ' {c} {accept}'
+        //                ]
+        //            },
+        //            maxLength: 6,
+        //            restrictInput: true, // Prevent keys not in the displayed keyboard from being typed in
+        //            // include lower case characters (added v1.25.7)
+        ////            restrictInclude : 'a b c d e f',
+        //            useCombos: false, // don't want A+E to become a ligature
+        //            acceptValid: true,
+        //            validate: function (keyboard, value, isClosing) {
+        //                // only make valid if input is 6 characters in length
+        //                return value.length === 6;
+        //            },
+        ////            restrictInput: true, // Prevent keys not in the displayed keyboard from being typed in
+        //            preventPaste: true,  // prevent ctrl-v and right click
+        //            autoAccept: true
+        //        });
     </script>
 </head>
 
@@ -665,12 +740,21 @@
 
 </div>
 
-<div id="mesm_content" style="width:1000px;margin:auto;"></div>
 
 <div id="login_form" style="width:842px;margin:auto;"></div>
 
 <a id="colorButton" class="colorButton" onclick="buttonToggle()" href="javascript:void(0);"><i id="colorButtonText"></i></a>
 
 <a id="loginButton" class="loginButton" onclick="loginToggle()" href="javascript:void(0);"><i id="loginButtonText"></i></a>
+
+
+<div class="block">
+    <a class="hiddenInput">
+        <div id="mesm_content" style="width:1000px;margin:auto;"></div>
+    </a>
+
+    <input id="hidden" type="text" style="width:250px;display:none;">
+
+</div>
 </body>
 </html>
