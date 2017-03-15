@@ -475,7 +475,9 @@
                             document.getElementById("mesm_content").innerHTML = stringHTML;
 
                             setTimeout(function () {
-                                getStatus()
+                                cc('refreash Status');
+                                getStatus();
+                                updateTableOperatorsLog();
                             }, 3000);
                         } else {
                             alert("Error: " + oReqData.statusText);
@@ -553,7 +555,7 @@
                 template: new sap.ui.commons.TextView().bindProperty("text", "logInDateTime"),
                 sortProperty: "logInDateTimen",
                 filterProperty: "logInDateTime",
-                width: "355px"
+                width: "auto"
             }));
         }
 
@@ -983,7 +985,7 @@
                         }
                     }
                 }
-                cc(lineID + '/' + lineName + ' // ' + opID + '/' + opName);
+//                cc(lineID + '/' + lineName + ' // ' + opID + '/' + opName);
                 if (lineName != null && opName != null) {
                     cc(lineID + '/' + lineName + ' // ' + opID + '/' + opName);
                     UnitID = opID;
