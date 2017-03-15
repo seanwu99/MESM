@@ -475,7 +475,7 @@
                             document.getElementById("mesm_content").innerHTML = stringHTML;
 
                             setTimeout(function () {
-                                cc('refreash Status');
+//                                cc('refreash Status');
                                 getStatus();
                                 updateTableOperatorsLog();
                             }, 3000);
@@ -528,7 +528,7 @@
             var paramStr = "Param.1=" + encodeURIComponent(Param1)
             // alert(paramStr);
             oModel.loadData("/XMII/Illuminator?QueryTemplate=MESM/STATIONS_HMI/QUERIES/operatorGetLogStatus&" + paramStr + "&ts=" + timestamp + "&Content-Type=text/xml", "", false);
-            oTableLabels.getModel().refresh(true);
+//            oTableLabels.getModel().refresh(true);
         }
 
         // *****************************************************************************
@@ -710,45 +710,6 @@
         oOverlayContaineroOperatorsLogin.addContent(oMatrixLO);
 
 
-        //todo
-        //        var UnitID = '';
-        //        var UnitName = '';
-        //        var OpreationName = '';
-        // ******************************************************************************************************************************
-        function getOperators() {
-            var lineID = null, lineName = null, opID = null, opName = null;
-            var url = "/XMII/Illuminator?QueryTemplate=MESM/STATIONS_HMI/QUERIES/get_OperatorData" + "&Content-Type=text/xml";
-            getData(url, parseJsonParent);
-
-            function parseJsonParent(jsondata) {
-                for (var i = 0; i < jsondata.length; i++) {
-                    if (selectedSTATION.indexOf(jsondata[i]['unitName']) == 0) {
-                        lineID = jsondata[i]['recordID'];
-                        lineName = jsondata[i]['unitName'];
-                    }
-                }
-
-                if (lineID != null) {
-                    for (var i = 0; i < jsondata.length; i++) {
-                        if (jsondata[i]['unitName'] == selectedSTATION.substr(lineName.length + 1) && jsondata[i]['idUnitParent'] == lineID) {
-                            opID = jsondata[i]['recordID'];
-                            opName = jsondata[i]['unitName'];
-                        }
-                    }
-                }
-
-                if (lineName != null && opName != null) {
-                    cc(lineID + '/' + lineName + ' // ' + opID + '/' + opName);
-                    UnitID = opID;
-                    UnitName = lineName;
-                    OpreationName = opName;
-                    showButton(UnitID);
-                } else {
-                    cc('noMatch')
-                }
-            }
-        }
-
         function doOpenLogIN() {
             // alert(selected_recordID);
             if (selected_recordID == 0) {
@@ -762,30 +723,47 @@
                 doLogOutOperator();
             }
         }
-
+        function idParser(str) {
+            var id = "";
+            var shift = 0;
+            if (str.indexOf("A") >= 0) {
+                shift = 1;
+            } else if (str.indexOf("B") >= 0) {
+                shift = 2;
+            } else if (str.indexOf("C") >= 0) {
+                shift = 3;
+            }
+            for (var i = 0; i < str.length; i++) {
+                if ("0123456789".indexOf(str.substring(i, i + 1)) >= 0) {
+                    id = id + str.substring(i, i + 1);
+                }
+            }
+            return '' + shift + '' + id;
+        }
         // ****************************************************************************************************************
         function doLogOperator_kp() {
+            var _clockID = (idParser(clockID));
             // retrieve values
             var input_plantID = 268;
             var input_unitID = UnitID;
-            var input_operatorCLID = parseInt(clockID.substring(6, 10));// $('#input_clid').val()
-            var input_operatorShiftRecID = 0;//  oCore.byId("ShiftBox").getSelectedKey();
+            var input_operatorCLID = parseInt(_clockID.substring(1));// $('#input_clid').val()
+            var input_operatorShiftRecID = _clockID.substring(0, 1);//  oCore.byId("ShiftBox").getSelectedKey();
 //            if (input_operatorCLID == "") {
 //                alert("Please Input Operator CLOCK ID ..");
 //                oCore.byId("input_clid").focus();
 //                return;
 //            }
-            if (clockID.substring(10, 11) == 'A') {
-                input_operatorShiftRecID = 1;
-            } else if (clockID.substring(10, 11) == 'B') {
-                input_operatorShiftRecID = 2;
-            } else if (clockID.substring(10, 11) == 'C') {
-                input_operatorShiftRecID = 3;
-            }
-            if (input_operatorShiftRecID == 0) {
-//                alert("Please Select Shift ID ..");
-                return;
-            }
+//            if (clockID.substring(10, 11) == 'A') {
+//                input_operatorShiftRecID = 1;
+//            } else if (clockID.substring(10, 11) == 'B') {
+//                input_operatorShiftRecID = 2;
+//            } else if (clockID.substring(10, 11) == 'C') {
+//                input_operatorShiftRecID = 3;
+//            }
+//            if (input_operatorShiftRecID == 0) {
+////                alert("Please Select Shift ID ..");
+//                return;
+//            }
             // all good. Try to write them ..
             var Param1 = escapeSQLString(input_plantID);
             var Param2 = escapeSQLString(input_operatorShiftRecID);
@@ -820,6 +798,7 @@
                 window.alert("Error creating XmlHttpRequest object.");
             }
         }
+
         function doLogOperator() {
             // retrieve values
             var input_plantID = 268;
@@ -874,19 +853,20 @@
 
         // ****************************************************************************************************************
         function doLogOutOperator_kp() {
+            var _clockID = idParser(clockID);
             var input_plantID = 268;
 //            var Param1 = escapeSQLString(selected_recordID);
             var oReqData;
             if (window.XMLHttpRequest) {
                 oReqData = new XMLHttpRequest();
             }
-            cc('doLogOutOperator_kp');
+//            cc('doLogOutOperator_kp');
             if (oReqData != null) {
                 var timestamp = new Date().getTime();
-                var paramStr = "Param.1=" + input_plantID + '&Param.2=' + UnitID + '&Param.3=' + parseInt(clockID.substring(7, 11));
-                cc(paramStr);
+                var paramStr = "Param.1=" + input_plantID + '&Param.2=' + UnitID + '&Param.3=' + parseInt(_clockID.substring(1));
+//                cc(paramStr);
                 var queryStr = "/XMII/Illuminator?QueryTemplate=MESM/STATIONS_HMI/QUERIES/operatorLogOut_kp&" + paramStr + "&ts=" + timestamp + "&Content-Type=text/xml";
-                cc(queryStr);
+//                cc(queryStr);
                 oReqData.open("GET", queryStr, true);
                 oReqData.onreadystatechange = function () {
                     if (oReqData.readyState == 4)
@@ -904,6 +884,7 @@
                 window.alert("Error creating XmlHttpRequest object.");
             }
         }
+
         function doLogOutOperator() {
             var Param1 = escapeSQLString(selected_recordID);
             var oReqData;
@@ -1096,61 +1077,27 @@
         ]
         var clockID = '';
         $(function ($) {
-
             $.extend($.keyboard.keyaction, {
 
                 login: function (base) {
-                    base.mode = 0; // 0 = radians, 1 = degrees, 2 = grads
-                    // base.$keyboard.find('.ui-keyboard-rad').addClass(base.options.css.buttonAction);
-                    // base.$keyboard.find('.ui-keyboard-deg, .ui-keyboard-grad').removeClass(base.options.css.buttonAction);
-                    // console.log(base.memory2);
-//                    base.memory2 = '';
-                    // console.log('login', base.checkCombos());
-                    // base.originalContent = base.checkCombos();
-                    // console.log('originalContent', base.originalContent);
+                    base.mode = 0; // 0 = login, 1 = logout
                     clockID = 'login_' + base.checkCombos();
-                    cc(clockID);
+//                    cc(clockID);
                     doLogOperator_kp();
 //                    base.$preview.val(base.checkCombos());
-
                     base.close(true);
 
                     // base.$preview.val('login');
                 },
 
                 logout: function (base) {
-                    base.mode = 1; // 0 = radians, 1 = degrees, 2 = grads
-                    // base.$keyboard.find('.ui-keyboard-deg').addClass(base.options.css.buttonAction);
-                    // base.$keyboard.find('.ui-keyboard-rad, .ui-keyboard-grad').removeClass(base.options.css.buttonAction);
-                    // cc(base.memory2);
-//                    base.memory2 = '';
-//                    base.$preview.val(base.checkCombos());
+                    base.mode = 1; // 0 = login, 1 = logout
                     clockID = 'logout_' + base.checkCombos();
-                    cc(clockID);
+//                    cc(clockID);
                     doLogOutOperator_kp();
                     base.close(true);
 
-                },
-
-
-                // Process multi-parameter math functions
-                // ***************************
-                equals: function (base) {
-                    base.$preview.val(function (i, v) {
-                        var fx = base.memory2 || '';
-                        if (fx === '') {
-                            return eval(v);
-                        }
-                        if (fx[0] === 'yroot') {
-                            return Math.pow($.trim(fx[1]), 1 / $.trim(v));
-                        }
-                        if (fx[0] === 'xy') {
-                            return Math.pow($.trim(fx[1]), $.trim(v));
-                        }
-                    });
-                    base.memory2 = '';
                 }
-
             });
 
 
@@ -1158,14 +1105,6 @@
                 $('#hidden').data('keyboard').reveal();
                 return false;
             });
-//            $('#hidden').keyboard({
-//                layout: 'num',
-//                position: {
-//                    of: $('.hiddenInput'),
-//                    my: 'center top',
-//                    at: 'center top'
-//                }
-//            });
             $('#hidden').keyboard({
                 layout: 'custom',
                 display: {
@@ -1228,7 +1167,7 @@
 
 
 <!--<div id="login_form" style="width:1000px;margin:auto;"></div>-->
-<a id="colorButton" class="colorButton" onclick="buttonToggle()" href="javascript:void(0);"><i id="colorButtonText"></i></a>
+<a id="colorButton" class="colorButton" onclick="buttonToggle()" href="javascript:void(0);"><i id="colorButtonText">REPLACE_STA</i></a>
 
 </body>
 </html>

@@ -708,45 +708,6 @@
         oOverlayContaineroOperatorsLogin.addContent(oMatrixLO);
 
 
-        //todo
-        //        var UnitID = '';
-        //        var UnitName = '';
-        //        var OpreationName = '';
-        // ******************************************************************************************************************************
-        function getOperators() {
-            var lineID = null, lineName = null, opID = null, opName = null;
-            var url = "/XMII/Illuminator?QueryTemplate=MESM/STATIONS_HMI/QUERIES/get_OperatorData" + "&Content-Type=text/xml";
-            getData(url, parseJsonParent);
-
-            function parseJsonParent(jsondata) {
-                for (var i = 0; i < jsondata.length; i++) {
-                    if (selectedSTATION.indexOf(jsondata[i]['unitName']) == 0) {
-                        lineID = jsondata[i]['recordID'];
-                        lineName = jsondata[i]['unitName'];
-                    }
-                }
-
-                if (lineID != null) {
-                    for (var i = 0; i < jsondata.length; i++) {
-                        if (jsondata[i]['unitName'] == selectedSTATION.substr(lineName.length + 1) && jsondata[i]['idUnitParent'] == lineID) {
-                            opID = jsondata[i]['recordID'];
-                            opName = jsondata[i]['unitName'];
-                        }
-                    }
-                }
-
-                if (lineName != null && opName != null) {
-                    cc(lineID + '/' + lineName + ' // ' + opID + '/' + opName);
-                    UnitID = opID;
-                    UnitName = lineName;
-                    OpreationName = opName;
-                    showButton(UnitID);
-                } else {
-                    cc('noMatch')
-                }
-            }
-        }
-
         function doOpenLogIN() {
             // alert(selected_recordID);
             if (selected_recordID == 0) {
@@ -878,7 +839,6 @@
             if (window.XMLHttpRequest) {
                 oReqData = new XMLHttpRequest();
             }
-            cc('doLogOutOperator_kp');
             if (oReqData != null) {
                 var timestamp = new Date().getTime();
                 var paramStr = "Param.1=" + input_plantID + '&Param.2=' + UnitID + '&Param.3=' + parseInt(clockID.substring(7, 11));
@@ -1090,19 +1050,11 @@
             '#91e8e1'
         ]
         var clockID = '';
+
         $(function ($) {
-
             $.extend($.keyboard.keyaction, {
-
                 login: function (base) {
-                    base.mode = 0; // 0 = radians, 1 = degrees, 2 = grads
-                    // base.$keyboard.find('.ui-keyboard-rad').addClass(base.options.css.buttonAction);
-                    // base.$keyboard.find('.ui-keyboard-deg, .ui-keyboard-grad').removeClass(base.options.css.buttonAction);
-                    // console.log(base.memory2);
-//                    base.memory2 = '';
-                    // console.log('login', base.checkCombos());
-                    // base.originalContent = base.checkCombos();
-                    // console.log('originalContent', base.originalContent);
+                    base.mode = 0;
                     clockID = 'login_' + base.checkCombos();
                     cc(clockID);
                     doLogOperator_kp();
@@ -1114,11 +1066,7 @@
                 },
 
                 logout: function (base) {
-                    base.mode = 1; // 0 = radians, 1 = degrees, 2 = grads
-                    // base.$keyboard.find('.ui-keyboard-deg').addClass(base.options.css.buttonAction);
-                    // base.$keyboard.find('.ui-keyboard-rad, .ui-keyboard-grad').removeClass(base.options.css.buttonAction);
-                    // cc(base.memory2);
-//                    base.memory2 = '';
+                    base.mode = 1;
 //                    base.$preview.val(base.checkCombos());
                     clockID = 'logout_' + base.checkCombos();
                     cc(clockID);
@@ -1127,8 +1075,6 @@
 
                 },
 
-
-                // Process multi-parameter math functions
                 // ***************************
                 equals: function (base) {
                     base.$preview.val(function (i, v) {
@@ -1153,14 +1099,6 @@
                 $('#hidden').data('keyboard').reveal();
                 return false;
             });
-//            $('#hidden').keyboard({
-//                layout: 'num',
-//                position: {
-//                    of: $('.hiddenInput'),
-//                    my: 'center top',
-//                    at: 'center top'
-//                }
-//            });
             $('#hidden').keyboard({
                 layout: 'custom',
                 display: {
