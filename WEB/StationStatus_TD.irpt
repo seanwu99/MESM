@@ -14,13 +14,6 @@
             font-family: Arial;
         }
 
-        a.colorButton:link, a.colorButton:active, a.colorButton:hover, a.colorButton:visited {
-            text-decoration: none;
-            color: #007dc0;
-            cursor: pointer;
-            background-position: right top;
-        }
-
         #loginButton {
             position: fixed;
             top: 520px;
@@ -55,8 +48,8 @@
 
         #colorButton {
             position: fixed;
-            top: 520px;
-            left: 1270px;
+            top: 620px;
+            left: 1470px;
             width: 100px;
             height: 36px;
             line-height: 36px;
@@ -76,6 +69,13 @@
             -o-border-bottom-right-radius: 21px;
             border-bottom-right-radius: 21px;
             border-right: 2px solid #007dc0;
+        }
+
+        a.colorButton:link, a.colorButton:active, a.colorButton:hover, a.colorButton:visited {
+            text-decoration: none;
+            color: #007dc0;
+            cursor: pointer;
+            background-position: right top;
         }
 
         #app_header {
@@ -122,19 +122,16 @@
             color: #cfcfcf;
         }
 
+        #mesm_content {
+            padding: 30px;
+            padding-top: 40px;
+        }
+
         #login_content {
             padding: 30px;
             padding-top: 40px;
         }
 
-        /*#mesm_content {*/
-        /*padding: 30px;*/
-        /*padding-top: 40px;*/
-        /*}*/
-        /*#login_content {*/
-        /*padding: 30px;*/
-        /*padding-top: 40px;*/
-        /*}*/
         #B-Docs {
             width: 200px;
             margin-top: 10px;
@@ -181,6 +178,13 @@
             font-size: 38px;
             font-weight: bold;
             line-height: 1.65857
+        }
+
+        .tile-stats-double .message {
+            font-size: 38px;
+            font-weight: bold;
+            line-height: 1.65857;
+            text-align: center;
         }
 
         .tile-stats-double .trans {
@@ -267,6 +271,34 @@
             line-height: 1.65857
         }
 
+        .tile-stats .trans {
+            font-family: "Arial Black", Arial, Helvetica, sans-serif;
+            font-size: 38px;
+            font-weight: bold;
+            line-height: 1.85857
+            width: 20px;
+            height: 24px;
+            color: #007dc0;
+            position: absolute;
+            right: 80px;
+            top: 22px;
+            z-index: 1
+        }
+
+        .tile-stats .transTitle {
+            font-family: "Arial Black", Arial, Helvetica, sans-serif;
+            font-size: 18px;
+            font-weight: bold;
+            line-height: 1.65857
+            width: 40px;
+            height: 20px;
+            color: #DAD8D8;
+            position: absolute;
+            right: 37px;
+            top: 65px;
+            z-index: 1
+        }
+
         .tile-stats .count, .tile-stats h3, .tile-stats p {
             position: relative;
             margin: 0;
@@ -287,6 +319,40 @@
         .tile-stats img {
             zoom: 1.5
         }
+
+        #B-OperatorsOpenLogin, #B-OperatorsLogin {
+            margin-top: 0px;
+            width: 100px;
+            height: 35px;
+            font-size: 14px;
+        }
+
+        #__cell0 {
+            padding: 10px;
+            padding-right: 20px;
+            text-align: right;
+        }
+
+        #__cell3, #__cell5 {
+            padding: 10px;
+            padding-right: 20px;
+            text-align: right;
+        }
+
+        #__cell2, #__cell4, #__cell6, #__cell8 {
+            text-align: center;
+            height: 36px;
+        }
+
+        #L-OperatorLog {
+            margin-top: 15px;
+            padding: 5px;
+            font-family: "Arial Black", Arial, Helvetica, sans-serif;
+            font-size: 27px;
+            height: 35px;
+            color: #007dc0;
+        }
+
     </style>
     <script id="sap-ui-bootstrap"
             src="/sapui5/resources/sap-ui-core.js"
@@ -298,12 +364,8 @@
 
     <!--<link rel="stylesheet" type="text/css" href="Common/css/keyboard.css">-->
     <!--<script type="text/javascript" src="Common/js/jquery.keyboard.js"></script>-->
-
-
     <link href="mottie/keyboard.css" rel="stylesheet">
     <script src="mottie/jquery.keyboard.js"></script>
-
-    <!--<script src="mottie/js/jquery.keyboard.extension-caret.js"></script>-->
 
 
     <script type="text/javascript" id="app-init">
@@ -320,6 +382,8 @@
         var plant2Access = "";
         // Initialize screen
         var user_name = "";
+
+        var selected_recordID = 0;
 
         var selectedSTATION = 0;
         var selectedSTATION_TXT = "";
@@ -343,47 +407,43 @@
                 var role_ADM = "MESM_ADM_" + plant2Access;
                 var role_OPS = "MESM_OPS_" + plant2Access;
 
-
                 selectedSTATION = document.getElementById("user_station").value;
                 findUnitID();
-
-                //selectedSTATION = 'P558_ASSY_OP010';
-
+//                getOperators();
                 var tabID = selectedSTATION.split("_");
                 if (typeof tabID[2] === "undefined" || tabID[2] === null) tabID[2] = "OP010";
                 selectedSTATION_TXT = tabID[1] + " " + tabID[2];
 
-//                cc(selectedSTATION);
-//                cc(selectedSTATION_TXT);
+                // get loged operators
+                setTimeout(function () {
+                    createTableOperatorsLog();
+                }, 1000);
 
-                // show status
+                // show alert status
                 setTimeout(function () {
                     getStatus()
                 }, 3000);
 
                 switch (role2Access) {
                     case "MESM_ADM_ALL":
-
                         // update screen
                         document.getElementById("page_title").innerHTML = selectedSTATION_TXT;
                         oMatrixC.placeAt('login_form');
                         break;
                     case role_ADM:
-
                         // update screen
                         document.getElementById("page_title").innerHTML = selectedSTATION_TXT;
+                        oMatrixC.placeAt('login_form');
                         break;
                     case "MESM_OPS_ALL":
-
                         // update screen
                         document.getElementById("page_title").innerHTML = selectedSTATION_TXT;
-
+                        oMatrixC.placeAt('login_form');
                         break;
                     case role_OPS:
-
                         // update screen
                         document.getElementById("page_title").innerHTML = selectedSTATION_TXT;
-
+                        oMatrixC.placeAt('login_form');
                         break;
                     default:
                         alert("MES Module Role Unknown: " + role2Access);
@@ -391,11 +451,11 @@
                 }
             }
         }
+
         // ******************************************************************************************************************************************************************
         function getStatus() {
             // document.getElementById("mesm_content").innerHTML = "<center><img src='Common/img/pls_wait.gif' alt='wait ..' /></center>";
-            cc(oTF_ClockID.getValue());
-            oTF_ClockID.setValue('');
+
             var oReqData;
             if (window.XMLHttpRequest) {
                 oReqData = new XMLHttpRequest();
@@ -412,7 +472,6 @@
                             document.getElementById("mesm_content").innerHTML = " XML Header Received. Processing ...";
                             // Successful -- rebuild the screen
                             stringHTML = oReqData.responseText;
-
                             document.getElementById("mesm_content").innerHTML = stringHTML;
 
                             setTimeout(function () {
@@ -429,51 +488,451 @@
         }
         // ******************************************************************************************************************************************************************
 
-
         var oMatrixC = new sap.ui.commons.layout.MatrixLayout({
             id: 'MatrixC',
             layoutFixed: true,
-            width: '200px',
+            width: '842px',//'1200px',
+//            columns: 2,
+//            widths: ['200px', '1000px']
+        });
+
+        var oButtonOperatorsOpenLog = new sap.ui.commons.Button({
+            id: 'B-OperatorsOpenLogin',
+            tooltip: "LOG IN",
+            text: 'SUBMIT',
+            enabled: true
+        });
+        oButtonOperatorsOpenLog.attachPress(doOpenLogIN);
+
+        function createTableOperatorsLog() {
+            // Bind the table rows to this model
+            var timestamp = new Date().getTime();
+            var Param1 = escapeSQLString(UnitID);
+            var paramStr = "Param.1=" + encodeURIComponent(Param1)
+            // alert(paramStr);
+            oModel.loadData("/XMII/Illuminator?QueryTemplate=MESM/STATIONS_HMI/QUERIES/operatorGetLogStatus&" + paramStr + "&ts=" + timestamp + "&Content-Type=text/xml", "", false);
+            // alert(oModel.getXML());
+            createColumnsOperatorsLog();
+            oTableOperatorsLog.setModel(oModel);
+            oTableOperatorsLog.bindRows("/Rowset/Row");
+        }
+
+        // ************************************************************************************
+
+        function updateTableOperatorsLog() {
+            oTableOperatorsLog.clearSelection();
+            var timestamp = new Date().getTime();
+            var Param1 = escapeSQLString(UnitID);
+            var paramStr = "Param.1=" + encodeURIComponent(Param1)
+            // alert(paramStr);
+            oModel.loadData("/XMII/Illuminator?QueryTemplate=MESM/STATIONS_HMI/QUERIES/operatorGetLogStatus&" + paramStr + "&ts=" + timestamp + "&Content-Type=text/xml", "", false);
+            oTableLabels.getModel().refresh(true);
+        }
+
+        // *****************************************************************************
+
+        function createColumnsOperatorsLog() {
+            //Define the columns and the control templates to be used
+            oTableOperatorsLog.addColumn(new sap.ui.table.Column({
+                label: new sap.ui.commons.Label({text: "NAME"}),
+                template: new sap.ui.commons.TextView().bindProperty("text", "FirstName"),
+                sortProperty: "FirstName",
+                filterProperty: "FirstName",
+                width: "220px",
+                hAlign: "Center"
+            }));
+            oTableOperatorsLog.addColumn(new sap.ui.table.Column({
+                label: new sap.ui.commons.Label({text: "SHIFT"}),
+                template: new sap.ui.commons.TextView().bindProperty("text", "idShift"),
+                sortProperty: "idShift",
+                filterProperty: "idShift",
+                width: "220px"
+            }));
+            oTableOperatorsLog.addColumn(new sap.ui.table.Column({
+                label: new sap.ui.commons.Label({text: "LOG IN TIME"}),
+                template: new sap.ui.commons.TextView().bindProperty("text", "logInDateTime"),
+                sortProperty: "logInDateTimen",
+                filterProperty: "logInDateTime",
+                width: "355px"
+            }));
+        }
+
+        // **********************************************************************************************************
+
+        //Create an instance of the table control
+        var oTableOperatorsLog = new sap.ui.table.Table({
+            visibleRowCount: 3,
+            visibleRowCountMode: sap.ui.table.VisibleRowCountMode.Interactive,
+            firstVisibleRow: 0,
+            width: "822px",
+            selectionBehavior: sap.ui.table.SelectionBehavior.Row,
+            selectionMode: sap.ui.table.SelectionMode.Single
+        });
+
+        // *********************************************************************************************************
+
+        oTableOperatorsLog.attachRowSelectionChange(function (oEvent) {
+            // Retrieve the selected row
+            var selIndex = oTableOperatorsLog.getSelectedIndex();
+            selectedIndex = selIndex;
+            if (selIndex >= 0) {
+                //oButton1.setEnabled(false);
+                // Retrieve the selected row
+                var selectedRow = oTableOperatorsLog.getRows()[selIndex];
+                // sap.ui.commons.MessageBox.alert(selectedRow);
+                var selectedRowContext = oEvent.getParameter("rowContext");
+                selected_recordID = oModel.getProperty("recordID", selectedRowContext);
+            }
+            else {
+                //  oButton1.setEnabled(true);
+                selectedIndex = -1;
+                selected_recordID = 0;
+                // alert ("No Selection ..");
+            }
+        });
+
+        // ********************************************************************************************
+
+        var oModel = new sap.ui.model.xml.XMLModel();
+
+        //        oMatrixC.createRow(oButtonOperatorsOpenLog, oTableOperatorsLog);
+        oMatrixC.createRow(oTableOperatorsLog);
+
+        // **********************************************************************************************************************************
+
+        // Create Log Operator Overlay
+
+        var oMatrixLO = new sap.ui.commons.layout.MatrixLayout({
+            id: 'MatrixLO',
+            layoutFixed: true,
+            width: '690px',
+            columns: 1,
+            widths: ['700px']
+        });
+
+        var oMatrixLOin = new sap.ui.commons.layout.MatrixLayout({
+            id: 'MatrixLOin',
+            layoutFixed: true,
+            width: '690px',
             columns: 2,
-            widths: ['200px', '100px']
+            widths: ['295px', '385px']
         });
 
-        var oLabelClockID = new sap.ui.commons.Label({
+        var oTitleLO = new sap.ui.commons.Label({
+            id: 'L-OperatorLog',
+            text: 'OPERATOR LOGIN'
+        });
+        oMatrixLO.createRow(oTitleLO);
+
+        // ******************************************************
+
+        var oLabeClockID = new sap.ui.commons.Label({
             id: 'L-ClockID',
-            visible: true,
-            text: ' OPERATOR CLOCK ID',
-            width: '180px'
+            text: ' CLOCK ID '
         });
 
-        var oTF_ClockID = new sap.ui.commons.TextField({
-            id: 'TF-ClockID',
-            tooltip: 'Clock ID',
-            editable: true,
-            maxLength: 5,
-            visible: true,
-            width: '200px'
-        });
 
-        oTF_ClockID.addEventDelegate({
+        var oInput_CLID = new sap.ui.commons.TextField('input_clid');
+
+        oInput_CLID.addEventDelegate({
             onAfterRendering: function () {
-                cc('onAfterRendering');
                 // do something
-                $('#TF-ClockID').keyboard({
+                $('#input_clid').keyboard({
                     layout: 'num',
                     restrictInput: true, // Prevent keys not in the displayed keyboard from being typed in
                     preventPaste: true,  // prevent ctrl-v and right click
                     autoAccept: true
                 });
-
             }
         });
 
 
-        oMatrixC.createRow(oLabelClockID, oTF_ClockID);
+        oMatrixLOin.createRow(oLabeClockID, oInput_CLID);
 
+
+        var oLabel_SHIFTID = new sap.ui.commons.Label({
+            id: 'L-SHIFTID',
+            text: ' SHIFT'
+        });
+
+        var oDropdownBoxShift = new sap.ui.commons.DropdownBox({
+            id: "ShiftBox",
+            tooltip: 'Shifts',
+            editable: true,
+            change: function (oEvent) {
+                //alert(oEvent.oSource.getSelectedKey());
+            }
+        });
+
+        // ********************************************************************************************************************
+
+        function updateShift() {
+            var timestamp = new Date().getTime();
+            getData("/XMII/Illuminator?QueryTemplate=MESM/OPERATORS/QUERIES/get_Shifts&ts=" + timestamp + "&Content-Type=text/xml", parseJsonShiftsList);
+            function parseJsonShiftsList(jsondata) {
+                oDropdownBoxShift.destroyItems();
+                for (var i = 0; i < jsondata.length; i++) {
+                    //	alert(jsondata[i]['recordID'] + '  ' + jsondata[i]['shiftName']);
+                    item_id = jsondata[i]['recordID'];
+                    item_key = jsondata[i]['recordID'];
+                    item_text = jsondata[i]['shiftName'];
+                    oItem = new sap.ui.core.ListItem("shifta_" + item_id, {
+                        key: item_key,
+                        text: item_text
+                    });
+                    oDropdownBoxShift.addItem(oItem);
+                }
+                oDropdownBoxShift.setSelectedKey(0);
+            }
+        }
+
+        // ***********************************************************************************************************************
+
+        oMatrixLOin.createRow(oLabel_SHIFTID, oDropdownBoxShift);
+
+        oMatrixLO.createRow(oMatrixLOin);
+
+        var oButtonOperatorsLogin = new sap.ui.commons.Button({
+            id: 'B-OperatorsLogin',
+            tooltip: "Submit Operators Clock ID",
+            text: 'SUBMIT',
+            enabled: true
+        });
+        oButtonOperatorsLogin.attachPress(doLogOperator);
+
+        oMatrixLO.createRow(oButtonOperatorsLogin);
+
+        var oOverlayContaineroOperatorsLogin = new sap.ui.ux3.OverlayDialog({openButtonVisible: false});
+        oOverlayContaineroOperatorsLogin.setHeight('200px');
+        oOverlayContaineroOperatorsLogin.setWidth('700px');
+        oOverlayContaineroOperatorsLogin.addContent(oMatrixLO);
+
+
+        //todo
+        //        var UnitID = '';
+        //        var UnitName = '';
+        //        var OpreationName = '';
+        // ******************************************************************************************************************************
+        function getOperators() {
+            var lineID = null, lineName = null, opID = null, opName = null;
+            var url = "/XMII/Illuminator?QueryTemplate=MESM/STATIONS_HMI/QUERIES/get_OperatorData" + "&Content-Type=text/xml";
+            getData(url, parseJsonParent);
+
+            function parseJsonParent(jsondata) {
+                for (var i = 0; i < jsondata.length; i++) {
+                    if (selectedSTATION.indexOf(jsondata[i]['unitName']) == 0) {
+                        lineID = jsondata[i]['recordID'];
+                        lineName = jsondata[i]['unitName'];
+                    }
+                }
+
+                if (lineID != null) {
+                    for (var i = 0; i < jsondata.length; i++) {
+                        if (jsondata[i]['unitName'] == selectedSTATION.substr(lineName.length + 1) && jsondata[i]['idUnitParent'] == lineID) {
+                            opID = jsondata[i]['recordID'];
+                            opName = jsondata[i]['unitName'];
+                        }
+                    }
+                }
+
+                if (lineName != null && opName != null) {
+                    cc(lineID + '/' + lineName + ' // ' + opID + '/' + opName);
+                    UnitID = opID;
+                    UnitName = lineName;
+                    OpreationName = opName;
+                    showButton(UnitID);
+                } else {
+                    cc('noMatch')
+                }
+            }
+        }
+
+        function doOpenLogIN() {
+            // alert(selected_recordID);
+            if (selected_recordID == 0) {
+                if (!oOverlayContaineroOperatorsLogin.isOpen()) {
+                    updateShift();
+                    oCore.byId("input_clid").setValue("");
+                    oOverlayContaineroOperatorsLogin.open();
+                }
+            }
+            else {
+                doLogOutOperator();
+            }
+        }
+
+        // ****************************************************************************************************************
+        function doLogOperator_kp() {
+            // retrieve values
+            var input_plantID = 268;
+            var input_unitID = UnitID;
+            var input_operatorCLID = parseInt(clockID.substring(6, 10));// $('#input_clid').val()
+            var input_operatorShiftRecID = 0;//  oCore.byId("ShiftBox").getSelectedKey();
+//            if (input_operatorCLID == "") {
+//                alert("Please Input Operator CLOCK ID ..");
+//                oCore.byId("input_clid").focus();
+//                return;
+//            }
+            if (clockID.substring(10, 11) == 'A') {
+                input_operatorShiftRecID = 1;
+            } else if (clockID.substring(10, 11) == 'B') {
+                input_operatorShiftRecID = 2;
+            } else if (clockID.substring(10, 11) == 'C') {
+                input_operatorShiftRecID = 3;
+            }
+            if (input_operatorShiftRecID == 0) {
+//                alert("Please Select Shift ID ..");
+                return;
+            }
+            // all good. Try to write them ..
+            var Param1 = escapeSQLString(input_plantID);
+            var Param2 = escapeSQLString(input_operatorShiftRecID);
+            var Param3 = escapeSQLString(input_operatorCLID);
+            var Param4 = escapeSQLString(input_unitID);
+
+            var oReqData;
+            if (window.XMLHttpRequest) {
+                oReqData = new XMLHttpRequest();
+            }
+            if (oReqData != null) {
+                var timestamp = new Date().getTime();
+                var paramStr = "Param.1=" + encodeURIComponent(Param1) + "&Param.2=" + encodeURIComponent(Param2) + "&Param.3=" + encodeURIComponent(Param3) + "&Param.4=" + encodeURIComponent(Param4);
+                // alert(paramStr);
+                var queryStr = "/XMII/Illuminator?QueryTemplate=MESM/STATIONS_HMI/QUERIES/operatorLogIn&" + paramStr + "&ts=" + timestamp + "&Content-Type=text/xml";
+                // alert(queryStr);
+                oReqData.open("GET", queryStr, true);
+                oReqData.onreadystatechange = function () {
+                    if (oReqData.readyState == 4)
+                        if (oReqData.status == 200) {
+                            // Successful -- rebuild the screen
+                            //refresh station login table
+                            oOverlayContaineroOperatorsLogin.close();
+                            updateTableOperatorsLog();
+                        } else {
+                            // Not Successful -- alert the user
+                            alert("Error: " + oReqData.statusText);
+                        }
+                }
+                oReqData.send();
+            } else {
+                window.alert("Error creating XmlHttpRequest object.");
+            }
+        }
+        function doLogOperator() {
+            // retrieve values
+            var input_plantID = 268;
+            var input_unitID = UnitID;
+            //	var input_operatorCLID = oCore.byId("input_clid").getValue();
+            var input_operatorCLID = $('#input_clid').val()
+            var input_operatorShiftRecID = oCore.byId("ShiftBox").getSelectedKey();
+            if (input_operatorCLID == "") {
+                alert("Please Input Operator CLOCK ID ..");
+                oCore.byId("input_clid").focus();
+                return;
+            }
+
+            if (input_operatorShiftRecID == 0) {
+                alert("Please Select Shift ID ..");
+                return;
+            }
+            // all good. Try to write them ..
+            var Param1 = escapeSQLString(input_plantID);
+            var Param2 = escapeSQLString(input_operatorShiftRecID);
+            var Param3 = escapeSQLString(input_operatorCLID);
+            var Param4 = escapeSQLString(input_unitID);
+
+            var oReqData;
+            if (window.XMLHttpRequest) {
+                oReqData = new XMLHttpRequest();
+            }
+            if (oReqData != null) {
+                var timestamp = new Date().getTime();
+                var paramStr = "Param.1=" + encodeURIComponent(Param1) + "&Param.2=" + encodeURIComponent(Param2) + "&Param.3=" + encodeURIComponent(Param3) + "&Param.4=" + encodeURIComponent(Param4);
+                // alert(paramStr);
+                var queryStr = "/XMII/Illuminator?QueryTemplate=MESM/STATIONS_HMI/QUERIES/operatorLogIn&" + paramStr + "&ts=" + timestamp + "&Content-Type=text/xml";
+                // alert(queryStr);
+                oReqData.open("GET", queryStr, true);
+                oReqData.onreadystatechange = function () {
+                    if (oReqData.readyState == 4)
+                        if (oReqData.status == 200) {
+                            // Successful -- rebuild the screen
+                            //refresh station login table
+                            oOverlayContaineroOperatorsLogin.close();
+                            updateTableOperatorsLog();
+                        } else {
+                            // Not Successful -- alert the user
+                            alert("Error: " + oReqData.statusText);
+                        }
+                }
+                oReqData.send();
+            } else {
+                window.alert("Error creating XmlHttpRequest object.");
+            }
+        }
+
+        // ****************************************************************************************************************
+        function doLogOutOperator_kp() {
+            var input_plantID = 268;
+//            var Param1 = escapeSQLString(selected_recordID);
+            var oReqData;
+            if (window.XMLHttpRequest) {
+                oReqData = new XMLHttpRequest();
+            }
+            cc('doLogOutOperator_kp');
+            if (oReqData != null) {
+                var timestamp = new Date().getTime();
+                var paramStr = "Param.1=" + input_plantID + '&Param.2=' + UnitID + '&Param.3=' + parseInt(clockID.substring(7, 11));
+                cc(paramStr);
+                var queryStr = "/XMII/Illuminator?QueryTemplate=MESM/STATIONS_HMI/QUERIES/operatorLogOut_kp&" + paramStr + "&ts=" + timestamp + "&Content-Type=text/xml";
+                cc(queryStr);
+                oReqData.open("GET", queryStr, true);
+                oReqData.onreadystatechange = function () {
+                    if (oReqData.readyState == 4)
+                        if (oReqData.status == 200) {
+                            // Successful -- rebuild the screen
+                            //refresh station login table
+                            updateTableOperatorsLog();
+                        } else {
+                            // Not Successful -- alert the user
+                            alert("Error: " + oReqData.statusText);
+                        }
+                }
+                oReqData.send();
+            } else {
+                window.alert("Error creating XmlHttpRequest object.");
+            }
+        }
+        function doLogOutOperator() {
+            var Param1 = escapeSQLString(selected_recordID);
+            var oReqData;
+            if (window.XMLHttpRequest) {
+                oReqData = new XMLHttpRequest();
+            }
+            if (oReqData != null) {
+                var timestamp = new Date().getTime();
+                var paramStr = "Param.1=" + encodeURIComponent(Param1);
+                // alert(paramStr);
+                var queryStr = "/XMII/Illuminator?QueryTemplate=MESM/STATIONS_HMI/QUERIES/operatorLogOut&" + paramStr + "&ts=" + timestamp + "&Content-Type=text/xml";
+                // alert(queryStr);
+                oReqData.open("GET", queryStr, true);
+                oReqData.onreadystatechange = function () {
+                    if (oReqData.readyState == 4)
+                        if (oReqData.status == 200) {
+                            // Successful -- rebuild the screen
+                            //refresh station login table
+                            updateTableOperatorsLog();
+                        } else {
+                            // Not Successful -- alert the user
+                            alert("Error: " + oReqData.statusText);
+                        }
+                }
+                oReqData.send();
+            } else {
+                window.alert("Error creating XmlHttpRequest object.");
+            }
+        }
 
         // ******************************************************************************************************************************************************************
-
 
         var oButtonDocs = new sap.ui.commons.Button({
             id: 'B-Docs',
@@ -482,11 +941,14 @@
         });
         oButtonDocs.attachPress(loadDocuments);
         oButtonDocs.placeAt('app_menu');
+
         // ******************************************************************************************************************************************************************
+
         function loadDocuments() {
             setTimeout("location.href = '" + "Documents.irpt?ROLE=" + document.getElementById("user_role").value + "&DIR=" + document.getElementById("user_station").value + "'", 0);
             return;
         }
+
         // ******************************************************************************************************************************************************************
         function cc(obj) {
             console.log(obj)
@@ -495,6 +957,7 @@
         var UnitID = '';
         var UnitName = '';
         var OpreationName = '';
+
         function findUnitID() {
             var lineID = null, lineName = null, opID = null, opName = null;
             var url = "/XMII/Illuminator?QueryTemplate=MESM/STATIONS_HMI/QUERIES/get_FloorMapsData" + "&Content-Type=text/xml";
@@ -530,13 +993,6 @@
             }
         }
 
-
-        function loginToggle() {
-
-            alert("login");
-        }
-
-
         var alertBtn = false;
 
         function buttonToggle() {
@@ -549,10 +1005,9 @@
                     showButton(UnitID);
                 }
 
-
-//                document.getElementById('colorButton').style.borderRight = '2px solid #007dc0';
-//                document.getElementById('colorButtonText').style.color = '#007dc0';
-//                document.getElementById("colorButtonText").innerHTML = "Alerts OFF";
+                //                document.getElementById('colorButton').style.borderRight = '2px solid #007dc0';
+                //                document.getElementById('colorButtonText').style.color = '#007dc0';
+                //                document.getElementById("colorButtonText").innerHTML = "Alerts OFF";
             } else {
                 var url = "/XMII/Illuminator?QueryTemplate=MESM/STATIONS_HMI/QUERIES/alertClose&Param.1=" + UnitID + "&Content-Type=text/xml";
                 getData(url, parseJsonParent);
@@ -561,9 +1016,9 @@
                     showButton(UnitID);
                 }
 
-//                document.getElementById('colorButton').style.borderRight = '2px solid #fc071b';
-//                document.getElementById('colorButtonText').style.color = '#fc071b';
-//                document.getElementById("colorButtonText").innerHTML = "Alerts ON";
+                //                document.getElementById('colorButton').style.borderRight = '2px solid #fc071b';
+                //                document.getElementById('colorButtonText').style.color = '#fc071b';
+                //                document.getElementById("colorButtonText").innerHTML = "Alerts ON";
 
             }
 
@@ -585,24 +1040,24 @@
                 winW = window.innerWidth;
                 winH = window.innerHeight;
             }
-//            cc(winW);
-//            cc(winH);
-//            cc((winW - 825) / 2 + 825);
-//            cc('style.left ' + document.getElementById('colorButton').style.left);
+            //            cc(winW);
+            //            cc(winH);
+            //            cc((winW - 825) / 2 + 825);
+            //            cc('style.left ' + document.getElementById('colorButton').style.left);
             //param
             var url = "/XMII/Illuminator?QueryTemplate=MESM/STATIONS_HMI/QUERIES/alertGetUnitStatus&Param.1=" + param + "&Content-Type=text/xml";
             getData(url, parseJsonParent);
             function parseJsonParent(jsondata) {
-//                cc(jsondata[0]['recordID']);
-//                cc(jsondata[0]['processed']);
+                //                cc(jsondata[0]['recordID']);
+                //                cc(jsondata[0]['processed']);
                 if (jsondata[0]['processed'] == '1') {
                     alertBtn = false;
                 } else {
                     alertBtn = true;
                 }
                 if (alertBtn == true) {
-                    var sLeft = (winW - 825) / 2 + 700;
-//                    cc(Math.round(sLeft));
+                    var sLeft = (winW - 825) / 2 + 900;
+                    //                    cc(Math.round(sLeft));
                     document.getElementById('colorButton').style.left = Math.round(sLeft) + 'px';
                     document.getElementById('colorButton').style.borderRight = '2px solid #f7a35c';
                     document.getElementById('colorButtonText').style.color = '#f7a35c';
@@ -610,8 +1065,8 @@
                     document.getElementById("page_title").innerHTML = OpreationName;
 
                 } else {
-                    var sLeft = (winW - 825) / 2 + 700;
-//                    cc(Math.round(sLeft));
+                    var sLeft = (winW - 825) / 2 + 900;
+                    //                    cc(Math.round(sLeft));
                     document.getElementById('colorButton').style.left = Math.round(sLeft) + 'px';
                     document.getElementById('colorButton').style.borderRight = '2px solid #7cb5ec';
                     document.getElementById('colorButtonText').style.color = '#7cb5ec';
@@ -619,10 +1074,7 @@
                     document.getElementById("page_title").innerHTML = OpreationName;
 
                 }
-
             }
-
-
         }
 
         colors: [
@@ -637,8 +1089,66 @@
             '#8d4653',
             '#91e8e1'
         ]
-
+        var clockID = '';
         $(function ($) {
+
+            $.extend($.keyboard.keyaction, {
+
+                login: function (base) {
+                    base.mode = 0; // 0 = radians, 1 = degrees, 2 = grads
+                    // base.$keyboard.find('.ui-keyboard-rad').addClass(base.options.css.buttonAction);
+                    // base.$keyboard.find('.ui-keyboard-deg, .ui-keyboard-grad').removeClass(base.options.css.buttonAction);
+                    // console.log(base.memory2);
+//                    base.memory2 = '';
+                    // console.log('login', base.checkCombos());
+                    // base.originalContent = base.checkCombos();
+                    // console.log('originalContent', base.originalContent);
+                    clockID = 'login_' + base.checkCombos();
+                    cc(clockID);
+                    doLogOperator_kp();
+//                    base.$preview.val(base.checkCombos());
+
+                    base.close(true);
+
+                    // base.$preview.val('login');
+                },
+
+                logout: function (base) {
+                    base.mode = 1; // 0 = radians, 1 = degrees, 2 = grads
+                    // base.$keyboard.find('.ui-keyboard-deg').addClass(base.options.css.buttonAction);
+                    // base.$keyboard.find('.ui-keyboard-rad, .ui-keyboard-grad').removeClass(base.options.css.buttonAction);
+                    // cc(base.memory2);
+//                    base.memory2 = '';
+//                    base.$preview.val(base.checkCombos());
+                    clockID = 'logout_' + base.checkCombos();
+                    cc(clockID);
+                    doLogOutOperator_kp();
+                    base.close(true);
+
+                },
+
+
+                // Process multi-parameter math functions
+                // ***************************
+                equals: function (base) {
+                    base.$preview.val(function (i, v) {
+                        var fx = base.memory2 || '';
+                        if (fx === '') {
+                            return eval(v);
+                        }
+                        if (fx[0] === 'yroot') {
+                            return Math.pow($.trim(fx[1]), 1 / $.trim(v));
+                        }
+                        if (fx[0] === 'xy') {
+                            return Math.pow($.trim(fx[1]), $.trim(v));
+                        }
+                    });
+                    base.memory2 = '';
+                }
+
+            });
+
+
             $('.hiddenInput').click(function () {
                 $('#hidden').data('keyboard').reveal();
                 return false;
@@ -653,55 +1163,34 @@
 //            });
             $('#hidden').keyboard({
                 layout: 'custom',
+                display: {
+
+                    'login': 'Login:login', // Login
+                    'logout': 'Logout:logout', // Logout
+                },
                 customLayout: {
-                    'normal': [
+                    'default': [
                         '9 8 7 6 5',
                         '4 3 2 1 0',
                         'A B C {bksp}',
-                        '{accept} {a}'
+                        '{login} {logout}'
+                    ],
+                    'meta1': [
+                        '9 8 7 6 5',
+                        '4 3 2 1 0',
+                        'A B C {bksp}',
+                        '{login} {logout}'
                     ]
                 },
                 position: {
                     of: $('.hiddenInput'),
                     my: 'center top',
                     at: 'center top'
-                },
-                maxLength: 5,
-                validate: function (keyboard, value, isClosing) {
-                    // only make valid if input is 6 characters in length
-                    return value.length === 5;
-                },
-//                restrictInput: true, // Prevent keys not in the displayed keyboard from being typed in
-//                preventPaste: true,  // prevent ctrl-v and right click
-//                autoAccept: true
+                }
             });
 
         });
 
-        //        $('#IDpad').keyboard({
-        //            layout: 'custom',
-        //            customLayout: {
-        //                'normal': [
-        //                    '9 8 7 6 5',
-        //                    '4 3 2 1 0',
-        //                    'A B C {bksp}',
-        //                    ' {c} {accept}'
-        //                ]
-        //            },
-        //            maxLength: 6,
-        //            restrictInput: true, // Prevent keys not in the displayed keyboard from being typed in
-        //            // include lower case characters (added v1.25.7)
-        ////            restrictInclude : 'a b c d e f',
-        //            useCombos: false, // don't want A+E to become a ligature
-        //            acceptValid: true,
-        //            validate: function (keyboard, value, isClosing) {
-        //                // only make valid if input is 6 characters in length
-        //                return value.length === 6;
-        //            },
-        ////            restrictInput: true, // Prevent keys not in the displayed keyboard from being typed in
-        //            preventPaste: true,  // prevent ctrl-v and right click
-        //            autoAccept: true
-        //        });
     </script>
 </head>
 
@@ -714,47 +1203,27 @@
 <input id="user_address" type="hidden" value="{Machine}" style="display:block;width:1000px;" readonly/>
 <input id="user_firstname" type="hidden" value="{firstname}" style="display:block;width:800px;" readonly/>
 <input id="user_lastname" type="hidden" value="{lastname}" style="display:block;width:800px;" readonly/>
+
 <div id="app_header">
     <div id="app_title">STATION STATUS</div>
     <div id="app_menu"></div>
     <div id="page_title">DEFAULT ROLE</div>
 </div>
 
-
-<div id="login_content" style="width:842px;margin:auto;">
-
-    <div id="cont3" class="container-stats">
-        <div id="Tile03" class="tile-stats">
-            <h3>Operator :</h3>
-            <div class="count">STEVEN SMITH</div>
-        </div>
-    </div>
-    <div id="cont4" class="container-stats">
-        <div id="Tile04" class="tile-stats">
-            <h3>&nbsp;</h3>
-            <h3>&nbsp;</h3>
-            <h3>Loged Time :</h3>
-            <p>2016-02-14 13:45:46.390</p>
-        </div>
-    </div>
-
-</div>
-
-
-<div id="login_form" style="width:842px;margin:auto;"></div>
-
-<a id="colorButton" class="colorButton" onclick="buttonToggle()" href="javascript:void(0);"><i id="colorButtonText"></i></a>
-
-<a id="loginButton" class="loginButton" onclick="loginToggle()" href="javascript:void(0);"><i id="loginButtonText"></i></a>
-
+<div id="mesm_content" style="width:1000px;margin:auto;"></div>
 
 <div class="block">
     <a class="hiddenInput">
-        <div id="mesm_content" style="width:1000px;margin:auto;"></div>
+        <div id="login_form" style="width:842px;margin:auto;"></div>
     </a>
 
     <input id="hidden" type="text" style="width:250px;display:none;">
 
 </div>
+
+
+<!--<div id="login_form" style="width:1000px;margin:auto;"></div>-->
+<a id="colorButton" class="colorButton" onclick="buttonToggle()" href="javascript:void(0);"><i id="colorButtonText"></i></a>
+
 </body>
 </html>

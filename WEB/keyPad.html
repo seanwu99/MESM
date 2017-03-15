@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+
+    <title>Virtual Keyboard Basic Scientific Calculator Demo</title>
+    <script id="sap-ui-bootstrap"
+            src="https://sapui5.netweaver.ondemand.com/resources/sap-ui-core.js"
+            data-sap-ui-theme="sap_bluecrystal"
+            data-sap-ui-language="en">
+    </script>
+
+    <link href="mottie\keyboard.css" rel="stylesheet">
+    <script src="mottie\jquery.keyboard.js"></script>
+    <!--<link href="keyPad.css" rel="stylesheet"/>-->
+    <script src="mottie\keyPad.js"></script>
+
+    <script>
+        $(function ($) {
+            $('.hiddenInput').click(function () {
+                $('#hidden').data('keyboard').reveal();
+                return false;
+            });
+//            $('#hidden').keyboard({
+//                layout: 'num',
+//                position: {
+//                    of: $('.hiddenInput'),
+//                    my: 'center top',
+//                    at: 'center top'
+//                }
+//            });
+            $('#hidden').keyboard({
+                layout: 'custom',
+                customLayout: {
+                    'normal': [
+                        '9 8 7 6 5',
+                        '4 3 2 1 0',
+                        'A B C {bksp}',
+                        '{accept} {a}'
+                    ]
+                },
+                position: {
+                    of: $('.hiddenInput'),
+                    my: 'center top',
+                    at: 'center top'
+                },
+                maxLength: 5,
+                validate: function (keyboard, value, isClosing) {
+                    // only make valid if input is 6 characters in length
+                    return value.length === 5;
+                },
+//                restrictInput: true, // Prevent keys not in the displayed keyboard from being typed in
+//                preventPaste: true,  // prevent ctrl-v and right click
+//                autoAccept: true
+            });
+
+        });
+    </script>
+</head>
+
+<body>
+
+
+<!--<input id="keyPad" type="text"/>-->
+
+
+<a class="hiddenInput">ABC</a>
+
+<input id="hidden" type="text" style="width:250px;display:none;">
+
+<!--<input id="keyPad" type="text" style="width:100px;">-->
+<!--<input id="calc" type="text"/>-->
+
+<!--<input id="keyPadText" type="text" style="width:100px;display:none;">-->
+
+</body>
+</html>
