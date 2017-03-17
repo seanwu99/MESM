@@ -504,7 +504,7 @@
             text: 'SUBMIT',
             enabled: true
         });
-        oButtonOperatorsOpenLog.attachPress(doOpenLogIN);
+        //        oButtonOperatorsOpenLog.attachPress(doOpenLogIN);
 
         function createTableOperatorsLog() {
             // Bind the table rows to this model
@@ -700,7 +700,7 @@
             text: 'SUBMIT',
             enabled: true
         });
-        oButtonOperatorsLogin.attachPress(doLogOperator);
+        //        oButtonOperatorsLogin.attachPress(doLogOperator);
 
         oMatrixLO.createRow(oButtonOperatorsLogin);
 
@@ -710,19 +710,19 @@
         oOverlayContaineroOperatorsLogin.addContent(oMatrixLO);
 
 
-        function doOpenLogIN() {
-            // alert(selected_recordID);
-            if (selected_recordID == 0) {
-                if (!oOverlayContaineroOperatorsLogin.isOpen()) {
-                    updateShift();
-                    oCore.byId("input_clid").setValue("");
-                    oOverlayContaineroOperatorsLogin.open();
-                }
-            }
-            else {
-                doLogOutOperator();
-            }
-        }
+        //        function doOpenLogIN() {
+        //            // alert(selected_recordID);
+        //            if (selected_recordID == 0) {
+        //                if (!oOverlayContaineroOperatorsLogin.isOpen()) {
+        //                    updateShift();
+        //                    oCore.byId("input_clid").setValue("");
+        //                    oOverlayContaineroOperatorsLogin.open();
+        //                }
+        //            }
+        //            else {
+        //                doLogOutOperator();
+        //            }
+        //        }
         function idParser(str) {
             var id = "";
             var shift = 0;
@@ -740,11 +740,14 @@
             }
             return '' + shift + '' + id;
         }
+
         // ****************************************************************************************************************
-        function doLogOperator_kp() {
+        function doLogOperator() {
+            cc(document.getElementById('hidden').value);
+//            document.getElementById('textbox_id').value
             var _clockID = (idParser(clockID));
             // retrieve values
-            var input_plantID = 268;
+            var input_plantID = plantID;//268;
             var input_unitID = UnitID;
             var input_operatorCLID = parseInt(_clockID.substring(1));// $('#input_clid').val()
             var input_operatorShiftRecID = _clockID.substring(0, 1);//  oCore.byId("ShiftBox").getSelectedKey();
@@ -760,60 +763,8 @@
 //            } else if (clockID.substring(10, 11) == 'C') {
 //                input_operatorShiftRecID = 3;
 //            }
-//            if (input_operatorShiftRecID == 0) {
-////                alert("Please Select Shift ID ..");
-//                return;
-//            }
-            // all good. Try to write them ..
-            var Param1 = escapeSQLString(input_plantID);
-            var Param2 = escapeSQLString(input_operatorShiftRecID);
-            var Param3 = escapeSQLString(input_operatorCLID);
-            var Param4 = escapeSQLString(input_unitID);
-
-            var oReqData;
-            if (window.XMLHttpRequest) {
-                oReqData = new XMLHttpRequest();
-            }
-            if (oReqData != null) {
-                var timestamp = new Date().getTime();
-                var paramStr = "Param.1=" + encodeURIComponent(Param1) + "&Param.2=" + encodeURIComponent(Param2) + "&Param.3=" + encodeURIComponent(Param3) + "&Param.4=" + encodeURIComponent(Param4);
-                // alert(paramStr);
-                var queryStr = "/XMII/Illuminator?QueryTemplate=MESM/STATIONS_HMI/QUERIES/operatorLogIn&" + paramStr + "&ts=" + timestamp + "&Content-Type=text/xml";
-                // alert(queryStr);
-                oReqData.open("GET", queryStr, true);
-                oReqData.onreadystatechange = function () {
-                    if (oReqData.readyState == 4)
-                        if (oReqData.status == 200) {
-                            // Successful -- rebuild the screen
-                            //refresh station login table
-                            oOverlayContaineroOperatorsLogin.close();
-                            updateTableOperatorsLog();
-                        } else {
-                            // Not Successful -- alert the user
-                            alert("Error: " + oReqData.statusText);
-                        }
-                }
-                oReqData.send();
-            } else {
-                window.alert("Error creating XmlHttpRequest object.");
-            }
-        }
-
-        function doLogOperator() {
-            // retrieve values
-            var input_plantID = 268;
-            var input_unitID = UnitID;
-            //	var input_operatorCLID = oCore.byId("input_clid").getValue();
-            var input_operatorCLID = $('#input_clid').val()
-            var input_operatorShiftRecID = oCore.byId("ShiftBox").getSelectedKey();
-            if (input_operatorCLID == "") {
-                alert("Please Input Operator CLOCK ID ..");
-                oCore.byId("input_clid").focus();
-                return;
-            }
-
             if (input_operatorShiftRecID == 0) {
-                alert("Please Select Shift ID ..");
+//                alert("Please Select Shift ID ..");
                 return;
             }
             // all good. Try to write them ..
@@ -850,11 +801,63 @@
                 window.alert("Error creating XmlHttpRequest object.");
             }
         }
+
+        //        function doLogOperator() {
+        //            // retrieve values
+        //            var input_plantID = 268;
+        //            var input_unitID = UnitID;
+        //            //	var input_operatorCLID = oCore.byId("input_clid").getValue();
+        //            var input_operatorCLID = $('#input_clid').val()
+        //            var input_operatorShiftRecID = oCore.byId("ShiftBox").getSelectedKey();
+        //            if (input_operatorCLID == "") {
+        //                alert("Please Input Operator CLOCK ID ..");
+        //                oCore.byId("input_clid").focus();
+        //                return;
+        //            }
+        //
+        //            if (input_operatorShiftRecID == 0) {
+        //                alert("Please Select Shift ID ..");
+        //                return;
+        //            }
+        //            // all good. Try to write them ..
+        //            var Param1 = escapeSQLString(input_plantID);
+        //            var Param2 = escapeSQLString(input_operatorShiftRecID);
+        //            var Param3 = escapeSQLString(input_operatorCLID);
+        //            var Param4 = escapeSQLString(input_unitID);
+        //
+        //            var oReqData;
+        //            if (window.XMLHttpRequest) {
+        //                oReqData = new XMLHttpRequest();
+        //            }
+        //            if (oReqData != null) {
+        //                var timestamp = new Date().getTime();
+        //                var paramStr = "Param.1=" + encodeURIComponent(Param1) + "&Param.2=" + encodeURIComponent(Param2) + "&Param.3=" + encodeURIComponent(Param3) + "&Param.4=" + encodeURIComponent(Param4);
+        //                // alert(paramStr);
+        //                var queryStr = "/XMII/Illuminator?QueryTemplate=MESM/STATIONS_HMI/QUERIES/operatorLogIn&" + paramStr + "&ts=" + timestamp + "&Content-Type=text/xml";
+        //                // alert(queryStr);
+        //                oReqData.open("GET", queryStr, true);
+        //                oReqData.onreadystatechange = function () {
+        //                    if (oReqData.readyState == 4)
+        //                        if (oReqData.status == 200) {
+        //                            // Successful -- rebuild the screen
+        //                            //refresh station login table
+        //                            oOverlayContaineroOperatorsLogin.close();
+        //                            updateTableOperatorsLog();
+        //                        } else {
+        //                            // Not Successful -- alert the user
+        //                            alert("Error: " + oReqData.statusText);
+        //                        }
+        //                }
+        //                oReqData.send();
+        //            } else {
+        //                window.alert("Error creating XmlHttpRequest object.");
+        //            }
+        //        }
 
         // ****************************************************************************************************************
-        function doLogOutOperator_kp() {
+        function doLogOutOperator() {
             var _clockID = idParser(clockID);
-            var input_plantID = 268;
+            var input_plantID = plantID;//268;
 //            var Param1 = escapeSQLString(selected_recordID);
             var oReqData;
             if (window.XMLHttpRequest) {
@@ -885,35 +888,35 @@
             }
         }
 
-        function doLogOutOperator() {
-            var Param1 = escapeSQLString(selected_recordID);
-            var oReqData;
-            if (window.XMLHttpRequest) {
-                oReqData = new XMLHttpRequest();
-            }
-            if (oReqData != null) {
-                var timestamp = new Date().getTime();
-                var paramStr = "Param.1=" + encodeURIComponent(Param1);
-                // alert(paramStr);
-                var queryStr = "/XMII/Illuminator?QueryTemplate=MESM/STATIONS_HMI/QUERIES/operatorLogOut&" + paramStr + "&ts=" + timestamp + "&Content-Type=text/xml";
-                // alert(queryStr);
-                oReqData.open("GET", queryStr, true);
-                oReqData.onreadystatechange = function () {
-                    if (oReqData.readyState == 4)
-                        if (oReqData.status == 200) {
-                            // Successful -- rebuild the screen
-                            //refresh station login table
-                            updateTableOperatorsLog();
-                        } else {
-                            // Not Successful -- alert the user
-                            alert("Error: " + oReqData.statusText);
-                        }
-                }
-                oReqData.send();
-            } else {
-                window.alert("Error creating XmlHttpRequest object.");
-            }
-        }
+        //        function doLogOutOperator() {
+        //            var Param1 = escapeSQLString(selected_recordID);
+        //            var oReqData;
+        //            if (window.XMLHttpRequest) {
+        //                oReqData = new XMLHttpRequest();
+        //            }
+        //            if (oReqData != null) {
+        //                var timestamp = new Date().getTime();
+        //                var paramStr = "Param.1=" + encodeURIComponent(Param1);
+        //                // alert(paramStr);
+        //                var queryStr = "/XMII/Illuminator?QueryTemplate=MESM/STATIONS_HMI/QUERIES/operatorLogOut&" + paramStr + "&ts=" + timestamp + "&Content-Type=text/xml";
+        //                // alert(queryStr);
+        //                oReqData.open("GET", queryStr, true);
+        //                oReqData.onreadystatechange = function () {
+        //                    if (oReqData.readyState == 4)
+        //                        if (oReqData.status == 200) {
+        //                            // Successful -- rebuild the screen
+        //                            //refresh station login table
+        //                            updateTableOperatorsLog();
+        //                        } else {
+        //                            // Not Successful -- alert the user
+        //                            alert("Error: " + oReqData.statusText);
+        //                        }
+        //                }
+        //                oReqData.send();
+        //            } else {
+        //                window.alert("Error creating XmlHttpRequest object.");
+        //            }
+        //        }
 
         // ******************************************************************************************************************************************************************
 
@@ -938,8 +941,13 @@
         }
 
         var UnitID = '';
+        var plantID = '';
         var UnitName = '';
         var OpreationName = '';
+        var FloorMapsData_recordID = [];
+        var FloorMapsData_unitType = [];
+        var FloorMapsData_unitName = [];
+        var FloorMapsData_idUnitParent = [];
 
         function findUnitID() {
             var lineID = null, lineName = null, opID = null, opName = null;
@@ -952,6 +960,11 @@
 
                 //selectedSTATION
                 for (var i = 0; i < jsondata.length; i++) {
+                    FloorMapsData_recordID.push(jsondata[i]['recordID']);
+                    FloorMapsData_unitType.push(jsondata[i]['unitType']);
+                    FloorMapsData_unitName.push(jsondata[i]['unitName']);
+                    FloorMapsData_idUnitParent.push(jsondata[i]['idUnitParent']);
+
                     if (selectedSTATION.indexOf(jsondata[i]['unitName']) == 0) {
                         lineID = jsondata[i]['recordID'];
                         lineName = jsondata[i]['unitName'];
@@ -970,12 +983,45 @@
                 if (lineName != null && opName != null) {
                     cc(lineID + '/' + lineName + ' // ' + opID + '/' + opName);
                     UnitID = opID;
+                    getPlantID(UnitID);
                     UnitName = lineName;
                     OpreationName = opName;
                     showButton(UnitID);
                 } else {
                     cc('noMatch')
                 }
+            }
+        }
+
+        function getPlantID(_UnitID) {
+            var _recordID = _UnitID;
+            var _plantID = '';
+            var _idUnitParent = '';
+            var _unitType = '';
+            $.each(FloorMapsData_recordID, function (i, _FloorMapsData_recordID) {
+                if (_recordID == _FloorMapsData_recordID) {
+                    _idUnitParent = FloorMapsData_idUnitParent[i];
+//                    _unitType = FloorMapsData_unitType[i];
+                    return false;
+                }
+
+            });
+            cc(_recordID + " => " + _idUnitParent);
+            $.each(FloorMapsData_recordID, function (i, _FloorMapsData_recordID) {
+                if (_FloorMapsData_recordID == _idUnitParent) {
+                    _plantID = _FloorMapsData_recordID;
+                    _unitType = FloorMapsData_unitType[i];
+                    _idUnitParent = FloorMapsData_idUnitParent[i];
+                    return false;
+                }
+            });
+//            cc(_plantID + " => " + _idUnitParent);
+            if (_unitType == 3) {
+                plantID = _plantID;
+                cc('plantID  => ' + plantID);
+            } else {
+                cc(_plantID + " => " + _idUnitParent);
+                getPlantID(_plantID);
             }
         }
 
@@ -1083,7 +1129,7 @@
                     base.mode = 0; // 0 = login, 1 = logout
                     clockID = 'login_' + base.checkCombos();
 //                    cc(clockID);
-                    doLogOperator_kp();
+                    doLogOperator();
 //                    base.$preview.val(base.checkCombos());
                     base.close(true);
 
@@ -1094,7 +1140,7 @@
                     base.mode = 1; // 0 = login, 1 = logout
                     clockID = 'logout_' + base.checkCombos();
 //                    cc(clockID);
-                    doLogOutOperator_kp();
+                    doLogOutOperator();
                     base.close(true);
 
                 }
