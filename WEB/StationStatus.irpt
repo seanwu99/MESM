@@ -387,7 +387,7 @@
 
         var selectedSTATION = 0;
         var selectedSTATION_TXT = "";
-
+        var clockID = '';
         // ****************************************************************************************************************************************************
         function roleSecurity() {
             var myRoles = document.getElementById("user_roles").value;
@@ -396,7 +396,50 @@
             if (myRoles.indexOf(role2Access) < 0) {
                 window.location.assign("security.irpt");
             } else {
-
+                $.extend($.keyboard.keyaction, {
+                    login: function (base) {
+                        base.mode = 0; // 0 = login, 1 = logout
+                        clockID = 'login_' + base.checkCombos();
+                        doLogOperator();
+                        base.close(true);
+                    },
+                    logout: function (base) {
+                        base.mode = 1; // 0 = login, 1 = logout
+                        clockID = 'logout_' + base.checkCombos();
+                        doLogOutOperator();
+                        base.close(true);
+                    }
+                });
+                $('.hiddenInput').click(function () {
+                    $('#hidden').data('keyboard').reveal();
+                    return false;
+                });
+                $('#hidden').keyboard({
+                    layout: 'custom',
+                    display: {
+                        'login': 'Login:login', // Login
+                        'logout': 'Logout:logout', // Logout
+                    },
+                    customLayout: {
+                        'default': [
+                            '9 8 7 6 5',
+                            '4 3 2 1 0',
+                            'A B C {bksp}',
+                            '{login} {logout}'
+                        ],
+//                    'meta1': [
+//                        '9 8 7 6 5',
+//                        '4 3 2 1 0',
+//                        'A B C {bksp}',
+//                        '{login} {logout}'
+//                    ]
+                    },
+                    position: {
+                        of: $('.hiddenInput'),
+                        my: 'center top',
+                        at: 'center top'
+                    }
+                });
                 var roleString = document.getElementById("user_role").value;
                 var roleArray = roleString.split("_");
                 level2Access = roleArray[0];
@@ -1121,65 +1164,65 @@
             '#8d4653',
             '#91e8e1'
         ]
-        var clockID = '';
-        $(function ($) {
-            $.extend($.keyboard.keyaction, {
 
-                login: function (base) {
-                    base.mode = 0; // 0 = login, 1 = logout
-                    clockID = 'login_' + base.checkCombos();
-//                    cc(clockID);
-                    doLogOperator();
-//                    base.$preview.val(base.checkCombos());
-                    base.close(true);
-
-                    // base.$preview.val('login');
-                },
-
-                logout: function (base) {
-                    base.mode = 1; // 0 = login, 1 = logout
-                    clockID = 'logout_' + base.checkCombos();
-//                    cc(clockID);
-                    doLogOutOperator();
-                    base.close(true);
-
-                }
-            });
-
-
-            $('.hiddenInput').click(function () {
-                $('#hidden').data('keyboard').reveal();
-                return false;
-            });
-            $('#hidden').keyboard({
-                layout: 'custom',
-                display: {
-
-                    'login': 'Login:login', // Login
-                    'logout': 'Logout:logout', // Logout
-                },
-                customLayout: {
-                    'default': [
-                        '9 8 7 6 5',
-                        '4 3 2 1 0',
-                        'A B C {bksp}',
-                        '{login} {logout}'
-                    ],
-//                    'meta1': [
-//                        '9 8 7 6 5',
-//                        '4 3 2 1 0',
-//                        'A B C {bksp}',
-//                        '{login} {logout}'
-//                    ]
-                },
-                position: {
-                    of: $('.hiddenInput'),
-                    my: 'center top',
-                    at: 'center top'
-                }
-            });
-
-        });
+        //        $(function ($) {
+        //            $.extend($.keyboard.keyaction, {
+        //
+        //                login: function (base) {
+        //                    base.mode = 0; // 0 = login, 1 = logout
+        //                    clockID = 'login_' + base.checkCombos();
+        ////                    cc(clockID);
+        //                    doLogOperator();
+        ////                    base.$preview.val(base.checkCombos());
+        //                    base.close(true);
+        //
+        //                    // base.$preview.val('login');
+        //                },
+        //
+        //                logout: function (base) {
+        //                    base.mode = 1; // 0 = login, 1 = logout
+        //                    clockID = 'logout_' + base.checkCombos();
+        ////                    cc(clockID);
+        //                    doLogOutOperator();
+        //                    base.close(true);
+        //
+        //                }
+        //            });
+        //
+        //
+        //            $('.hiddenInput').click(function () {
+        //                $('#hidden').data('keyboard').reveal();
+        //                return false;
+        //            });
+        //            $('#hidden').keyboard({
+        //                layout: 'custom',
+        //                display: {
+        //
+        //                    'login': 'Login:login', // Login
+        //                    'logout': 'Logout:logout', // Logout
+        //                },
+        //                customLayout: {
+        //                    'default': [
+        //                        '9 8 7 6 5',
+        //                        '4 3 2 1 0',
+        //                        'A B C {bksp}',
+        //                        '{login} {logout}'
+        //                    ],
+        ////                    'meta1': [
+        ////                        '9 8 7 6 5',
+        ////                        '4 3 2 1 0',
+        ////                        'A B C {bksp}',
+        ////                        '{login} {logout}'
+        ////                    ]
+        //                },
+        //                position: {
+        //                    of: $('.hiddenInput'),
+        //                    my: 'center top',
+        //                    at: 'center top'
+        //                }
+        //            });
+        //
+        //        });
 
     </script>
 </head>
