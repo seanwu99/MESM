@@ -422,9 +422,9 @@
                     },
                     customLayout: {
                         'default': [
-                            '9 8 7 6 5',
-                            '4 3 2 1 0',
-                            'A B C {bksp}',
+                            '9 8 7 6',
+                            '5 4 3 2',
+                            '1 0 {bksp}',
                             '{login} {logout}'
                         ],
 //                    'meta1': [
@@ -806,10 +806,10 @@
 //            } else if (clockID.substring(10, 11) == 'C') {
 //                input_operatorShiftRecID = 3;
 //            }
-            if (input_operatorShiftRecID == 0) {
-//                alert("Please Select Shift ID ..");
-                return;
-            }
+//            if (input_operatorShiftRecID == 0) {
+////                alert("Please Select Shift ID ..");
+//                return;
+//            }
             // all good. Try to write them ..
             var Param1 = escapeSQLString(input_plantID);
             var Param2 = escapeSQLString(input_operatorShiftRecID);
@@ -822,8 +822,10 @@
             }
             if (oReqData != null) {
                 var timestamp = new Date().getTime();
-                var paramStr = "Param.1=" + encodeURIComponent(Param1) + "&Param.2=" + encodeURIComponent(Param2) + "&Param.3=" + encodeURIComponent(Param3) + "&Param.4=" + encodeURIComponent(Param4);
+//                var paramStr = "Param.1=" + encodeURIComponent(Param1) + "&Param.2=" + encodeURIComponent(Param2) + "&Param.3=" + encodeURIComponent(Param3) + "&Param.4=" + encodeURIComponent(Param4);
+                var paramStr = "Param.1=" + encodeURIComponent(Param1) + "&Param.2=" + encodeURIComponent(Param3) + "&Param.3=" + encodeURIComponent(Param4) ;
                 // alert(paramStr);
+//                var queryStr = "/XMII/Illuminator?QueryTemplate=MESM/STATIONS_HMI/QUERIES/operatorLogIn&" + paramStr + "&ts=" + timestamp + "&Content-Type=text/xml";
                 var queryStr = "/XMII/Illuminator?QueryTemplate=MESM/STATIONS_HMI/QUERIES/operatorLogIn&" + paramStr + "&ts=" + timestamp + "&Content-Type=text/xml";
                 // alert(queryStr);
                 oReqData.open("GET", queryStr, true);
