@@ -1133,7 +1133,7 @@
                     alertBtn = true;
                 }
                 if (alertBtn == true) {
-                    var sLeft = (winW - 825) / 2 + 900;
+                    var sLeft = (winW - 825) / 2 + 700;
                     //                    cc(Math.round(sLeft));
                     document.getElementById('colorButton').style.left = Math.round(sLeft) + 'px';
                     document.getElementById('colorButton').style.borderRight = '2px solid #f7a35c';
@@ -1142,7 +1142,7 @@
                     document.getElementById("page_title").innerHTML = OpreationName;
 
                 } else {
-                    var sLeft = (winW - 825) / 2 + 900;
+                    var sLeft = (winW - 825) / 2 + 700;
                     //                    cc(Math.round(sLeft));
                     document.getElementById('colorButton').style.left = Math.round(sLeft) + 'px';
                     document.getElementById('colorButton').style.borderRight = '2px solid #7cb5ec';
